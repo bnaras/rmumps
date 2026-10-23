@@ -1,0 +1,3 @@
+useDynLib(rmumpsclient, .registration = TRUE, .fixes = "C_")
+importFrom(Rcpp, evalCpp)
+importFrom(rmumps, Rmumps)

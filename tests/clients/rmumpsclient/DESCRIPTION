@@ -1,0 +1,10 @@
+Package: rmumpsclient
+Type: Package
+Title: Test Client of the 'rmumps' C and C++ Interfaces
+Version: 0.0.1
+Authors@R: person("rmumps", "authors", role = c("aut", "cre"), email = "noreply@example.org")
+Description: Exercises every way another package links to 'rmumps'. Not for release.
+License: GPL (>= 2)
+Imports: Rcpp, rmumps
+LinkingTo: Rcpp, rmumps
+NeedsCompilation: yes

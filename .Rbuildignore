@@ -8,3 +8,8 @@ scotch-v7\.*
 ^.*\.patch.*$
 ^.*/MUMPS_5.3.5/.*$
 tar\.gz$
+^upstream$
+^tools$
+^PLAN-mumps-update\.md$
+^CLAUDE\.md$
+^tests/clients$
