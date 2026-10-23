@@ -4,7 +4,6 @@
 \alias{Rcpp_Rmumps-class}
 \alias{Rmumps}
 \alias{solve.Rcpp_Rmumps}
-\alias{solvet}
 \alias{solvet.Rcpp_Rmumps}
 \alias{determinant.Rcpp_Rmumps}
 \alias{dim.Rcpp_Rmumps}
