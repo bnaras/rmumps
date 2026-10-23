@@ -1,6 +1,42 @@
 Log changes in rmumps package
 =============================
 
+Version 5.2.1-44
+----------------
+
+* 2026-10-23
+ - new C interface for other packages, <rmumps/rmumps_api.h>: registered
+   entry points named after the DMUMPS_STRUC_C layout
+   (rmumps_dmumps_c_safe_abi1, rmumps_dmumps_c_abi1) plus metadata
+   (rmumps_api_version, rmumps_mumps_version, rmumps_orderings_available).
+   The "safe" entry point never longjmps: R errors and interrupts raised
+   inside MUMPS are returned as codes with a message, and the failed
+   instance is marked (INFO(1) = -99999). The "dmumps_c" callable is kept.
+ - MUMPS C headers are also installed under include/rmumps/; the top-level
+   ones are kept for compatibility (they will go with MUMPS 5.9.x)
+ - new pointer interface functions Rmumps__xptr(), Rmumps__symbolic(),
+   Rmumps__numeric(), Rmumps__solvetptr(), Rmumps__set/get_icntl(),
+   Rmumps__set/get_cntl(), Rmumps__get_infos(), Rmumps__det(),
+   Rmumps__log2det(), Rmumps__get_sym_perm(), Rmumps__get_uns_perm(),
+   Rmumps__set_perm_in(), Rmumps__mumps_version() (also callable from C++)
+ - entry points are registered through Rcpp (no dynamic symbol lookup)
+ - fixed undefined behavior: errors raised in the bundled C libraries threw
+   C++ exceptions through Fortran code; all MUMPS calls now go through the
+   error boundary above and give ordinary R errors
+ - error messages describe the MUMPS INFO(1) code; positive INFO(1) values
+   (MUMPS warnings) are now R warnings instead of errors
+ - get_icntl(), get_cntl() and get_infos() return the full MUMPS vectors
+   (ICNTL 60, CNTL 15, INFO/INFOG 80, RINFO/RINFOG 40); set_icntl(),
+   set_cntl() and set_keep() accept all positions and reject invalid ones
+ - RMUMPS_PERM_SCOTCH gives a warning and uses RMUMPS_PERM_AUTO
+ - PORD ordering no longer fails on a 1 x 1 matrix
+ - determinant() method fixed (it failed) and returns a "det" object
+ - solvet() is exported
+ - set_perm_in() keeps its own copy of the permutation
+ - no deprecated Matrix coercions; out-of-core files go to tempdir()
+ - rmumps.h no longer does 'using namespace Rcpp' and no longer includes
+   rcpp_errwarn.h
+
 Version 5.2.1-43
 ----------------
 
