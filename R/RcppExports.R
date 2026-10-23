@@ -2,7 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .get_cnst <- function(s) {
-    .Call('_rmumps_get_cnst', s)
+    .Call(`_rmumps_get_cnst`, s)
 }
 
 #' Solve via Pointer
@@ -16,7 +16,7 @@
 #' @param nrhs integer, number of rhs to solve.
 #' @export
 Rmumps__solveptr <- function(pobj, pb, lrhs, nrhs) {
-    invisible(.Call('_rmumps_Rmumps__solveptr', pobj, pb, lrhs, nrhs))
+    invisible(.Call(`_rmumps_Rmumps__solveptr`, pobj, pb, lrhs, nrhs))
 }
 
 #' Construct via Triplet Pointers
@@ -33,7 +33,7 @@ Rmumps__solveptr <- function(pobj, pb, lrhs, nrhs) {
 #' @return pointer of type XPtr<Rmumps> pointing to newly created object. To avoid memory leakage, it is user's responsibility to call \code{Rmumps__del_ptr(pm)} in a due moment (where \code{pm} is the returned pointer).
 #' @export
 Rmumps__ptr_ijv <- function(pi, pj, pa, n, nz, sym) {
-    .Call('_rmumps_Rmumps__ptr_ijv', pi, pj, pa, n, nz, sym)
+    .Call(`_rmumps_Rmumps__ptr_ijv`, pi, pj, pa, n, nz, sym)
 }
 
 #' Delete via Pointer
@@ -44,7 +44,7 @@ Rmumps__ptr_ijv <- function(pi, pj, pa, n, nz, sym) {
 #' @param pm pointer of type XPtr<Rmumps>, object to be deleted
 #' @export
 Rmumps__del_ptr <- function(pm) {
-    invisible(.Call('_rmumps_Rmumps__del_ptr', pm))
+    invisible(.Call(`_rmumps_Rmumps__del_ptr`, pm))
 }
 
 #' Explore via Triplet
@@ -56,7 +56,7 @@ Rmumps__del_ptr <- function(pm) {
 #' @return a list with sparse triplet described with fields i, j, v
 #' @export
 Rmumps__triplet <- function(pm) {
-    .Call('_rmumps_Rmumps__triplet', pm)
+    .Call(`_rmumps_Rmumps__triplet`, pm)
 }
 
 #' Set Matrix via Pointer
@@ -68,7 +68,7 @@ Rmumps__triplet <- function(pm) {
 #' @param pa pointer of type XPtr<double>, value vector from sparse triplet providing a new matrix. Structure of the new matrix must be identical to the old one. That's why there is no need to provide i and j for the new triplet.
 #' @export
 Rmumps__set_mat_ptr <- function(pm, pa) {
-    invisible(.Call('_rmumps_Rmumps__set_mat_ptr', pm, pa))
+    invisible(.Call(`_rmumps_Rmumps__set_mat_ptr`, pm, pa))
 }
 
 #' Set Permutation Parameter
@@ -80,7 +80,7 @@ Rmumps__set_mat_ptr <- function(pm, pa) {
 #' @param permutation integer one of predefined constants (cf. \code{\link{RMUMPS_PERM}}). Setting a new permutation invalidates current symbolic and numeric matrix decompositions.
 #' @export
 Rmumps__set_permutation <- function(pm, permutation) {
-    invisible(.Call('_rmumps_Rmumps__set_permutation', pm, permutation))
+    invisible(.Call(`_rmumps_Rmumps__set_permutation`, pm, permutation))
 }
 
 #' Get Permutation Parameter
@@ -92,10 +92,114 @@ Rmumps__set_permutation <- function(pm, permutation) {
 #' @return integer defining permutation method used before matrix decomposition.
 #' @export
 Rmumps__get_permutation <- function(pm) {
-    .Call('_rmumps_Rmumps__get_permutation', pm)
+    .Call(`_rmumps_Rmumps__get_permutation`, pm)
+}
+
+#' Pointer Interface to Rmumps Methods
+#'
+#' C wrappers to methods of the \code{Rmumps} class, for objects held as
+#' pointers (e.g. created with \code{\link{Rmumps__ptr_ijv}} or obtained with
+#' \code{Rmumps__xptr}). Available in R too. In C++ code they can be used as
+#' \code{rmumps::Rmumps__symbolic(pm)} etc. (\code{LinkingTo: rmumps, Rcpp}).
+#'
+#' @param pm pointer of type XPtr<Rmumps>.
+#' @param obj an object created with \code{Rmumps$new()}.
+#' @param pb pointer of type XPtr<double>, vector or dense matrix of rhs,
+#'   overwritten with the solution.
+#' @param lrhs integer, leading dimension in pb.
+#' @param nrhs integer, number of rhs to solve.
+#' @param iv,ii integer vectors of values and 1-based positions.
+#' @param v numeric vector of values.
+#' @param p_in integer vector, a permutation of \code{1:n}.
+#' @return \code{Rmumps__xptr}: a pointer of type XPtr<Rmumps> to the object
+#'   inside \code{obj}, without a finalizer (\code{obj} keeps owning it and
+#'   must stay alive). \code{Rmumps__get_icntl}, \code{Rmumps__get_cntl},
+#'   \code{Rmumps__get_infos}, \code{Rmumps__det}, \code{Rmumps__log2det},
+#'   \code{Rmumps__get_sym_perm}, \code{Rmumps__get_uns_perm},
+#'   \code{Rmumps__mumps_version}: the same values as the corresponding
+#'   methods of \code{Rmumps}. The other functions are called for their side
+#'   effects and return \code{NULL} invisibly.
+#' @name Rmumps__pointer_api
+#' @examples
+#' a <- Rmumps$new(c(0L, 1L), c(0L, 1L), c(2, 4), 2L)
+#' pm <- Rmumps__xptr(a)
+#' Rmumps__numeric(pm)
+#' Rmumps__det(pm)
+Rmumps__xptr <- function(obj) {
+    .Call(`_rmumps_Rmumps__xptr`, obj)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__symbolic <- function(pm) {
+    invisible(.Call(`_rmumps_Rmumps__symbolic`, pm))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__numeric <- function(pm) {
+    invisible(.Call(`_rmumps_Rmumps__numeric`, pm))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__solvetptr <- function(pm, pb, lrhs, nrhs) {
+    invisible(.Call(`_rmumps_Rmumps__solvetptr`, pm, pb, lrhs, nrhs))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__set_icntl <- function(pm, iv, ii) {
+    invisible(.Call(`_rmumps_Rmumps__set_icntl`, pm, iv, ii))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__get_icntl <- function(pm) {
+    .Call(`_rmumps_Rmumps__get_icntl`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__set_cntl <- function(pm, v, iv) {
+    invisible(.Call(`_rmumps_Rmumps__set_cntl`, pm, v, iv))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__get_cntl <- function(pm) {
+    .Call(`_rmumps_Rmumps__get_cntl`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__get_infos <- function(pm) {
+    .Call(`_rmumps_Rmumps__get_infos`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__det <- function(pm) {
+    .Call(`_rmumps_Rmumps__det`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__log2det <- function(pm) {
+    .Call(`_rmumps_Rmumps__log2det`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__get_sym_perm <- function(pm) {
+    .Call(`_rmumps_Rmumps__get_sym_perm`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__get_uns_perm <- function(pm) {
+    .Call(`_rmumps_Rmumps__get_uns_perm`, pm)
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__set_perm_in <- function(pm, p_in) {
+    invisible(.Call(`_rmumps_Rmumps__set_perm_in`, pm, p_in))
+}
+
+#' @rdname Rmumps__pointer_api
+Rmumps__mumps_version <- function(pm) {
+    .Call(`_rmumps_Rmumps__mumps_version`, pm)
 }
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_rmumps_RcppExport_registerCCallable')
+    .Call(`_rmumps_RcppExport_registerCCallable`)
 })

@@ -268,6 +268,518 @@ RcppExport SEXP _rmumps_Rmumps__get_permutation(SEXP pmSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// Rmumps__xptr
+XPtr<Rmumps> Rmumps__xptr(RObject obj);
+static SEXP _rmumps_Rmumps__xptr_try(SEXP objSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< RObject >::type obj(objSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__xptr(obj));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__xptr(SEXP objSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__xptr_try(objSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__symbolic
+void Rmumps__symbolic(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__symbolic_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rmumps__symbolic(pm);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__symbolic(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__symbolic_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__numeric
+void Rmumps__numeric(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__numeric_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rmumps__numeric(pm);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__numeric(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__numeric_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__solvetptr
+void Rmumps__solvetptr(XPtr<Rmumps> pm, XPtr<double> pb, int lrhs, int nrhs);
+static SEXP _rmumps_Rmumps__solvetptr_try(SEXP pmSEXP, SEXP pbSEXP, SEXP lrhsSEXP, SEXP nrhsSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< XPtr<double> >::type pb(pbSEXP);
+    Rcpp::traits::input_parameter< int >::type lrhs(lrhsSEXP);
+    Rcpp::traits::input_parameter< int >::type nrhs(nrhsSEXP);
+    Rmumps__solvetptr(pm, pb, lrhs, nrhs);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__solvetptr(SEXP pmSEXP, SEXP pbSEXP, SEXP lrhsSEXP, SEXP nrhsSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__solvetptr_try(pmSEXP, pbSEXP, lrhsSEXP, nrhsSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__set_icntl
+void Rmumps__set_icntl(XPtr<Rmumps> pm, IntegerVector iv, IntegerVector ii);
+static SEXP _rmumps_Rmumps__set_icntl_try(SEXP pmSEXP, SEXP ivSEXP, SEXP iiSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type iv(ivSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type ii(iiSEXP);
+    Rmumps__set_icntl(pm, iv, ii);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__set_icntl(SEXP pmSEXP, SEXP ivSEXP, SEXP iiSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__set_icntl_try(pmSEXP, ivSEXP, iiSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__get_icntl
+IntegerVector Rmumps__get_icntl(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__get_icntl_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__get_icntl(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__get_icntl(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__get_icntl_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__set_cntl
+void Rmumps__set_cntl(XPtr<Rmumps> pm, NumericVector v, IntegerVector iv);
+static SEXP _rmumps_Rmumps__set_cntl_try(SEXP pmSEXP, SEXP vSEXP, SEXP ivSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type iv(ivSEXP);
+    Rmumps__set_cntl(pm, v, iv);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__set_cntl(SEXP pmSEXP, SEXP vSEXP, SEXP ivSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__set_cntl_try(pmSEXP, vSEXP, ivSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__get_cntl
+NumericVector Rmumps__get_cntl(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__get_cntl_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__get_cntl(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__get_cntl(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__get_cntl_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__get_infos
+List Rmumps__get_infos(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__get_infos_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__get_infos(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__get_infos(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__get_infos_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__det
+double Rmumps__det(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__det_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__det(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__det(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__det_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__log2det
+double Rmumps__log2det(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__log2det_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__log2det(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__log2det(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__log2det_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__get_sym_perm
+IntegerVector Rmumps__get_sym_perm(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__get_sym_perm_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__get_sym_perm(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__get_sym_perm(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__get_sym_perm_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__get_uns_perm
+IntegerVector Rmumps__get_uns_perm(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__get_uns_perm_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__get_uns_perm(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__get_uns_perm(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__get_uns_perm_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__set_perm_in
+void Rmumps__set_perm_in(XPtr<Rmumps> pm, IntegerVector p_in);
+static SEXP _rmumps_Rmumps__set_perm_in_try(SEXP pmSEXP, SEXP p_inSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p_in(p_inSEXP);
+    Rmumps__set_perm_in(pm, p_in);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__set_perm_in(SEXP pmSEXP, SEXP p_inSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__set_perm_in_try(pmSEXP, p_inSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// Rmumps__mumps_version
+std::string Rmumps__mumps_version(XPtr<Rmumps> pm);
+static SEXP _rmumps_Rmumps__mumps_version_try(SEXP pmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< XPtr<Rmumps> >::type pm(pmSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmumps__mumps_version(pm));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _rmumps_Rmumps__mumps_version(SEXP pmSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_rmumps_Rmumps__mumps_version_try(pmSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _rmumps_RcppExport_validate(const char* sig) { 
@@ -280,6 +792,21 @@ static int _rmumps_RcppExport_validate(const char* sig) {
         signatures.insert("void(*Rmumps__set_mat_ptr)(XPtr<Rmumps>,XPtr<double>)");
         signatures.insert("void(*Rmumps__set_permutation)(XPtr<Rmumps>,int)");
         signatures.insert("int(*Rmumps__get_permutation)(XPtr<Rmumps>)");
+        signatures.insert("XPtr<Rmumps>(*Rmumps__xptr)(RObject)");
+        signatures.insert("void(*Rmumps__symbolic)(XPtr<Rmumps>)");
+        signatures.insert("void(*Rmumps__numeric)(XPtr<Rmumps>)");
+        signatures.insert("void(*Rmumps__solvetptr)(XPtr<Rmumps>,XPtr<double>,int,int)");
+        signatures.insert("void(*Rmumps__set_icntl)(XPtr<Rmumps>,IntegerVector,IntegerVector)");
+        signatures.insert("IntegerVector(*Rmumps__get_icntl)(XPtr<Rmumps>)");
+        signatures.insert("void(*Rmumps__set_cntl)(XPtr<Rmumps>,NumericVector,IntegerVector)");
+        signatures.insert("NumericVector(*Rmumps__get_cntl)(XPtr<Rmumps>)");
+        signatures.insert("List(*Rmumps__get_infos)(XPtr<Rmumps>)");
+        signatures.insert("double(*Rmumps__det)(XPtr<Rmumps>)");
+        signatures.insert("double(*Rmumps__log2det)(XPtr<Rmumps>)");
+        signatures.insert("IntegerVector(*Rmumps__get_sym_perm)(XPtr<Rmumps>)");
+        signatures.insert("IntegerVector(*Rmumps__get_uns_perm)(XPtr<Rmumps>)");
+        signatures.insert("void(*Rmumps__set_perm_in)(XPtr<Rmumps>,IntegerVector)");
+        signatures.insert("std::string(*Rmumps__mumps_version)(XPtr<Rmumps>)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -293,6 +820,59 @@ RcppExport SEXP _rmumps_RcppExport_registerCCallable() {
     R_RegisterCCallable("rmumps", "_rmumps_Rmumps__set_mat_ptr", (DL_FUNC)_rmumps_Rmumps__set_mat_ptr_try);
     R_RegisterCCallable("rmumps", "_rmumps_Rmumps__set_permutation", (DL_FUNC)_rmumps_Rmumps__set_permutation_try);
     R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_permutation", (DL_FUNC)_rmumps_Rmumps__get_permutation_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__xptr", (DL_FUNC)_rmumps_Rmumps__xptr_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__symbolic", (DL_FUNC)_rmumps_Rmumps__symbolic_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__numeric", (DL_FUNC)_rmumps_Rmumps__numeric_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__solvetptr", (DL_FUNC)_rmumps_Rmumps__solvetptr_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__set_icntl", (DL_FUNC)_rmumps_Rmumps__set_icntl_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_icntl", (DL_FUNC)_rmumps_Rmumps__get_icntl_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__set_cntl", (DL_FUNC)_rmumps_Rmumps__set_cntl_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_cntl", (DL_FUNC)_rmumps_Rmumps__get_cntl_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_infos", (DL_FUNC)_rmumps_Rmumps__get_infos_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__det", (DL_FUNC)_rmumps_Rmumps__det_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__log2det", (DL_FUNC)_rmumps_Rmumps__log2det_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_sym_perm", (DL_FUNC)_rmumps_Rmumps__get_sym_perm_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__get_uns_perm", (DL_FUNC)_rmumps_Rmumps__get_uns_perm_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__set_perm_in", (DL_FUNC)_rmumps_Rmumps__set_perm_in_try);
+    R_RegisterCCallable("rmumps", "_rmumps_Rmumps__mumps_version", (DL_FUNC)_rmumps_Rmumps__mumps_version_try);
     R_RegisterCCallable("rmumps", "_rmumps_RcppExport_validate", (DL_FUNC)_rmumps_RcppExport_validate);
     return R_NilValue;
+}
+
+RcppExport SEXP _rcpp_module_boot_mod_Rmumps();
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_rmumps_get_cnst", (DL_FUNC) &_rmumps_get_cnst, 1},
+    {"_rmumps_Rmumps__solveptr", (DL_FUNC) &_rmumps_Rmumps__solveptr, 4},
+    {"_rmumps_Rmumps__ptr_ijv", (DL_FUNC) &_rmumps_Rmumps__ptr_ijv, 6},
+    {"_rmumps_Rmumps__del_ptr", (DL_FUNC) &_rmumps_Rmumps__del_ptr, 1},
+    {"_rmumps_Rmumps__triplet", (DL_FUNC) &_rmumps_Rmumps__triplet, 1},
+    {"_rmumps_Rmumps__set_mat_ptr", (DL_FUNC) &_rmumps_Rmumps__set_mat_ptr, 2},
+    {"_rmumps_Rmumps__set_permutation", (DL_FUNC) &_rmumps_Rmumps__set_permutation, 2},
+    {"_rmumps_Rmumps__get_permutation", (DL_FUNC) &_rmumps_Rmumps__get_permutation, 1},
+    {"_rmumps_Rmumps__xptr", (DL_FUNC) &_rmumps_Rmumps__xptr, 1},
+    {"_rmumps_Rmumps__symbolic", (DL_FUNC) &_rmumps_Rmumps__symbolic, 1},
+    {"_rmumps_Rmumps__numeric", (DL_FUNC) &_rmumps_Rmumps__numeric, 1},
+    {"_rmumps_Rmumps__solvetptr", (DL_FUNC) &_rmumps_Rmumps__solvetptr, 4},
+    {"_rmumps_Rmumps__set_icntl", (DL_FUNC) &_rmumps_Rmumps__set_icntl, 3},
+    {"_rmumps_Rmumps__get_icntl", (DL_FUNC) &_rmumps_Rmumps__get_icntl, 1},
+    {"_rmumps_Rmumps__set_cntl", (DL_FUNC) &_rmumps_Rmumps__set_cntl, 3},
+    {"_rmumps_Rmumps__get_cntl", (DL_FUNC) &_rmumps_Rmumps__get_cntl, 1},
+    {"_rmumps_Rmumps__get_infos", (DL_FUNC) &_rmumps_Rmumps__get_infos, 1},
+    {"_rmumps_Rmumps__det", (DL_FUNC) &_rmumps_Rmumps__det, 1},
+    {"_rmumps_Rmumps__log2det", (DL_FUNC) &_rmumps_Rmumps__log2det, 1},
+    {"_rmumps_Rmumps__get_sym_perm", (DL_FUNC) &_rmumps_Rmumps__get_sym_perm, 1},
+    {"_rmumps_Rmumps__get_uns_perm", (DL_FUNC) &_rmumps_Rmumps__get_uns_perm, 1},
+    {"_rmumps_Rmumps__set_perm_in", (DL_FUNC) &_rmumps_Rmumps__set_perm_in, 2},
+    {"_rmumps_Rmumps__mumps_version", (DL_FUNC) &_rmumps_Rmumps__mumps_version, 1},
+    {"_rcpp_module_boot_mod_Rmumps", (DL_FUNC) &_rcpp_module_boot_mod_Rmumps, 0},
+    {"_rmumps_RcppExport_registerCCallable", (DL_FUNC) &_rmumps_RcppExport_registerCCallable, 0},
+    {NULL, NULL, 0}
+};
+
+void rmumps_init(DllInfo *dll);
+RcppExport void R_init_rmumps(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+    rmumps_init(dll);
 }

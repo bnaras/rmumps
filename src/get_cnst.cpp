@@ -1,3 +1,4 @@
+#include <map>
 #include <string>
 #include "../inst/include/rmumps.h"
 
@@ -26,6 +27,6 @@ int get_cnst(std::string s) {
   if (dict.count(s))
     return(dict[s]);
   else
-    stop(".get_cnst: constant '%s' is not in dictionary", s);
+    Rcpp::stop(".get_cnst: constant '%s' is not in dictionary", s);
   return(NA_INTEGER);
 }

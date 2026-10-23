@@ -18,12 +18,87 @@ using namespace Rcpp;
 #endif
 
 #include "../inst/include/rmumps.h"
+#include "../inst/include/rmumps/rmumps_api.h"
+#include "rmumps_internal.h"
+
+// lengths of the MUMPS control and information arrays (MUMPS 5.2.1)
+#define RMUMPS_NICNTL 60
+#define RMUMPS_NCNTL 15
+#define RMUMPS_NINFO 80
+#define RMUMPS_NRINFO 40
+#define RMUMPS_NKEEP 500
+
 Rmumps::~Rmumps() { if (ref == 0) clean(); }
 void Rmumps::clean() {
-  //Rprintf("clean() is called...\n");
+  // Never throws: called from the destructor. A poisoned instance is skipped
+  // by rmumps_dmumps_c_safe(), and any failure here is ignored.
   param.job=JOB_END;
-  dmumps_c(&param);
-  //Rprintf("clean(): done\n");
+  rmumps_dmumps_c_safe(&param, sizeof param, NULL, 0);
+}
+bool Rmumps::is_poisoned() {
+  return param.info[0] == RMUMPS_INFO_POISONED;
+}
+
+// Short descriptions of MUMPS errors (INFO(1) < 0), from the user guide.
+static const char *info_message(int info1) {
+  switch (info1) {
+  case -1: return "an error occurred on another processor";
+  case -2: return "NNZ (or NZ) is out of range";
+  case -3: return "MUMPS was called with an invalid value of JOB";
+  case -4: return "error in the user-provided permutation (PERM_IN)";
+  case -5: return "not enough memory for real workspace during analysis";
+  case -6: return "the matrix is singular in structure";
+  case -7: return "not enough memory for integer workspace during analysis";
+  case -8: return "the main internal integer workarray is too small; increase ICNTL(14)";
+  case -9: return "the main internal real workarray is too small; increase ICNTL(14)";
+  case -10: return "the matrix is numerically singular";
+  case -11: return "the internal real workarray is too small for the solution phase";
+  case -12: return "the internal real workarray is too small for iterative refinement";
+  case -13: return "a memory allocation failed";
+  case -14: return "the internal integer workarray is too small for the solution phase";
+  case -15: return "the integer workarray is too small for iterative refinement or error analysis";
+  case -16: return "N is out of range";
+  case -17: return "the internal send buffer is too small";
+  case -19: return "the maximum allowed memory size (ICNTL(23)) is too small";
+  case -20: return "the internal reception buffer is too small";
+  case -21: return "the value of PAR is not valid for a single process";
+  case -22: return "an input array is not allocated or has a wrong size";
+  case -23: return "MPI was not initialized";
+  case -24: return "NELT is out of range";
+  case -25: return "a problem occurred in BLACS initialization";
+  case -26: return "LRHS is out of range";
+  case -27: return "NZ_RHS and IRHS_PTR(NRHS+1) do not match";
+  case -28: return "IRHS_PTR(1) is not equal to 1";
+  case -29: return "LSOL_LOC is smaller than INFO(23)";
+  case -30: return "SCHUR_LLD is out of range";
+  case -32: return "incompatible values of NRHS and ICNTL(25)";
+  case -34: return "LREDRHS is out of range";
+  case -38: return "parallel analysis was requested but not available";
+  case -40: return "the matrix was declared positive definite (SYM = 1) but a negative or null pivot was found";
+  case -44: return "the solve phase cannot be done because the factors were discarded (ICNTL(31))";
+  case -45: return "NRHS is not positive";
+  case -46: return "NZ_RHS is not positive";
+  case -47: return "entries of A^-1 were requested (ICNTL(30)) but NRHS is not equal to N";
+  case -48: return "entries of A^-1 were requested (ICNTL(30)) with an incompatible ICNTL value (index in INFO(2))";
+  case -49: return "SIZE_SCHUR has an incorrect value";
+  case -50: return "an error occurred while computing the fill-reducing ordering";
+  case -51: return "the graph is too large for an ordering library built with 32-bit integers";
+  case -52: return "the ordering libraries must use the same integer size as MUMPS";
+  case -53: return "internal error: inconsistent input data between two consecutive calls";
+  default:
+    if (info1 <= -90 && info1 >= -99) return "an out-of-core (disk I/O) error occurred";
+    return "see the MUMPS user guide for this INFO(1) value";
+  }
+}
+
+// One MUMPS call through the error boundary: R errors and interrupts raised
+// inside MUMPS become a C++ exception here, never a longjmp through Fortran.
+void Rmumps::call_mumps(int job) {
+  char msg[NBUF];
+  param.job=job;
+  int rc=rmumps_dmumps_c_safe(&param, sizeof param, msg, sizeof msg);
+  if (rc != RMUMPS_OK)
+    stop("%s (job=%d)", msg, job);
 }
 /* unfortunately, there is an unwanted extra destructor call
 Rmumps Rmumps::shallow_copy(Rmumps a) {
@@ -41,6 +116,10 @@ void Rmumps::set_copy(bool copy_) {
 void Rmumps::set_permutation(int perm) {
   if (perm < RMUMPS_PERM_AMD || perm > RMUMPS_PERM_AUTO || perm == 1)
     stop("Rmumps::set_permutation: invalid perm value %d", perm);
+  if (perm == RMUMPS_PERM_SCOTCH) {
+    warning("Rmumps::set_permutation: SCOTCH ordering is no longer supported; using RMUMPS_PERM_AUTO instead");
+    perm=RMUMPS_PERM_AUTO;
+  }
   if (perm != param.ICNTL(7))
     jobs.erase(jobs.begin(), jobs.end()); // invalidate previous factorizations both symbolic and numeric
   param.ICNTL(7)=perm;
@@ -92,20 +171,24 @@ void Rmumps::do_job(int job) {
     }
     break;
   }
-  param.job=job;
-  // set core number to use in openmp
-//#ifdef _OPENMP
-//#pragma omp parallel
-  //{
-  //omp_set_num_threads(ncore);
-//#endif
-  dmumps_c(&param);
-//#ifdef _OPENMP
-//  }
-//#endif
-  if (param.info[0] != 0) {
-    //clean();
-    stop("rmumps: job=%d, info[1]=%d, info[2]=%d", job, param.info[0], param.info[1]);
+  if (job != JOB_INIT && is_poisoned())
+    stop("rmumps: this Rmumps object failed earlier and cannot be used; create a new one");
+  // PORD cannot order a 1 x 1 matrix (it fails with "#stages = 2"); any
+  // ordering gives the same result there, so use AMD for the analysis.
+  bool pord_guard=(job == 1 || job == 4 || job == 6) && param.n <= 1 &&
+    param.ICNTL(7) == RMUMPS_PERM_PORD;
+  if (pord_guard)
+    param.ICNTL(7)=RMUMPS_PERM_AMD;
+  call_mumps(job);
+  if (pord_guard)
+    param.ICNTL(7)=RMUMPS_PERM_PORD;
+  if (param.info[0] < 0) {
+    stop("rmumps: job=%d, info[1]=%d, info[2]=%d: %s", job, param.info[0],
+         param.info[1], info_message(param.info[0]));
+  }
+  if (param.info[0] > 0 && job != JOB_INIT) {
+    warning("rmumps: job=%d, info[1]=%d, info[2]=%d (MUMPS warning, see the MUMPS user guide)",
+            job, param.info[0], param.info[1]);
   }
   /* combined jobs are split for the record */
   switch (job) {
@@ -133,9 +216,16 @@ void Rmumps::numeric() {
 }
 SEXP Rmumps::solvet(RObject b) {
   // solve A^t x = b
+  int icntl9=param.ICNTL(9);
   param.ICNTL(9) = 2;
-  SEXP res=solve(b);
-  param.ICNTL(9) = 1;
+  SEXP res;
+  try {
+    res=solve(b);
+  } catch (...) {
+    param.ICNTL(9) = icntl9;
+    throw;
+  }
+  param.ICNTL(9) = icntl9;
   return res;
 }
 SEXP Rmumps::solve(RObject b) {
@@ -251,6 +341,18 @@ void Rmumps::solveptr(double* b, int lrhs, int nrhs) {
   param.ICNTL(20)=0; // rhs is dense
   do_job(3);
 }
+void Rmumps::solvetptr(double* b, int lrhs, int nrhs) {
+  // in place solve of the transposed system A^t x = b
+  int icntl9=param.ICNTL(9);
+  param.ICNTL(9)=2;
+  try {
+    solveptr(b, lrhs, nrhs);
+  } catch (...) {
+    param.ICNTL(9)=icntl9;
+    throw;
+  }
+  param.ICNTL(9)=icntl9;
+}
 NumericMatrix Rmumps::inv() {
   MUMPS_INT n=param.n;
   MUMPS_INT nrhs=param.n;
@@ -281,9 +383,8 @@ NumericMatrix Rmumps::solves(S4 mat) {
   // if dim(mat) == (0,0) then an inverse matrix is requested
   IntegerVector di(mat.slot("Dim"));
   if (!mat.inherits("dgCMatrix")) {
-    Environment meth("package:methods");
-    Function as_=meth["as"];
-    mat=as_(mat, "dgCMatrix");
+    Function as_=Environment::namespace_env("rmumps")[".as_dgC"];
+    mat=as_(mat);
     //stop("matrix must be of dgTMatrix class (cf. pkg Matrix)");
   }
   //if (!mat.inherits("dgCMatrix")) {
@@ -442,50 +543,44 @@ NumericMatrix Rmumps::get_mrhs() {
 }
 void Rmumps::set_icntl(IntegerVector iv, IntegerVector ii) {
   // set control vector ICNTL at positions in ii (1-based)) to the values in iv
-  // only 1 <= ii <= 33 are effectively used
   if (iv.size() != ii.size()) {
     snprintf(buf, NBUF-1, "set_icntl: length(iv) and length(ii) must be the same (got %d and %d respectively)", (int) iv.size(), (int) ii.size());
     stop(buf);
   }
   for (auto i=0; i < ii.size(); i++) {
-    if (ii[i] > 33 || ii[i] < 1)
-      continue;
-    param.ICNTL(ii[i])=iv[i];
+    if (ii[i] == NA_INTEGER || ii[i] > RMUMPS_NICNTL || ii[i] < 1)
+      stop("set_icntl: index %d is out of range 1..%d", ii[i], RMUMPS_NICNTL);
+    if (iv[i] == NA_INTEGER)
+      stop("set_icntl: NA value for ICNTL(%d)", ii[i]);
   }
+  for (auto i=0; i < ii.size(); i++)
+    param.ICNTL(ii[i])=iv[i];
 }
 void Rmumps::set_cntl(NumericVector v, IntegerVector iv) {
   // set control vector CNTL at positions in iv (1-based)) to the values in v
-  // only 1 <= iv <= 5 are effectively used
   if (v.size() != iv.size()) {
     snprintf(buf, NBUF-1, "set_cntl: length(v) and length(iv) must be the same (got %d and %d respectively)", (int) v.size(), (int) iv.size());
     stop(buf);
   }
   for (auto i=0; i < iv.size(); i++) {
-    if (iv[i] > 5 || iv[i] < 1)
-      continue;
-    param.cntl[iv[i]-1]=v[i];
+    if (iv[i] == NA_INTEGER || iv[i] > RMUMPS_NCNTL || iv[i] < 1)
+      stop("set_cntl: index %d is out of range 1..%d", iv[i], RMUMPS_NCNTL);
   }
+  for (auto i=0; i < iv.size(); i++)
+    param.cntl[iv[i]-1]=v[i];
 }
 IntegerVector Rmumps::get_icntl() {
   // return control vector ICNTL
-  IntegerVector icntl(33);
-  for (auto i=0; i < icntl.size(); i++) {
-    icntl[i]=param.icntl[i];
-  }
-  return icntl;
+  return IntegerVector(param.icntl, param.icntl+RMUMPS_NICNTL);
 }
 NumericVector Rmumps::get_cntl() {
-  // return control vector ICNTL
-  NumericVector cntl(5);
-  for (auto i=0; i < cntl.size(); i++) {
-    cntl[i]=param.cntl[i];
-  }
-  return cntl;
+  // return control vector CNTL
+  return NumericVector(param.cntl, param.cntl+RMUMPS_NCNTL);
 }
 List Rmumps::get_infos() {
   // return a named list with vectors info, rinfo, infog and rinfog
-  NumericVector rinfo(3), rinfog(13);
-  IntegerVector info(27), infog(34);
+  NumericVector rinfo(RMUMPS_NRINFO), rinfog(RMUMPS_NRINFO);
+  IntegerVector info(RMUMPS_NINFO), infog(RMUMPS_NINFO);
   for (auto i=0; i < rinfo.size(); i++)
     rinfo[i]=param.rinfo[i];
   for (auto i=0; i < info.size(); i++)
@@ -509,14 +604,15 @@ void Rmumps::set_keep(IntegerVector iv, IntegerVector ii) {
     stop(buf);
   }
   for (auto i=0; i < ii.size(); i++) {
-    if (ii[i] > 500 || ii[i] < 1)
-      continue;
-    param.keep[ii[i]-1]=iv[i];
+    if (ii[i] == NA_INTEGER || ii[i] > RMUMPS_NKEEP || ii[i] < 1)
+      stop("set_keep: index %d is out of range 1..%d", ii[i], RMUMPS_NKEEP);
   }
+  for (auto i=0; i < ii.size(); i++)
+    param.keep[ii[i]-1]=iv[i];
 }
 IntegerVector Rmumps::get_keep() {
   // get a copy of control vector KEEP of length 500
-  IntegerVector res(500);
+  IntegerVector res(RMUMPS_NKEEP);
   for (auto i=0; i < res.size(); i++)
     res[i]=param.keep[i];
   return res;
@@ -561,9 +657,12 @@ List Rmumps::triplet() {
 }
 void Rmumps::set_perm_in(IntegerVector p_in) {
   // set a vector of symmetric permutation provided by user
+  if (p_in.size() != param.n)
+    stop("set_perm_in: the permutation must have length %d (got %d)", (int) param.n, (int) p_in.size());
   param.ICNTL(7)=1;
   param.ICNTL(28)=1;
-  param.perm_in=(MUMPS_INT*) &*p_in.begin();
+  perm_in=clone(p_in); // kept alive by this object while MUMPS uses it
+  param.perm_in=(MUMPS_INT*) &*perm_in.begin();
   jobs.erase(jobs.begin(), jobs.end()); // invalidate previous factorizations both symbolic and numeric
 }
 IntegerVector Rmumps::get_sym_perm() {
@@ -636,9 +735,8 @@ void Rmumps::new_mat(RObject mat_, int sym, bool copy_) {
   case S4SXP: {
     S4 mat=as<S4>(mat_);
     if (!mat.inherits("dgTMatrix")) {
-       Environment meth("package:methods");
-       Function as_=meth["as"];
-       mat=as_(mat, "dgTMatrix");
+       Function as_=Environment::namespace_env("rmumps")[".as_dgT"];
+       mat=as_(mat);
        //stop("matrix must be of dgTMatrix class (cf. pkg Matrix)");
     }
     IntegerVector di(mat.slot("Dim"));
@@ -729,8 +827,8 @@ void Rmumps::tri_init(MUMPS_INT *irn, MUMPS_INT *jcn, double *a, MUMPS_INT sym) 
   this->ncore=1;
   this->ref=0;
   /* Initialize a MUMPS instance. Use MPI_COMM_WORLD */
+  memset(&param, 0, sizeof param); // MUMPS reads some fields before setting them
   param.job=JOB_INIT;
-  param.keep[39]=0; // otherwise valgrind complaints
   param.par=1;
   param.sym=sym;
   param.comm_fortran=USE_COMM_WORLD;
@@ -766,6 +864,11 @@ void Rmumps::tri_init(MUMPS_INT *irn, MUMPS_INT *jcn, double *a, MUMPS_INT sym) 
   param.ICNTL(31)=0; // matrix factors are kept (not discarded)
   param.ICNTL(32)=0; // standart factorization (without forward elim of rhs)
   param.ICNTL(33)=1; // compute the detreminant
+  // out-of-core files (only if the user sets ICNTL(22)=1) go to the session
+  // temporary directory, never to the current one
+  std::string tmpdir=as<std::string>(Function("tempdir")());
+  if (tmpdir.size() < sizeof param.ooc_tmpdir)
+    snprintf(param.ooc_tmpdir, sizeof param.ooc_tmpdir, "%s", tmpdir.c_str());
 }
 //RCPP_EXPOSED_CLASS(Rmumps)
 RCPP_MODULE(mod_Rmumps){
@@ -920,23 +1023,120 @@ int Rmumps__get_permutation(XPtr<Rmumps> pm) {
   XPtr<Rmumps> p(pm);
   return(p->get_permutation());
 }
+//' Pointer Interface to Rmumps Methods
+//'
+//' C wrappers to methods of the \code{Rmumps} class, for objects held as
+//' pointers (e.g. created with \code{\link{Rmumps__ptr_ijv}} or obtained with
+//' \code{Rmumps__xptr}). Available in R too. In C++ code they can be used as
+//' \code{rmumps::Rmumps__symbolic(pm)} etc. (\code{LinkingTo: rmumps, Rcpp}).
+//'
+//' @param pm pointer of type XPtr<Rmumps>.
+//' @param obj an object created with \code{Rmumps$new()}.
+//' @param pb pointer of type XPtr<double>, vector or dense matrix of rhs,
+//'   overwritten with the solution.
+//' @param lrhs integer, leading dimension in pb.
+//' @param nrhs integer, number of rhs to solve.
+//' @param iv,ii integer vectors of values and 1-based positions.
+//' @param v numeric vector of values.
+//' @param p_in integer vector, a permutation of \code{1:n}.
+//' @return \code{Rmumps__xptr}: a pointer of type XPtr<Rmumps> to the object
+//'   inside \code{obj}, without a finalizer (\code{obj} keeps owning it and
+//'   must stay alive). \code{Rmumps__get_icntl}, \code{Rmumps__get_cntl},
+//'   \code{Rmumps__get_infos}, \code{Rmumps__det}, \code{Rmumps__log2det},
+//'   \code{Rmumps__get_sym_perm}, \code{Rmumps__get_uns_perm},
+//'   \code{Rmumps__mumps_version}: the same values as the corresponding
+//'   methods of \code{Rmumps}. The other functions are called for their side
+//'   effects and return \code{NULL} invisibly.
+//' @name Rmumps__pointer_api
+//' @examples
+//' a <- Rmumps$new(c(0L, 1L), c(0L, 1L), c(2, 4), 2L)
+//' pm <- Rmumps__xptr(a)
+//' Rmumps__numeric(pm)
+//' Rmumps__det(pm)
+// [[Rcpp::export]]
+XPtr<Rmumps> Rmumps__xptr(RObject obj) {
+  if (!obj.isS4() || !obj.inherits("Rcpp_Rmumps"))
+    stop("Rmumps__xptr: 'obj' must be an object created with Rmumps$new()");
+  Environment env(as<S4>(obj).slot(".xData"));
+  SEXP p=env.get(".pointer");
+  if (TYPEOF(p) != EXTPTRSXP || R_ExternalPtrAddr(p) == NULL)
+    stop("Rmumps__xptr: 'obj' holds no valid pointer (was it saved and reloaded?)");
+  return XPtr<Rmumps>((Rmumps *) R_ExternalPtrAddr(p), false, R_NilValue, obj);
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__symbolic(XPtr<Rmumps> pm) {
+  pm->symbolic();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__numeric(XPtr<Rmumps> pm) {
+  pm->numeric();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__solvetptr(XPtr<Rmumps> pm, XPtr<double> pb, int lrhs, int nrhs) {
+  pm->solvetptr(pb, lrhs, nrhs);
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__set_icntl(XPtr<Rmumps> pm, IntegerVector iv, IntegerVector ii) {
+  pm->set_icntl(iv, ii);
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+IntegerVector Rmumps__get_icntl(XPtr<Rmumps> pm) {
+  return pm->get_icntl();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__set_cntl(XPtr<Rmumps> pm, NumericVector v, IntegerVector iv) {
+  pm->set_cntl(v, iv);
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+NumericVector Rmumps__get_cntl(XPtr<Rmumps> pm) {
+  return pm->get_cntl();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+List Rmumps__get_infos(XPtr<Rmumps> pm) {
+  return pm->get_infos();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+double Rmumps__det(XPtr<Rmumps> pm) {
+  return pm->det();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+double Rmumps__log2det(XPtr<Rmumps> pm) {
+  return pm->log2det();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+IntegerVector Rmumps__get_sym_perm(XPtr<Rmumps> pm) {
+  return pm->get_sym_perm();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+IntegerVector Rmumps__get_uns_perm(XPtr<Rmumps> pm) {
+  return pm->get_uns_perm();
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+void Rmumps__set_perm_in(XPtr<Rmumps> pm, IntegerVector p_in) {
+  pm->set_perm_in(p_in);
+}
+//' @rdname Rmumps__pointer_api
+// [[Rcpp::export]]
+std::string Rmumps__mumps_version(XPtr<Rmumps> pm) {
+  return pm->mumps_version();
+}
 
-// define rcpp_stop and _warning for C compatibility
-extern "C" {
-  void rcpp_error(const char* format, ...) {
-    char buf[1024];
-    va_list ap;
-    va_start(ap, format);
-    vsnprintf(buf, (size_t) 1023, format, ap);
-    va_end(ap);
-    Rcpp::stop("%s", buf);
-  }
-  void rcpp_warning(const char* format, ...) {
-    char buf[1024];
-    va_list ap;
-    va_start(ap, format);
-    vsnprintf(buf, (size_t) 1023, format, ap);
-    va_end(ap);
-    Rcpp::warning("%s", buf);
-  }
+// Called from the R_init_rmumps() generated by Rcpp::compileAttributes(),
+// after the .Call entry points are registered.
+// [[Rcpp::init]]
+void rmumps_init(DllInfo *dll) {
+  rmumps_register_c_callables();
 }
