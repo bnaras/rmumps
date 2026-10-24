@@ -749,7 +749,7 @@ DMUMPS_GPU_ASYNC_PIN_MEMORY_C(DMUMPS_COMPLEX *A, MUMPS_INT8 *ADIM)
 #endif
 }/* dmumps_gpu_async_pin_memory_C */
 void MUMPS_CALL
-DMUMPS_GPU_WAIT_ENDOFPINNING_C()
+DMUMPS_GPU_WAIT_ENDOFPINNING_C(void)
 {
   double start, stop, elapsed;
   start = MPI_Wtime();
@@ -830,7 +830,7 @@ DMUMPS_GPU_ASYNC_UNPIN_MEMORY_C(DMUMPS_COMPLEX *A, MUMPS_INT8 *ADIM)
 #endif
 }/* dmumps_gpu_async_unpin_memory_c */
 void MUMPS_CALL
-DMUMPS_GPU_WAIT_ENDOFPINNING_C()
+DMUMPS_GPU_WAIT_ENDOFPINNING_C(void)
 {
 #if ! defined(MUMPS_WIN32) && ! defined(WITHOUT_PTHREAD)
   double start, stop, elapsed;
@@ -953,7 +953,7 @@ DMUMPS_GPU_UNPIN_MEMORY_C(DMUMPS_COMPLEX *A, MUMPS_INT8 *ADIM)
 #endif
 }/* dmumps_gpu_unpin_memory_c */
 #else
-void MUMPS_CALL dmumps_gpu_return()
+void MUMPS_CALL dmumps_gpu_return(void)
 {
   /*
     GPU feature will be available in the future

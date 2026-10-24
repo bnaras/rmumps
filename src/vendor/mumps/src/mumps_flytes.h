@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -23,7 +24,7 @@
 #undef __AVX512VBMI__
 #endif
 #if defined(NOMIXHPC)
-void MUMPS_CALL mumps_flyte_return();
+void MUMPS_CALL mumps_flyte_return(void);
 #else
 union fl_fp64 {
 	uint64_t i;

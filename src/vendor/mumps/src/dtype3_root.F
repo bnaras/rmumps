@@ -467,21 +467,21 @@ C~      write(*,*) ' error in grid position buildandsendcbroot'
             NRLOCAL = PTRROW( IROW + 2 ) - PTRROW( IROW + 1 )
             NCLOCAL = PTRCOL( JCOL + 2 ) - PTRCOL( JCOL + 1 )
             CALL DMUMPS_ROOT_LOCAL_ASSEMBLY( N,
-     &        roota%SCHUR_POINTER(1),
+     &        roota%SCHUR_POINTER(1:),
      &        LOCAL_M, LOCAL_N,
      &        root%NPCOL, root%NPROW, root%MBLOCK, root%NBLOCK,
      &        NBCOL, NBROW,
      &        IW( PTRI(STEP(ISON)) + SHIFT_LIST_COL_SON ),
      &        IW( PTRI(STEP(ISON)) + SHIFT_LIST_ROW_SON ),
-     &        LDA, SONA_PTR( POSSONA_PTR + SHIFT_VAL_SON ),
+     &        LDA, SONA_PTR( POSSONA_PTR + SHIFT_VAL_SON: ),
      &        ROW_INDEX_LIST( PTRROW( IROW + 1 ) ),
      &        COL_INDEX_LIST( PTRCOL( JCOL + 1 ) ),
      &        NRLOCAL,
      &        NCLOCAL,
      &        NSUPROW(IROW+1), NSUPCOL(JCOL+1),
-     &        root%RG2L(1), TRANSPOSE_ASM,
+     &        root%RG2L(1:), TRANSPOSE_ASM,
      &        KEEP,
-     &        roota%RHS_ROOT(1,1), root%RHS_NLOC,
+     &        roota%RHS_ROOT(1:,1:), root%RHS_NLOC,
      &        NELIM_ROOT, NELIM_ROW, NELIM_COL )
        ELSE
         IF ( PTRIST(STEP( IROOT )) .GE. 0 ) THEN
@@ -502,15 +502,15 @@ C~      write(*,*) ' error in grid position buildandsendcbroot'
      &        NBCOL, NBROW,
      &        IW( PTRI(STEP(ISON)) + SHIFT_LIST_COL_SON ),
      &        IW( PTRI(STEP(ISON)) + SHIFT_LIST_ROW_SON ),
-     &        LDA, SONA_PTR( POSSONA_PTR + SHIFT_VAL_SON ),
+     &        LDA, SONA_PTR( POSSONA_PTR + SHIFT_VAL_SON: ),
      &        ROW_INDEX_LIST( PTRROW( IROW + 1 ) ),
      &        COL_INDEX_LIST( PTRCOL( JCOL + 1 ) ),
      &        NRLOCAL,
      &        NCLOCAL,
      &        NSUPROW(IROW+1), NSUPCOL(JCOL+1),
-     &        root%RG2L(1), TRANSPOSE_ASM,
+     &        root%RG2L(1:), TRANSPOSE_ASM,
      &        KEEP,
-     &        roota%RHS_ROOT(1,1), root%RHS_NLOC,
+     &        roota%RHS_ROOT(1:,1:), root%RHS_NLOC,
      &        NELIM_ROOT, NELIM_ROW, NELIM_COL )
         END IF
        ENDIF
@@ -1278,7 +1278,7 @@ C~   &       // 'routine DMUMPS_GATHER_ROOT '
               ELSE
                 CALL DMUMPS_ASM_ARR_ROOT( N, root, roota,
      &          IROOT, STEP(IROOT),
-     &          roota%SCHUR_POINTER(1), root%SCHUR_LLD,
+     &          roota%SCHUR_POINTER(1:), root%SCHUR_LLD,
      &          LOCAL_M, LOCAL_N,
      &          FILS,
      &          KEEP, PTR8ARR, NINCOLARR, NINROWARR, PTRDEBARR,
@@ -1294,7 +1294,7 @@ C~   &       // 'routine DMUMPS_GATHER_ROOT '
      &          KEEP8(27), KEEP8(26), KEEP, KEEP8, MYID )
               ELSE
                 CALL DMUMPS_ASM_ELT_ROOT( N, root, roota,
-     &           roota%SCHUR_POINTER(1), root%SCHUR_LLD,
+     &           roota%SCHUR_POINTER(1:), root%SCHUR_LLD,
      &           root%SCHUR_MLOC, root%SCHUR_NLOC,
      &           LPTRAR, NELT, FRTPTR, FRTELT,
      &           PTRAIW, PTRARW, INTARR, DBLARR,

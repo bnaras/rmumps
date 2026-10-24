@@ -1,0 +1,25 @@
+Why: dfac_b.F points S_IS_POINTERS%IW and %A at the local arrays
+ IDUMMY and CDUMMY when nothing is allocated; gfortran warns that the
+ pointers may outlive their targets (-Wtarget-lifetime, a significant
+ warning for R CMD check). The two one-element arrays get SAVE.
+Upstream: not sent.
+Obsolete when: upstream changes DMUMPS_FAC_B.
+
+diff --git a/src/dfac_b.F b/src/dfac_b.F
+index baef41a..89ff48c 100644
+--- a/src/dfac_b.F
++++ b/src/dfac_b.F
+@@ -142,8 +142,11 @@ C
+       INTEGER IWPOS, LEAF, NBROOT, NROOT
+       INTEGER    :: LIW_ARG_FAC_PAR
+       INTEGER(8) :: LA_ARG_FAC_PAR
+-      DOUBLE PRECISION, TARGET:: CDUMMY(1)
+-      INTEGER, TARGET :: IDUMMY(1)
++C     rmumps: SAVE, so that the pointers of S_IS_POINTERS that may be
++C     associated with them never outlive their target
++C     (-Wtarget-lifetime)
++      DOUBLE PRECISION, TARGET, SAVE :: CDUMMY(1)
++      INTEGER, TARGET, SAVE :: IDUMMY(1)
+       LOGICAL :: IW_DUMMY, A_DUMMY,
+      &           IW_ALLOCATED_HERE, A_ALLOCATED_HERE
+       KEEP(41)=0

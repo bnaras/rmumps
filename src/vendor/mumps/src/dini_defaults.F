@@ -1,3 +1,4 @@
+C     rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md)
 C
 C  This file is part of MUMPS 5.9.1, released
 C  on Mon Jul 20 09:00:43 UTC 2026
@@ -43,6 +44,8 @@ C
 C     K34= 4 and K10 = 2, except on CRAY machines or when compilation
 C     flag -i8 is used, in which case, K34 = 8 and K10 = 1
 C
+C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER, INTENT(OUT) :: K34, K149, K10, K150
       INTEGER(8) :: SIZE_INT, SIZE_REAL_OR_DOUBLE ! matches MUMPS_INT8
       INTEGER I(2)

@@ -1098,7 +1098,7 @@ C            From LUMAT build GCOMP final graph
      &            .FALSE., ! already unfolded LUMAT
      &            .TRUE.,  ! build final graph 
      &            LUMAT_REMAP_PTR, GCOMP, 
-     &            INFO(1), ICNTL(1), MEMCNT)
+     &            INFO(1:), ICNTL(1:), MEMCNT)
              GCOMP_PROVIDED = .TRUE.
              IF (KEEP(494).EQ.0.OR.KEEP(487).NE.1) THEN
                CALL MUMPS_AB_FREE_LMAT(LUMAT_REMAP_PTR, KEEP(147))
@@ -1114,7 +1114,7 @@ C            symmetrizing the Lmatrix
              CALL MUMPS_AB_LMAT_TO_CLEAN_G ( id%MYID, .TRUE.,
      &            .TRUE., ! not relevant because unfold is true
      &            LMAT_BLOCK, GCOMP, 
-     &            INFO(1), ICNTL(1), MEMCNT)
+     &            INFO(1:), ICNTL(1:), MEMCNT)
              GCOMP_PROVIDED = .TRUE.
              IF (KEEP(494).EQ.0.OR.KEEP(487).NE.1) THEN
                CALL MUMPS_AB_FREE_LMAT(LMAT_BLOCK, KEEP(147))
@@ -3822,7 +3822,7 @@ C
          END DO 
          CALL DMUMPS_BUILD_I_AM_CAND( id%NSLAVES, KEEP(79),
      &        NB_NIV2, id%MYID_NODES,
-     &        id%CANDIDATES(1,1), id%I_AM_CAND(1) )
+     &        id%CANDIDATES(1:,1:), id%I_AM_CAND(1:) )
       ENDIF
       IF ( I_AM_SLAVE ) THEN
          IF (associated(id%FUTURE_NIV2)) THEN

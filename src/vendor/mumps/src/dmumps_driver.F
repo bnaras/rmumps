@@ -37,6 +37,8 @@ C
 !$    USE OMP_LIB
 C
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
 C
 C  =======
 C  Purpose

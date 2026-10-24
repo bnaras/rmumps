@@ -4600,12 +4600,12 @@ C               -- Master not working
      &          id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &          MTYPE, PTR_RHS(IBEG_loc),LD_RHS_loc,NCOL_RHS_loc,
      &          NBRHS_EFF,
-     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
-     &          id%GLOB2LOC_RHS(1), NB_FS_RHSINTR_F,
+     &          id%RHSINTR(IBEG_RHSINTR:), id%LD_RHSINTR, NBRHS_EFF,
+     &          id%GLOB2LOC_RHS(1:), NB_FS_RHSINTR_F,
 C
-     &          id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1),
+     &          id%PTLUST_S(1:), id%KEEP(1), id%KEEP8(1),
      &          id%PROCNODE_STEPS(1),
-     &          IS(1), LIW_PASSED,
+     &          IS(1:), LIW_PASSED,
      &          id%STEP(1),
      &          id%ICNTL(1),id%INFO(1))
               ENDIF
@@ -5374,8 +5374,8 @@ C             compilers would do otherwise
                 CALL DMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
      &          id%MYID, id%COMM, NBRHS_EFF, MTYPE,
      &          PTR_RHS(1), LD_RHS_loc, NCOL_RHS_loc, JBEG_RHS_loc,
-     &          id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1),
-     &          id%PROCNODE_STEPS(1), IS(1), LIW_PASSED,
+     &          id%PTLUST_S(1:), id%KEEP(1), id%KEEP8(1),
+     &          id%PROCNODE_STEPS(1), IS(1:), LIW_PASSED,
      &          id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
      &          CWORK(1), LCWORK,
 #if defined(USE_OLD_SCALING)
@@ -5383,14 +5383,14 @@ C             compilers would do otherwise
 #else
      &          LSCAL, SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
 #endif
-     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
-     &          id%GLOB2LOC_SOL(1), id%N,
+     &          id%RHSINTR(IBEG_RHSINTR:), id%LD_RHSINTR, NBRHS_EFF,
+     &          id%GLOB2LOC_SOL(1:), id%N,
      &          PERM_RHS, size(PERM_RHS) ! For sparse permuted RHS
      &          )
               ELSE ! only gather target entries of A-1
                 CALL DMUMPS_GATHER_SOLUTION_AM1(id%NSLAVES,id%N,
      &          id%MYID, id%COMM, NBRHS_EFF,
-     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
+     &          id%RHSINTR(IBEG_RHSINTR:), id%LD_RHSINTR, NBRHS_EFF,
      &          id%KEEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
 #if defined(USE_OLD_SCALING)
      &          LSCAL, PT_SCALING(1), size(PT_SCALING)
@@ -5402,7 +5402,7 @@ C               --- A-1 related entries
      &          IRHS_SPARSE_COPY(1), size(IRHS_SPARSE_COPY),
      &          RHS_SPARSE_COPY(1), size(RHS_SPARSE_COPY),
      &          UNS_PERM_INV, size(UNS_PERM_INV),
-     &          id%GLOB2LOC_SOL(1), id%N, NB_FS_RHSINTR_TOT
+     &          id%GLOB2LOC_SOL(1:), id%N, NB_FS_RHSINTR_TOT
      &          )
               ENDIF
             ENDIF
@@ -7023,12 +7023,12 @@ C           system (ie, col indices of A or A^T)
      &      id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &      SOLVET,  C_Y(1), id%N, 1,
      &      1,
-     &      id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, 1,
-     &      PTR_POSINRHSINTR_FWD(1), NB_FS_RHSINTR_F,
+     &      id%RHSINTR(IBEG_RHSINTR:), id%LD_RHSINTR, 1,
+     &      PTR_POSINRHSINTR_FWD(1:), NB_FS_RHSINTR_F,
 C
-     &      id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1),
+     &      id%PTLUST_S(1:), id%KEEP(1), id%KEEP8(1),
      &      id%PROCNODE_STEPS(1),
-     &      IS(1), LIW_PASSED,
+     &      IS(1:), LIW_PASSED,
      &      id%STEP(1),
      &      id%ICNTL(1),id%INFO(1))
         ENDIF
@@ -7066,7 +7066,8 @@ C      Next 3 arguments are not used in this call
      & id%LD_RHSINTR,PTR_POSINRHSINTR_FWD(1),PTR_POSINRHSINTR_BWD(1),
      & -1, -1,
      & IDUMMY(1), IDUMMY(1),
-     & 1,1,1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY, 1,1,
+     & 1,1,1, IDUMMY(1), 1, JDUMMY(1), KDUMMY(1), 1, LDUMMY, 1,
+     & MDUMMY, 1,1,
      & NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
 #if defined(STAT_ES_SOLVE)
      & , IDUMMY, 1, JDUMMY, 1
@@ -7102,7 +7103,8 @@ C      Next 3 arguments are not used in this call
      & id%LD_RHSINTR,PTR_POSINRHSINTR_FWD(1),PTR_POSINRHSINTR_BWD(1),
      & -1, -1,
      & IDUMMY(1), IDUMMY(1),
-     & 1,1,1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY, 1,1,
+     & 1,1,1, IDUMMY(1), 1, JDUMMY(1), KDUMMY(1), 1, LDUMMY, 1,
+     & MDUMMY, 1,1,
      & NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
 #if defined(STAT_ES_SOLVE)
      & , IDUMMY, 1, JDUMMY, 1
@@ -7188,7 +7190,7 @@ C         (id%RHSINTR not set/allocate) : receive solution, store
 C         it and scale it.
           CALL DMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
      &      id%MYID, id%COMM, NBRHS_EFF,
-     &      SOLVET, C_Y, id%N, NBRHS_EFF, 1,
+     &      SOLVET, C_Y(1), id%N, NBRHS_EFF, 1,
      &      JDUMMY, id%KEEP(1),id%KEEP8(1), id%PROCNODE_STEPS(1),
      &      IDUMMY, 1,
      &      id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
@@ -7206,10 +7208,10 @@ C         it and scale it.
         ELSE
           CALL DMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
      &      id%MYID, id%COMM, NBRHS_EFF,
-     &      SOLVET, C_Y, id%N, NBRHS_EFF, 1,
-     &      id%PTLUST_S(1), id%KEEP(1),id%KEEP8(1),
+     &      SOLVET, C_Y(1), id%N, NBRHS_EFF, 1,
+     &      id%PTLUST_S(1:), id%KEEP(1),id%KEEP8(1),
      &      id%PROCNODE_STEPS(1),
-     &      IS(1), LIW_PASSED,
+     &      IS(1:), LIW_PASSED,
      &      id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
      &      CWORK(1), size(CWORK),
 #if defined(USE_OLD_SCALING)
@@ -7217,8 +7219,8 @@ C         it and scale it.
 #else
      &      LSCAL, SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
 #endif
-     &      id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
-     &      PTR_POSINRHSINTR_BWD(1), id%N,
+     &      id%RHSINTR(IBEG_RHSINTR:), id%LD_RHSINTR, NBRHS_EFF,
+     &      PTR_POSINRHSINTR_BWD(1:), id%N,
      &      PERM_RHS, size(PERM_RHS)) ! for sparse permuted RHS on host
         ENDIF
         DEALLOCATE( CWORK )

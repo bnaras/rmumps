@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -28,6 +29,6 @@
 #define get_address         F_SYMBOL(sol_omp_mem_manager_get_address,           SOL_OMP_MEM_MANAGER_GET_ADDRESS)
 void MUMPS_CALL init_workspaces(MUMPS_INT* n, MUMPS_INT* p, MUMPS_INT* err);
 void MUMPS_CALL resize_workspaces(MUMPS_INT* n, MUMPS_INT* err);
-void MUMPS_CALL release_workspaces();
+void MUMPS_CALL release_workspaces(void);
 void MUMPS_CALL get_address(MUMPS_INT* id, intptr_t* out);
 #endif

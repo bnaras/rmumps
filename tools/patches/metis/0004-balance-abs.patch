@@ -1,0 +1,22 @@
+Why: Balance2Way() passes a real_t expression to iabs(), i.e. abs() of
+ int, which clang reports (-Wabsolute-value, a significant warning for
+ R CMD check). The conversion to idx_t is now explicit; the behavior
+ (truncation, then absolute value) is unchanged. Later METIS releases use
+ rabs() here instead, which would change orderings slightly.
+Upstream: fixed differently in METIS 5.1.1+ (rabs).
+Obsolete when: METIS is updated.
+
+diff --git a/libmetis/balance.c b/libmetis/balance.c
+index 3fb0e6e..8fcfacd 100644
+--- a/libmetis/balance.c
++++ b/libmetis/balance.c
+@@ -20,7 +20,8 @@ void Balance2Way(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts)
+ 
+   if (graph->ncon == 1) {
+     /* return right away if the balance is OK */
+-    if (iabs(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0]) < 3*graph->tvwgt[0]/graph->nvtxs)
++    /* rmumps: explicit conversion (integer abs() of a real expression) */
++    if (iabs((idx_t)(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0])) < 3*graph->tvwgt[0]/graph->nvtxs)
+       return;
+ 
+     if (graph->nbnd > 0)

@@ -302,8 +302,8 @@ C~          WRITE (MP,99997) (IKEEP1(I),I=1,K)
           IF ( PROK ) THEN
             CALL MUMPS_SECDEB( TIMEB )
           ENDIF
-          CALL DMUMPS_ANA_GNEW(N,NZ8,IRN(1), ICN(1), IW(1), LIW8,
-     &        IPE(1), PTRAR(1,2),
+          CALL DMUMPS_ANA_GNEW(N,NZ8,IRN(1:), ICN(1:), IW(1:), LIW8,
+     &        IPE(1:), PTRAR(1,2),
      &        IPQ8, IWL1, IWFR8, KEEP8(126), KEEP8(127),
      &        INFO(1), INFO(2), ICNTL, symmetry, 
      &        KEEP(50), NBQD, AvgDens, KEEP(264), KEEP(265), 
@@ -432,8 +432,8 @@ C~   &                 ' WARNING input matrix data modified'
                      INFO( 2 ) = N*KEEP(10)
                   ENDIF
                   CALL DMUMPS_ANA_GNEW
-     &                 (N,NZ8,IRN(1), ICN(1), IW(1), LIW8, 
-     &                  IPE(1), PTRAR(1,2), 
+     &                 (N,NZ8,IRN(1:), ICN(1:), IW(1:), LIW8, 
+     &                  IPE(1:), PTRAR(1,2), 
      &                 IPQ8, IWL1, IWFR8, KEEP8(126), KEEP8(127), 
      &                 INFO(1), INFO(2), ICNTL, symmetry, KEEP(50),
      &                 NBQD, AvgDens, KEEP(264), KEEP(265), 
@@ -953,8 +953,8 @@ C~          WRITE(MP,'(A)') ' Ordering given is used'
                      INFO( 1 ) = -7
                      INFO( 2 ) = N*KEEP(10)
                ENDIF
-               CALL DMUMPS_ANA_GNEW(N,NZ8,IRN(1),ICN(1),IW(1),LIW8,
-     &              IPE(1), PTRAR(1,2),
+               CALL DMUMPS_ANA_GNEW(N,NZ8,IRN(1:),ICN(1:),IW(1:),LIW8,
+     &              IPE(1:), PTRAR(1,2),
      &              IPQ8, IWL1, IWFR8, KEEP8(126), KEEP8(127),
      &              INFO(1), INFO(2), ICNTL, symmetry, KEEP(50),
      &              NBQD, AvgDens, KEEP(264),KEEP(265), .TRUE.,
@@ -1030,8 +1030,9 @@ C~             WRITE( MP, '(A,F12.4)' )
 C~   &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
            ENDIF
          ELSE
-            CALL DMUMPS_ANA_J(N, NZ8, IRN(1), ICN(1), IKEEP1(1), IW(1),
-     &           LIW8, IPE(1),
+            CALL DMUMPS_ANA_J(N, NZ8, IRN(1:), ICN(1:), IKEEP1(1:),
+     & IW(1:),
+     &           LIW8, IPE(1:),
      &           PTRAR(1,2), IWL1, IWFR8,
      &           INFO(1),INFO(2), MP)
             IF (KEEP(60) .EQ. 0) THEN
@@ -1039,8 +1040,9 @@ C~   &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
             ELSE 
                ITEMP = SIZE_SCHUR
             ENDIF
-            CALL DMUMPS_ANA_K(N, IPE(1), IW(1), LIW8, IWFR8, IKEEP1(1),
-     &              IKEEP2(1), IWL1,
+            CALL DMUMPS_ANA_K(N, IPE(1:), IW(1:), LIW8, IWFR8,
+     & IKEEP1(1:),
+     &              IKEEP2(1:), IWL1,
      &              PTRAR, NCMPA, ITEMP, PARENT)
          ENDIF                  
       ENDIF                     
@@ -1059,12 +1061,12 @@ C~   &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
          GOTO 90                
       ENDIF
       CALL DMUMPS_ANA_LNEW
-     &     (N, PARENT, IWL1, IKEEP1(1), IKEEP2(1), IKEEP3(1),
-     &     NFSIZ(1), PTRAR, INFO(6), FILS(1), FRERE(1), 
+     &     (N, PARENT, IWL1, IKEEP1(1:), IKEEP2(1:), IKEEP3(1:),
+     &     NFSIZ(1:), PTRAR, INFO(6), FILS(1:), FRERE(1:), 
      &     PTRAR(1,3), NEMIN, WTEMP, KEEP(60),
-     &     KEEP(20),KEEP(38),PTRAR(1,2),KEEP(104),IW(1),KEEP(50), 
+     &     KEEP(20),KEEP(38),PTRAR(1,2),KEEP(104),IW(1:),KEEP(50), 
      &     ICNTL(13), KEEP(37), KEEP(197), NSLAVES, KEEP(250).EQ.1,
-     &     SIZEOFBLOCKS_AVAIL, SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR
+     &     SIZEOFBLOCKS_AVAIL, SIZEOFBLOCKS_PTR(1:), LSIZEOFBLOCKS_PTR
      &     , INODE_Scalapack_CAND, NBSONS_Scalapack_CAND, 
      &     KEEP(11), KEEP(191), KEEP(192), KEEP(193)
      &      )
@@ -1091,7 +1093,7 @@ C~   &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
          ENDDO
          FILS(IN) = -IFSON
       ENDIF
-      CALL DMUMPS_ANA_M(IKEEP2(1),
+      CALL DMUMPS_ANA_M(IKEEP2(1:),
      &     PTRAR(1,3), INFO(6),
      &     INFO(5), KEEP(2), KEEP(50),
      &     KEEP8(101), KEEP(108), KEEP(5),
@@ -1124,8 +1126,8 @@ C~   &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
         IF (KEEP(210).EQ.1) THEN
          SPLITROOT = .FALSE. 
          IF ( KEEP(62).GE.1) THEN
-           CALL DMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
-     &         SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6),
+           CALL DMUMPS_CUTNODES(N, FRERE(1:), FILS(1:), NFSIZ(1:), 
+     &         SIZEOFBLOCKS_PTR(1:), LSIZEOFBLOCKS_PTR, INFO(6),
      &         NSLAVES, KEEP,KEEP8, SPLITROOT,
      &         MP, LDIAG, INFO(1), INFO(2))
            IF (INFO(1).LT.0) GOTO 90 
@@ -1186,8 +1188,8 @@ C~   &         KEEP(61)
       SPLITROOT = (SPLITROOT.AND.( (KEEP(60).EQ.0) ))
       IF (SPLITROOT) THEN
         IF (KEEP(11).EQ.0) THEN
-          CALL DMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
-     &              SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6),
+          CALL DMUMPS_CUTNODES(N, FRERE(1:), FILS(1:), NFSIZ(1:), 
+     &              SIZEOFBLOCKS_PTR(1:), LSIZEOFBLOCKS_PTR, INFO(6),
      &              NSLAVES, KEEP,KEEP8, SPLITROOT,
      &              MP, LDIAG, INFO(1), INFO(2))
           IF (INFO(1).LT.0) GOTO 90 
@@ -1198,9 +1200,9 @@ C~   &         KEEP(61)
         ELSE
          CALL DMUMPS_SPLIT_ROOT( NSLAVES, 
      &            HOW_TO_SPLIT_ROOT, INODE_Scalapack_CAND,
-     &            N, FRERE(1), FILS(1), NFSIZ(1), 
+     &            N, FRERE(1:), FILS(1:), NFSIZ(1:), 
      &            KEEP(1), KEEP8(1),
-     &            SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6))
+     &            SIZEOFBLOCKS_PTR(1:), LSIZEOFBLOCKS_PTR, INFO(6))
         ENDIF
       ENDIF
       IF (LDIAG.GT.2 .AND. MP.GT.0) THEN
@@ -1683,10 +1685,10 @@ C~   &     ': MAXIMIZE PRODUCT DIAGONAL AND SCALE'
       FLAG => IKEEPALLOC(2_8*int(N,8)+1:3_8*int(N,8))
       IF(MTRANSLOC.NE.1) THEN
          CALL DMUMPS_SUPPRESS_DUPPLI_VAL(N,NZREAL,IPE(1),IW(IRNW),S2,
-     &        PERM(1),IPQ8(1))
+     &        PERM(1:),IPQ8(1))
       ELSE
          CALL DMUMPS_SUPPRESS_DUPPLI_STR(N,NZREAL,IPE(1),IW(IRNW),
-     &        PERM(1))
+     &        PERM(1:))
       ENDIF
       IF(NZREAL .NE. NZsave) DUPPLI = .TRUE.
       LS2 = NZTOT
@@ -1696,7 +1698,7 @@ C~   &     ': MAXIMIZE PRODUCT DIAGONAL AND SCALE'
       ENDIF
       CALL DMUMPS_MTRANS_DRIVER(MTRANSLOC ,N, N, NZREAL, 
      &     IPE, IW(IRNW), S2(1), LS2,
-     &     NUMNZ, PERM(1), LIW, IW(IPIW), LDW, S2(LS2+1),
+     &     NUMNZ, PERM(1:), LIW, IW(IPIW), LDW, S2(LS2+1),
      &     IPQ8,
      &     ICNTL64, CNTL64, INFO64, INFO)
       IF (INFO(1).LT.0) THEN 

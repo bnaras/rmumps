@@ -22,7 +22,8 @@ void Balance2Way(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts)
 
   if (graph->ncon == 1) {
     /* return right away if the balance is OK */
-    if (iabs(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0]) < 3*graph->tvwgt[0]/graph->nvtxs)
+    /* rmumps: explicit conversion (integer abs() of a real expression) */
+    if (iabs((idx_t)(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0])) < 3*graph->tvwgt[0]/graph->nvtxs)
       return;
 
     if (graph->nbnd > 0)

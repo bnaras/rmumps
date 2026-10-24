@@ -971,6 +971,8 @@ C
        SUBROUTINE DMUMPS_BLR_SAVE_DIAG_BLOCK (
      &    IWHANDLER, IPANEL, D, KEEP34 )
          use iso_c_binding
+C        rmumps: interfaces of the mixed-precision dispatch routines
+         INCLUDE 'dmumps_lrmixed_interfaces.h'
 C
 C      Purpose:
 C      =======

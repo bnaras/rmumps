@@ -1,0 +1,184 @@
+C     rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md)
+C
+C     rmumps: explicit interfaces of the precision kernels of lr_common.F
+C     called by the mixed-precision dispatch routines of dlr_core.F. The
+C     dispatch routines receive their matrices as type-agnostic dummies
+C     and pass them on unchanged, which requires explicit interfaces
+C     whose matrix arguments are type-agnostic too.
+C
+      INTERFACE
+      SUBROUTINE MUMPS_LRMIXED_CAST_16D(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_16D
+      SUBROUTINE MUMPS_LRMIXED_CAST_16S(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_16S
+      SUBROUTINE MUMPS_LRMIXED_CAST_24D(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_24D
+      SUBROUTINE MUMPS_LRMIXED_CAST_24S(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_24S
+      SUBROUTINE MUMPS_LRMIXED_CAST_40D(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_40D
+      SUBROUTINE MUMPS_LRMIXED_CAST_48D(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_48D
+      SUBROUTINE MUMPS_LRMIXED_CAST_56D(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_56D
+      SUBROUTINE MUMPS_LRMIXED_CAST_D16(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_D16
+      SUBROUTINE MUMPS_LRMIXED_CAST_D24(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_D24
+      SUBROUTINE MUMPS_LRMIXED_CAST_D40(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_D40
+      SUBROUTINE MUMPS_LRMIXED_CAST_D48(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_D48
+      SUBROUTINE MUMPS_LRMIXED_CAST_D56(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_D56
+      SUBROUTINE MUMPS_LRMIXED_CAST_DD(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_DD
+      SUBROUTINE MUMPS_LRMIXED_CAST_DS(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_DS
+      SUBROUTINE MUMPS_LRMIXED_CAST_S16(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_S16
+      SUBROUTINE MUMPS_LRMIXED_CAST_S24(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_S24
+      SUBROUTINE MUMPS_LRMIXED_CAST_SD(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_SD
+      SUBROUTINE MUMPS_LRMIXED_CAST_SS(A, B, nrows, ncols, ldA, ldB)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER :: nrows, ncols, ldA, ldB
+      END SUBROUTINE MUMPS_LRMIXED_CAST_SS
+      SUBROUTINE MUMPS_LRMIXED_PLUS_DD(X, Y, nrows, ncols, ldX, ldY)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DIR$ IGNORE_TKR (TKRC) X, Y
+      INTEGER :: X(*), Y(*)
+      INTEGER :: nrows, ncols, ldX, ldY
+      END SUBROUTINE MUMPS_LRMIXED_PLUS_DD
+      SUBROUTINE MUMPS_LRMIXED_PLUS_DS(X, Y, nrows, ncols, ldX, ldY)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DIR$ IGNORE_TKR (TKRC) X, Y
+      INTEGER :: X(*), Y(*)
+      INTEGER :: nrows, ncols, ldX, ldY
+      END SUBROUTINE MUMPS_LRMIXED_PLUS_DS
+      SUBROUTINE MUMPS_LRMIXED_PLUS_SD(X, Y, nrows, ncols, ldX, ldY)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DIR$ IGNORE_TKR (TKRC) X, Y
+      INTEGER :: X(*), Y(*)
+      INTEGER :: nrows, ncols, ldX, ldY
+      END SUBROUTINE MUMPS_LRMIXED_PLUS_SD
+      SUBROUTINE MUMPS_LRMIXED_PLUS_SS(X, Y, nrows, ncols, ldX, ldY)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
+!DIR$ IGNORE_TKR (TKRC) X, Y
+      INTEGER :: X(*), Y(*)
+      INTEGER :: nrows, ncols, ldX, ldY
+      END SUBROUTINE MUMPS_LRMIXED_PLUS_SS
+      SUBROUTINE MUMPS_LRMIXED_DGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
+     &               A, LDA, B, LDB, BETA, C, LDC)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
+!DIR$ IGNORE_TKR (TKRC) A, B, C
+      INTEGER :: A(*), B(*), C(*)
+      INTEGER :: M, N, K, LDA, LDB, LDC
+      DOUBLE PRECISION :: ALPHA, BETA
+      CHARACTER(len=1) :: TRANSA, TRANSB
+      END SUBROUTINE MUMPS_LRMIXED_DGEMM
+      SUBROUTINE MUMPS_LRMIXED_SGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
+     &               A, LDA, B, LDB, BETA, C, LDC)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
+!DIR$ IGNORE_TKR (TKRC) A, B, C
+      INTEGER :: A(*), B(*), C(*)
+      INTEGER :: M, N, K, LDA, LDB, LDC
+      DOUBLE PRECISION :: ALPHA, BETA
+      CHARACTER(len=1) :: TRANSA, TRANSB
+      END SUBROUTINE MUMPS_LRMIXED_SGEMM
+      END INTERFACE

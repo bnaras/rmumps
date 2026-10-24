@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -34,9 +35,9 @@ MUMPS_INT mumps_io_error(MUMPS_INT mumps_errno, const char* desc);
    Returns mumps_errno for convenience */
 MUMPS_INT mumps_io_sys_error(MUMPS_INT mumps_errno, const char* desc);
 #if ! ( defined(MUMPS_WIN32) || defined(WITHOUT_PTHREAD) )
-MUMPS_INT mumps_io_init_err_lock();
-MUMPS_INT mumps_io_destroy_err_lock();
-MUMPS_INT mumps_check_error_th();
-MUMPS_INLINE MUMPS_INT mumps_io_protect_err();
-MUMPS_INLINE MUMPS_INT mumps_io_unprotect_err();
+MUMPS_INT mumps_io_init_err_lock(void);
+MUMPS_INT mumps_io_destroy_err_lock(void);
+MUMPS_INT mumps_check_error_th(void);
+MUMPS_INLINE MUMPS_INT mumps_io_protect_err(void);
+MUMPS_INLINE MUMPS_INT mumps_io_unprotect_err(void);
 #endif /* ! ( MUMPS_WIN32 || WITHOUT_PTHREAD ) */

@@ -1,3 +1,4 @@
+C     rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md)
 C
 C  This file is part of MUMPS 5.9.1, released
 C  on Mon Jul 20 09:00:43 UTC 2026
@@ -264,7 +265,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: A(ldA,ncols)
-        INTEGER*1 :: B(2*ldB,ncols)
+        INTEGER(1) :: B(2*ldB,ncols)
         call mumps_float_fp16s(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_S16
       SUBROUTINE MUMPS_LRMIXED_CAST_D16(A, B, nrows, ncols, ldA, 
@@ -272,7 +273,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(2*ldB,ncols)
+        INTEGER(1) :: B(2*ldB,ncols)
         call mumps_double_fp16s(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_D16
       SUBROUTINE MUMPS_LRMIXED_CAST_S24(A, B, nrows, ncols, ldA, 
@@ -280,7 +281,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: A(ldA,ncols)
-        INTEGER*1 :: B(3*ldB,ncols)
+        INTEGER(1) :: B(3*ldB,ncols)
         call mumps_float_fp24s(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_S24
       SUBROUTINE MUMPS_LRMIXED_CAST_D24(A, B, nrows, ncols, ldA, 
@@ -288,7 +289,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(3*ldB,ncols)
+        INTEGER(1) :: B(3*ldB,ncols)
         call mumps_double_fp24s(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_D24
       SUBROUTINE MUMPS_LRMIXED_CAST_D40(A, B, nrows, ncols, ldA, 
@@ -296,7 +297,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(5*ldB,ncols)
+        INTEGER(1) :: B(5*ldB,ncols)
         call mumps_double_fp40(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_D40
       SUBROUTINE MUMPS_LRMIXED_CAST_D48(A, B, nrows, ncols, ldA, 
@@ -304,7 +305,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(6*ldB,ncols)
+        INTEGER(1) :: B(6*ldB,ncols)
         call mumps_double_fp48(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_D48
       SUBROUTINE MUMPS_LRMIXED_CAST_D56(A, B, nrows, ncols, ldA, 
@@ -312,7 +313,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(7*ldB,ncols)
+        INTEGER(1) :: B(7*ldB,ncols)
         call mumps_double_fp56(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_D56
       ! {fp16,...,fp56} -> {double,float}
@@ -320,7 +321,7 @@ C{
      &                                      ldB)
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
-        INTEGER*1 :: A(2*ldA,ncols)
+        INTEGER(1) :: A(2*ldA,ncols)
         REAL :: B(ldB,ncols)
         call mumps_fp16s_float(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_16S
@@ -329,7 +330,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(2*ldA,ncols)
+        INTEGER(1) :: A(2*ldA,ncols)
         call mumps_fp16s_double(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_16D
       SUBROUTINE MUMPS_LRMIXED_CAST_24S(A, B, nrows, ncols, ldA, 
@@ -337,7 +338,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: B(ldB,ncols)
-        INTEGER*1 :: A(3*ldA,ncols)
+        INTEGER(1) :: A(3*ldA,ncols)
         call mumps_fp24s_float(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_24S
       SUBROUTINE MUMPS_LRMIXED_CAST_24D(A, B, nrows, ncols, ldA, 
@@ -345,7 +346,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(3*ldA,ncols)
+        INTEGER(1) :: A(3*ldA,ncols)
         call mumps_fp24s_double(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_24D
       SUBROUTINE MUMPS_LRMIXED_CAST_40D(A, B, nrows, ncols, ldA, 
@@ -353,7 +354,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(5*ldA,ncols)
+        INTEGER(1) :: A(5*ldA,ncols)
         call mumps_fp40_double(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_40D
       SUBROUTINE MUMPS_LRMIXED_CAST_48D(A, B, nrows, ncols, ldA, 
@@ -361,7 +362,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(6*ldA,ncols)
+        INTEGER(1) :: A(6*ldA,ncols)
         call mumps_fp48_double(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_48D
       SUBROUTINE MUMPS_LRMIXED_CAST_56D(A, B, nrows, ncols, ldA, 
@@ -369,7 +370,7 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(7*ldA,ncols)
+        INTEGER(1) :: A(7*ldA,ncols)
         call mumps_fp56_double(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_56D
       ! complex domain {fp16,...,fp56} -> {double,float}
@@ -378,49 +379,49 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
-        INTEGER*1 :: A(2*2*ldA,ncols)
+        INTEGER(1) :: A(2*2*ldA,ncols)
         call mumps_fp16c_cfloat(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_16C
       SUBROUTINE MUMPS_LRMIXED_CAST_16Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*2*ldA,ncols)
+        INTEGER(1) :: A(2*2*ldA,ncols)
         call mumps_fp16c_zdouble(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_16Z
       SUBROUTINE MUMPS_LRMIXED_CAST_24C(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
-        INTEGER*1 :: A(2*3*ldA,ncols)
+        INTEGER(1) :: A(2*3*ldA,ncols)
         call mumps_fp24c_cfloat(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_24C
       SUBROUTINE MUMPS_LRMIXED_CAST_24Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*3*ldA,ncols)
+        INTEGER(1) :: A(2*3*ldA,ncols)
         call mumps_fp24c_zdouble(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_24Z
       SUBROUTINE MUMPS_LRMIXED_CAST_40Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*5*ldA,ncols)
+        INTEGER(1) :: A(2*5*ldA,ncols)
         call mumps_fp40z_zdouble(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_40Z
       SUBROUTINE MUMPS_LRMIXED_CAST_48Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*6*ldA,ncols)
+        INTEGER(1) :: A(2*6*ldA,ncols)
         call mumps_fp48z_zdouble(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_48Z
       SUBROUTINE MUMPS_LRMIXED_CAST_56Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*7*ldA,ncols)
+        INTEGER(1) :: A(2*7*ldA,ncols)
         call mumps_fp56z_zdouble(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_56Z
       ! complex domain {double,float} -> {fp16,...,fp56}
@@ -429,49 +430,49 @@ C{
         implicit none
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
-        INTEGER*1 :: B(2*2*ldB,ncols)
+        INTEGER(1) :: B(2*2*ldB,ncols)
         call mumps_cfloat_fp16c(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_C16
       SUBROUTINE MUMPS_LRMIXED_CAST_Z16(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*2*ldB,ncols)
+        INTEGER(1) :: B(2*2*ldB,ncols)
         call mumps_zdouble_fp16c(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z16
       SUBROUTINE MUMPS_LRMIXED_CAST_C24(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
-        INTEGER*1 :: B(2*3*ldB,ncols)
+        INTEGER(1) :: B(2*3*ldB,ncols)
         call mumps_cfloat_fp24c(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_C24
       SUBROUTINE MUMPS_LRMIXED_CAST_Z24(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*3*ldB,ncols)
+        INTEGER(1) :: B(2*3*ldB,ncols)
         call mumps_zdouble_fp24c(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z24
       SUBROUTINE MUMPS_LRMIXED_CAST_Z40(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*5*ldB,ncols)
+        INTEGER(1) :: B(2*5*ldB,ncols)
         call mumps_zdouble_fp40z(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z40
       SUBROUTINE MUMPS_LRMIXED_CAST_Z48(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*6*ldB,ncols)
+        INTEGER(1) :: B(2*6*ldB,ncols)
         call mumps_zdouble_fp48z(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z48
       SUBROUTINE MUMPS_LRMIXED_CAST_Z56(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*7*ldB,ncols)
+        INTEGER(1) :: B(2*7*ldB,ncols)
         call mumps_zdouble_fp56z(A,B,nrows,ncols,ldA,ldB)
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z56
 C} MIXHPC
@@ -481,7 +482,7 @@ C{ ! MIXHPC
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: A(ldA,ncols)
-        INTEGER*1 :: B(2*ldB,ncols)
+        INTEGER(1) :: B(2*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -494,7 +495,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: B(ldB,ncols)
-        INTEGER*1 :: A(2*ldA,ncols)
+        INTEGER(1) :: A(2*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -507,7 +508,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(2*ldB,ncols)
+        INTEGER(1) :: B(2*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -521,7 +522,7 @@ C       Local variables
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
         REAL :: TMP
-        INTEGER*1 :: A(2*ldA,ncols)
+        INTEGER(1) :: A(2*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -535,7 +536,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: A(ldA,ncols)
-        INTEGER*1 :: B(3*ldB,ncols)
+        INTEGER(1) :: B(3*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -548,7 +549,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         REAL :: B(ldB,ncols)
-        INTEGER*1 :: A(3*ldA,ncols)
+        INTEGER(1) :: A(3*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -561,7 +562,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(3*ldB,ncols)
+        INTEGER(1) :: B(3*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -574,7 +575,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(3*ldA,ncols)
+        INTEGER(1) :: A(3*ldA,ncols)
 C       Local variables
         REAL :: TMP
         INTEGER :: I, J
@@ -589,7 +590,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(5*ldB,ncols)
+        INTEGER(1) :: B(5*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -602,7 +603,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(5*ldA,ncols)
+        INTEGER(1) :: A(5*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -615,7 +616,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(6*ldB,ncols)
+        INTEGER(1) :: B(6*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -628,7 +629,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(6*ldA,ncols)
+        INTEGER(1) :: A(6*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -641,7 +642,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: A(ldA,ncols)
-        INTEGER*1 :: B(7*ldB,ncols)
+        INTEGER(1) :: B(7*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -654,7 +655,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         DOUBLE PRECISION :: B(ldB,ncols)
-        INTEGER*1 :: A(7*ldA,ncols)
+        INTEGER(1) :: A(7*ldA,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -667,7 +668,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
-        INTEGER*1 :: B(2*2*ldB,ncols)
+        INTEGER(1) :: B(2*2*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -681,7 +682,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
-        INTEGER*1 :: A(2*2*ldA,ncols)
+        INTEGER(1) :: A(2*2*ldA,ncols)
 C       Local variables
         REAL :: TMP1, TMP2
         INTEGER :: I, J
@@ -697,7 +698,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*2*ldB,ncols)
+        INTEGER(1) :: B(2*2*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -711,7 +712,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*2*ldA,ncols)
+        INTEGER(1) :: A(2*2*ldA,ncols)
 C       Local variables
         REAL :: TMP1, TMP2
         INTEGER :: I, J
@@ -727,7 +728,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
-        INTEGER*1 :: B(2*3*ldB,ncols)
+        INTEGER(1) :: B(2*3*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -741,7 +742,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
-        INTEGER*1 :: A(2*3*ldA,ncols)
+        INTEGER(1) :: A(2*3*ldA,ncols)
 C       Local variables
         REAL :: TMP1, TMP2
         INTEGER :: I, J
@@ -757,7 +758,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*3*ldB,ncols)
+        INTEGER(1) :: B(2*3*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -771,7 +772,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*3*ldA,ncols)
+        INTEGER(1) :: A(2*3*ldA,ncols)
 C       Local variables
         REAL :: TMP1, TMP2
         INTEGER :: I, J
@@ -787,7 +788,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*5*ldB,ncols)
+        INTEGER(1) :: B(2*5*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -801,7 +802,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*5*ldA,ncols)
+        INTEGER(1) :: A(2*5*ldA,ncols)
 C       Local variables
         DOUBLE PRECISION :: TMP1, TMP2
         INTEGER :: I, J
@@ -817,7 +818,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*6*ldB,ncols)
+        INTEGER(1) :: B(2*6*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -831,7 +832,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*6*ldA,ncols)
+        INTEGER(1) :: A(2*6*ldA,ncols)
 C       Local variables
         DOUBLE PRECISION :: TMP1, TMP2
         INTEGER :: I, J
@@ -847,7 +848,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
-        INTEGER*1 :: B(2*7*ldB,ncols)
+        INTEGER(1) :: B(2*7*ldB,ncols)
 C       Local variables
         INTEGER :: I, J
         DO J=1,ncols
@@ -861,7 +862,7 @@ C       Local variables
      &                                      ldB)
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
-        INTEGER*1 :: A(2*7*ldA,ncols)
+        INTEGER(1) :: A(2*7*ldA,ncols)
 C       Local variables
         DOUBLE PRECISION :: TMP1, TMP2
         INTEGER :: I, J
@@ -876,9 +877,9 @@ C       Local variables
 C} ! MIXHPC
 #endif
        SUBROUTINE CONVERT_32_16(A, B)
-         INTEGER*4 A
-         INTEGER*4 TMP
-         INTEGER*1 B(2) 
+         INTEGER(4) A
+         INTEGER(4) TMP
+         INTEGER(1) B(2) 
          TMP = 0
          CALL MVBITS(A, 16, 8, TMP, 0)
          B(1)=TMP
@@ -886,9 +887,9 @@ C} ! MIXHPC
          B(2)=TMP
        END SUBROUTINE CONVERT_32_16
        SUBROUTINE CONVERT_16_32(A, B)
-         INTEGER*4 B
-         INTEGER*4 TMP
-         INTEGER*1 A(3) 
+         INTEGER(4) B
+         INTEGER(4) TMP
+         INTEGER(1) A(3) 
          B = 32768
          TMP=A(1)
          CALL MVBITS(TMP, 0, 8, B, 16)
@@ -896,9 +897,9 @@ C} ! MIXHPC
          CALL MVBITS(TMP, 0, 8, B, 24)
        END SUBROUTINE CONVERT_16_32
        SUBROUTINE CONVERT_64_40(A, B)
-         INTEGER*8 A
-         INTEGER*8 TMP
-         INTEGER*1 B(5) 
+         INTEGER(8) A
+         INTEGER(8) TMP
+         INTEGER(1) B(5) 
          TMP = 0
          CALL MVBITS(A, 24, 8, TMP, 0)
          B(1)=TMP
@@ -912,9 +913,9 @@ C} ! MIXHPC
          B(5)=TMP
        END SUBROUTINE CONVERT_64_40
        SUBROUTINE CONVERT_40_64(A, B)
-         INTEGER*8 B
-         INTEGER*8 TMP
-         INTEGER*1 A(5) 
+         INTEGER(8) B
+         INTEGER(8) TMP
+         INTEGER(1) A(5) 
          B = 8388608_8
          TMP=A(1)
          CALL MVBITS(TMP, 0, 8, B, 24)
@@ -928,9 +929,9 @@ C} ! MIXHPC
          CALL MVBITS(TMP, 0, 8, B, 56)
        END SUBROUTINE CONVERT_40_64
        SUBROUTINE CONVERT_32_24(A, B)
-         INTEGER*4 A
-         INTEGER*4 TMP
-         INTEGER*1 B(3) 
+         INTEGER(4) A
+         INTEGER(4) TMP
+         INTEGER(1) B(3) 
          TMP = 0
          CALL MVBITS(A, 8, 8, TMP, 0)
          B(1)=TMP
@@ -940,9 +941,9 @@ C} ! MIXHPC
          B(3)=TMP
        END SUBROUTINE CONVERT_32_24
        SUBROUTINE CONVERT_24_32(A, B)
-         INTEGER*4 B
-         INTEGER*4 TMP
-         INTEGER*1 A(3) 
+         INTEGER(4) B
+         INTEGER(4) TMP
+         INTEGER(1) A(3) 
          B = 128
          TMP=A(1)
          CALL MVBITS(TMP, 0, 8, B, 8)
@@ -952,9 +953,9 @@ C} ! MIXHPC
          CALL MVBITS(TMP, 0, 8, B, 24)
        END SUBROUTINE CONVERT_24_32
        SUBROUTINE CONVERT_64_48(A, B)
-         INTEGER*8 A
-         INTEGER*8 TMP
-         INTEGER*1 B(6) 
+         INTEGER(8) A
+         INTEGER(8) TMP
+         INTEGER(1) B(6) 
          TMP = 0
          CALL MVBITS(A, 16, 8, TMP, 0)
          B(1)=TMP
@@ -970,9 +971,9 @@ C} ! MIXHPC
          B(6)=TMP
        END SUBROUTINE CONVERT_64_48
        SUBROUTINE CONVERT_48_64(A, B)
-         INTEGER*8 B
-         INTEGER*8 TMP
-         INTEGER*1 A(6) 
+         INTEGER(8) B
+         INTEGER(8) TMP
+         INTEGER(1) A(6) 
          B = 32768_8
          TMP=A(1)
          CALL MVBITS(TMP, 0, 8, B, 16)
@@ -988,9 +989,9 @@ C} ! MIXHPC
          CALL MVBITS(TMP, 0, 8, B, 56)
        END SUBROUTINE CONVERT_48_64
        SUBROUTINE CONVERT_64_56(A, B)
-         INTEGER*8 A
-         INTEGER*8 TMP
-         INTEGER*1 B(7) 
+         INTEGER(8) A
+         INTEGER(8) TMP
+         INTEGER(1) B(7) 
          TMP = 0
          CALL MVBITS(A, 8, 8, TMP, 0)
          B(1)=TMP
@@ -1008,9 +1009,9 @@ C} ! MIXHPC
          B(7)=TMP
        END SUBROUTINE CONVERT_64_56
        SUBROUTINE CONVERT_56_64(A, B)
-         INTEGER*8 B
-         INTEGER*8 TMP
-         INTEGER*1 A(7) 
+         INTEGER(8) B
+         INTEGER(8) TMP
+         INTEGER(1) A(7) 
          B = 128
          TMP=A(1)
          CALL MVBITS(TMP, 0, 8, B, 8)
@@ -1132,7 +1133,7 @@ C        Local variables
      &                         BUF, LBUF, POSITION, COMM, IERR)
          INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS, IROW_BEG,
      &              NROWS_TO_PACK
-         INTEGER*1 :: X(NROWS*NCOLS*NBYTES_PER_ELT)
+         INTEGER(1) :: X(NROWS*NCOLS*NBYTES_PER_ELT)
          INTEGER, intent(in)  :: COMM, LBUF 
          INTEGER, intent(inout) :: POSITION, IERR
          INTEGER, intent(inout) :: BUF(*)
@@ -1150,7 +1151,7 @@ c        Local variables
      &                                 NBYTES_PER_ELT,
      &                         BUF, LBUF, POSITION, COMM, IERR)
          INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS
-         INTEGER*1 :: X(NROWS*NCOLS*NBYTES_PER_ELT)
+         INTEGER(1) :: X(NROWS*NCOLS*NBYTES_PER_ELT)
          INTEGER, intent(in)  :: COMM, LBUF 
          INTEGER, intent(inout) :: POSITION, IERR
          INTEGER, intent(in) :: BUF(*)

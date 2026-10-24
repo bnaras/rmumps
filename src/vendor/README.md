@@ -16,8 +16,13 @@ saying so. The changes are:
   (`C~` in columns 1-2), STOP becomes `CALL REXIT(...)`, INQUIRE results
   are constant, RANDOM_NUMBER calls use a private generator, and file I/O
   in the routines listed in `tools/manifest/mumps.dcf` is removed;
-- T2 (C): `#include "rmumps_cshim.h"` after the last `#include` of each
-  `.c` file (see `src/shim/rmumps_cshim.h`);
+- T2 (C): `#include "rmumps_cshim.h"` after each `#include` of every
+  `.c` file (see `src/shim/rmumps_cshim.h`), and `(void)` for empty
+  parameter lists in declarations;
+- T4 (Fortran): elements of pointer or assumed-shape arrays passed to
+  array dummies become sections, `P(I)` -> `P(I:)`, at the sites listed
+  in `tools/conformance/mumps-sections.tsv`;
+- T5 (Fortran): `INTEGER*8`-style declarations become `INTEGER(8)`;
 - only the files needed for a sequential, double precision real build
   are kept.
 

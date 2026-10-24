@@ -631,7 +631,7 @@ MUMPS_INT mumps_io_set_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,
   strcpy((((mumps_files+*type)->mumps_io_pfile_pointer_array)+i)->name,name);
   return 0;  
 }
-MUMPS_INT mumps_io_open_files_for_read(){
+MUMPS_INT mumps_io_open_files_for_read(void){
   MUMPS_INT i,j;
   mumps_file_struct  *mumps_io_pfile_pointer_array;
 #if defined (sgi) || defined (__sgi)
@@ -663,19 +663,19 @@ MUMPS_INT mumps_io_set_last_file(MUMPS_INT* dim,MUMPS_INT* type){
 }
 #if ! defined( MUMPS_WIN32 ) &&  ! defined (WITHOUT_PTHREAD)
 # ifdef WITH_PFUNC
-MUMPS_INT mumps_io_protect_pointers(){
+MUMPS_INT mumps_io_protect_pointers(void){
   pthread_mutex_lock(&mumps_io_pwrite_mutex);
   return 0;
 }
-MUMPS_INT mumps_io_unprotect_pointers(){
+MUMPS_INT mumps_io_unprotect_pointers(void){
   pthread_mutex_unlock(&mumps_io_pwrite_mutex);
   return 0;
 }
-MUMPS_INT mumps_io_init_pointers_lock(){
+MUMPS_INT mumps_io_init_pointers_lock(void){
   pthread_mutex_init(&mumps_io_pwrite_mutex,NULL);
   return 0;
 }
-MUMPS_INT mumps_io_destroy_pointers_lock(){
+MUMPS_INT mumps_io_destroy_pointers_lock(void){
   pthread_mutex_destroy(&mumps_io_pwrite_mutex);
   return 0;
 }

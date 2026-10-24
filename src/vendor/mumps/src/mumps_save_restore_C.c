@@ -52,7 +52,7 @@ MUMPS_GET_SAVE_PREFIX_C(MUMPS_INT *len_save_prefix, char* save_prefix, mumps_ftn
 }
 #else
 void MUMPS_CALL
-MUMPS_SAVE_RESTORE_RETURN_C()
+MUMPS_SAVE_RESTORE_RETURN_C(void)
 {
 }
 #endif

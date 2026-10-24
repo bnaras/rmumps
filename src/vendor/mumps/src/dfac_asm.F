@@ -173,7 +173,7 @@ C
           IW(IOLDPS+1+KEEP(IXSZ)) = NASS
           CALL DMUMPS_ASM_SLAVE_ARROWHEADS(INODE, STEP(INODE),
      &           N, IW, LIW,
-     &           IOLDPS, A_PTR(POSELT), LA_PTR, 1_8, KEEP, KEEP8,
+     &           IOLDPS, A_PTR(POSELT:), LA_PTR, 1_8, KEEP, KEEP8,
      &           ITLOC, FILS,
      &           PTR8ARR, NINCOLARR, NINROWARR, PTRDEBARR,
      &           INTARR, DBLARR, KEEP8(27), KEEP8(26),

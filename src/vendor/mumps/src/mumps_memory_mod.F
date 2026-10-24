@@ -24,6 +24,8 @@ C
       INTEGER(8), PRIVATE :: ISIZE, I8SIZE, SSIZE, DSIZE, CSIZE, ZSIZE
       CONTAINS
       SUBROUTINE MUMPS_MEMORY_SET_DATA_SIZES()
+C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER             :: I(2)
       INTEGER(8)          :: I8(2)
       REAL(kind(1.e0))    :: S(2)

@@ -42,7 +42,7 @@ C
            INFO(1)=-7
            CALL MUMPS_SET_IERROR(int(id%N,8)+int(id%N,8), INFO(2))
          ENDIF
-         CALL MUMPS_PROPINFO( ICNTL(1), INFO(1), id%COMM, id%MYID )
+         CALL MUMPS_PROPINFO( ICNTL(1), INFO, id%COMM, id%MYID )
          IF ( INFO(1).LT.0 ) GOTO 500
          CALL DMUMPS_ANA_N_DIST(id, NBINCOL_TMP, NBINROW_TMP)
          IF ( .NOT. I_AM_SLAVE ) THEN
@@ -68,10 +68,10 @@ C
       IF ( I_AM_SLAVE ) THEN
          IF (KEEP(55) .EQ. 0) THEN
             CALL DMUMPS_ANA_DIST_ARROWHEADS( id%MYID,
-     &           id%NSLAVES, id%N, id%PROCNODE_STEPS(1),
-     &           id%STEP(1), id%FILS(1),
-     &           id%ISTEP_TO_INIV2(1), id%I_AM_CAND(1),
-     &           KEEP(1),KEEP8(1), ICNTL(1), id,
+     &           id%NSLAVES, id%N, id%PROCNODE_STEPS(1:),
+     &           id%STEP(1:), id%FILS(1:),
+     &           id%ISTEP_TO_INIV2(1:), id%I_AM_CAND(1:),
+     &           KEEP(1:),KEEP8(1:), ICNTL(1:), id,
      &           NBINCOL_TMP, NBINROW_TMP )
             DEALLOCATE(NBINCOL_TMP)
             DEALLOCATE(NBINROW_TMP)
@@ -375,7 +375,7 @@ C~   &   ': Error allocating BUFR in DMUMPS_FACTO_SEND_ARROWHEADS'
         ENDDO
       ENDIF
  100  CONTINUE
-      CALL MUMPS_PROPINFO( ICNTL, INFO, COMM, MYID )
+      CALL MUMPS_PROPINFO( ICNTL(1), INFO, COMM, MYID )
       IF ( INFO( 1 ) .LT. 0 ) GOTO 500
       IF (KEEP(46) .NE. 0) THEN
 #if defined(__ve__)
@@ -918,7 +918,7 @@ C~   &  ': Error allocaing PTRAW in DMUMPS_FACTO_RECV_ARROWHD2'
         GOTO 100
       END IF
  100  CONTINUE
-      CALL MUMPS_PROPINFO( ICNTL, INFO, COMM, MYID )
+      CALL MUMPS_PROPINFO( ICNTL(1), INFO, COMM, MYID )
       IF ( INFO( 1 ) .LT. 0 ) GOTO 500
       IF ( KEEP(38).NE.0 .AND. EARLYT3ROOTINS ) THEN
         CALL DMUMPS_GET_ROOT_INFO(root, LOCAL_M, LOCAL_N, PTR_ROOT, LA)
@@ -1093,7 +1093,7 @@ C~   &  ': Error allocaing PTRAW in DMUMPS_FACTO_RECV_ARROWHD2'
      &                            LOCAL_M, LOCAL_M, LOCAL_N, KEEP)
         ENDIF
       ELSE IF (root%yes) THEN
-        CALL DMUMPS_SET_TO_ZERO(roota%SCHUR_POINTER(1),
+        CALL DMUMPS_SET_TO_ZERO(roota%SCHUR_POINTER(1:),
      &       root%SCHUR_LLD, root%SCHUR_MLOC, root%SCHUR_NLOC,
      &       KEEP)
       ENDIF

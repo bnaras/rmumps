@@ -1,0 +1,140 @@
+Why: gfortran >= 10 rejects calls of one external routine, in one file,
+ that pass an array in one place and a scalar in another (or vice versa)
+ for the same argument. Made consistent, without changing what is passed:
+ - darrowheads.F, MUMPS_PROPINFO(LP, INFO, ...): the unit is ICNTL(1)
+   (was the whole ICNTL array) and INFO is passed whole (was INFO(1) of
+   a pointer);
+ - dfac_lr.F, DGEMM: TEMP_BLOCK(1,1) instead of the whole allocatable
+   TEMP_BLOCK, as for the other matrix arguments;
+ - dsol_driver.F: IDUMMY(1), JDUMMY(1), KDUMMY(1) in the DMUMPS_SOL_C
+   calls, C_Y(1) in two DMUMPS_GATHER_SOLUTION calls;
+ - dfac_par_m.F, DMUMPS_MCAST2: DUMMY(1) instead of DUMMY.
+Upstream: not sent; worth offering.
+Obsolete when: upstream makes these calls consistent.
+
+diff --git a/src/darrowheads.F b/src/darrowheads.F
+index 4c93b3e..ef6290d 100644
+--- a/src/darrowheads.F
++++ b/src/darrowheads.F
+@@ -41,7 +41,7 @@ C
+            INFO(1)=-7
+            CALL MUMPS_SET_IERROR(int(id%N,8)+int(id%N,8), INFO(2))
+          ENDIF
+-         CALL MUMPS_PROPINFO( ICNTL(1), INFO(1), id%COMM, id%MYID )
++         CALL MUMPS_PROPINFO( ICNTL(1), INFO, id%COMM, id%MYID )
+          IF ( INFO(1).LT.0 ) GOTO 500
+          CALL DMUMPS_ANA_N_DIST(id, NBINCOL_TMP, NBINROW_TMP)
+          IF ( .NOT. I_AM_SLAVE ) THEN
+@@ -374,7 +374,7 @@ C
+         ENDDO
+       ENDIF
+  100  CONTINUE
+-      CALL MUMPS_PROPINFO( ICNTL, INFO, COMM, MYID )
++      CALL MUMPS_PROPINFO( ICNTL(1), INFO, COMM, MYID )
+       IF ( INFO( 1 ) .LT. 0 ) GOTO 500
+       IF (KEEP(46) .NE. 0) THEN
+ #if defined(__ve__)
+@@ -917,7 +917,7 @@ C
+         GOTO 100
+       END IF
+  100  CONTINUE
+-      CALL MUMPS_PROPINFO( ICNTL, INFO, COMM, MYID )
++      CALL MUMPS_PROPINFO( ICNTL(1), INFO, COMM, MYID )
+       IF ( INFO( 1 ) .LT. 0 ) GOTO 500
+       IF ( KEEP(38).NE.0 .AND. EARLYT3ROOTINS ) THEN
+         CALL DMUMPS_GET_ROOT_INFO(root, LOCAL_M, LOCAL_N, PTR_ROOT, LA)
+diff --git a/src/dfac_lr.F b/src/dfac_lr.F
+index 9ed6773..20924cd 100644
+--- a/src/dfac_lr.F
++++ b/src/dfac_lr.F
+@@ -348,9 +348,9 @@ C       updates using BLR_U
+                ENDIF
+                CALL dgemm('N', 'N', LRB%K, NELIM, LRB%N, ONE,
+      &              LRB%R(1,1), LRB%K, A(LPOS), NFRONT,
+-     &              ZERO, TEMP_BLOCK, LRB%K) 
++     &              ZERO, TEMP_BLOCK(1,1), LRB%K) 
+                CALL dgemm('N', 'N', LRB%M, NELIM, LRB%K, MONE,
+-     &              LRB%Q(1,1), LRB%M, TEMP_BLOCK, LRB%K,
++     &              LRB%Q(1,1), LRB%M, TEMP_BLOCK(1,1), LRB%K,
+      &              ONE, A(UPOS), NFRONT) 
+                deallocate(TEMP_BLOCK)
+              ENDIF
+@@ -427,9 +427,9 @@ C       updates using BLR_L
+                ENDIF
+                CALL dgemm(UTRANS , 'T' , NELIM, KL, NL , ONE ,
+      &              A_U(UPOS) , LDU , BLR_L(I)%R(1,1) , KL ,
+-     &              ZERO , TEMP_BLOCK , NELIM) 
++     &              ZERO , TEMP_BLOCK(1,1) , NELIM) 
+                CALL dgemm('N' , 'T' , NELIM , ML , KL , MONE ,
+-     &              TEMP_BLOCK , NELIM , BLR_L(I)%Q(1,1) , ML ,
++     &              TEMP_BLOCK(1,1) , NELIM , BLR_L(I)%Q(1,1) , ML ,
+      &              ONE , A_L(IPOS) , LDL) 
+                deallocate(TEMP_BLOCK)
+              ENDIF
+@@ -540,9 +540,9 @@ CFIXME allocate once of size (NELIM,MAXICLUSTER) ouside loop I
+      &           + int(BEGS_BLR_U(CURRENT_BLR+1)+IS-NELIM-1,8)
+                CALL dgemm('N' , 'T' , NELIM, KL, NL , ONE ,
+      &                A(POSELT_TOP) , NFRONT , BLR_L(I)%R(1,1) , KL ,
+-     &                ZERO , TEMP_BLOCK , NELIM) 
++     &                ZERO , TEMP_BLOCK(1,1) , NELIM) 
+                CALL dgemm('N' , 'T' , NELIM , ML , KL , MONE ,
+-     &                TEMP_BLOCK , NELIM , BLR_L(I)%Q(1,1) , ML ,
++     &                TEMP_BLOCK(1,1) , NELIM , BLR_L(I)%Q(1,1) , ML ,
+      &                ONE , A(POSELT_INCB) , NFRONT) 
+                deallocate(TEMP_BLOCK)
+                ENDIF
+diff --git a/src/dfac_par_m.F b/src/dfac_par_m.F
+index 183eba1..8332d25 100644
+--- a/src/dfac_par_m.F
++++ b/src/dfac_par_m.F
+@@ -354,7 +354,7 @@ C
+             NBFIN = NBFIN - NBROOT
+             IF (SLAVEF.GT.1) THEN
+                 DUMMY(1) = NBROOT
+-                CALL DMUMPS_MCAST2(DUMMY, 1, MPI_INTEGER, MYID_NODES,
++                CALL DMUMPS_MCAST2(DUMMY(1), 1, MPI_INTEGER, MYID_NODES,
+      &          COMM_NODES, RACINE, SLAVEF, KEEP )
+             END IF
+          ENDIF
+diff --git a/src/dsol_driver.F b/src/dsol_driver.F
+index 32ca1a3..d097add 100644
+--- a/src/dsol_driver.F
++++ b/src/dsol_driver.F
+@@ -7065,7 +7065,8 @@ C      Next 3 arguments are not used in this call
+      & id%LD_RHSINTR,PTR_POSINRHSINTR_FWD(1),PTR_POSINRHSINTR_BWD(1),
+      & -1, -1,
+      & IDUMMY(1), IDUMMY(1),
+-     & 1,1,1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY, 1,1,
++     & 1,1,1, IDUMMY(1), 1, JDUMMY(1), KDUMMY(1), 1, LDUMMY, 1,
++     & MDUMMY, 1,1,
+      & NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
+ #if defined(STAT_ES_SOLVE)
+      & , IDUMMY, 1, JDUMMY, 1
+@@ -7101,7 +7102,8 @@ C      Next 3 arguments are not used in this call
+      & id%LD_RHSINTR,PTR_POSINRHSINTR_FWD(1),PTR_POSINRHSINTR_BWD(1),
+      & -1, -1,
+      & IDUMMY(1), IDUMMY(1),
+-     & 1,1,1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY, 1,1,
++     & 1,1,1, IDUMMY(1), 1, JDUMMY(1), KDUMMY(1), 1, LDUMMY, 1,
++     & MDUMMY, 1,1,
+      & NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
+ #if defined(STAT_ES_SOLVE)
+      & , IDUMMY, 1, JDUMMY, 1
+@@ -7187,7 +7189,7 @@ C         (id%RHSINTR not set/allocate) : receive solution, store
+ C         it and scale it.
+           CALL DMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
+      &      id%MYID, id%COMM, NBRHS_EFF,
+-     &      SOLVET, C_Y, id%N, NBRHS_EFF, 1,
++     &      SOLVET, C_Y(1), id%N, NBRHS_EFF, 1,
+      &      JDUMMY, id%KEEP(1),id%KEEP8(1), id%PROCNODE_STEPS(1),
+      &      IDUMMY, 1,
+      &      id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
+@@ -7205,7 +7207,7 @@ C         it and scale it.
+         ELSE
+           CALL DMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
+      &      id%MYID, id%COMM, NBRHS_EFF,
+-     &      SOLVET, C_Y, id%N, NBRHS_EFF, 1,
++     &      SOLVET, C_Y(1), id%N, NBRHS_EFF, 1,
+      &      id%PTLUST_S(1), id%KEEP(1),id%KEEP8(1),
+      &      id%PROCNODE_STEPS(1),
+      &      IS(1), LIW_PASSED,

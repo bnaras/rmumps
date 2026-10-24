@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*!
 \file gk_proto.h
 \brief This file contains function prototypes
@@ -88,13 +89,13 @@ GK_MKALLOC_PROTO(gk_idxkv, gk_idxkv_t)
 
 void   gk_AllocMatrix(void ***, size_t, size_t , size_t);
 void   gk_FreeMatrix(void ***, size_t, size_t);
-int    gk_malloc_init();
+int    gk_malloc_init(void);
 void   gk_malloc_cleanup(int showstats);
 void  *gk_malloc(size_t nbytes, char *msg);
 void  *gk_realloc(void *oldptr, size_t nbytes, char *msg);
 void   gk_free(void **ptr1,...);
-size_t gk_GetCurMemoryUsed();
-size_t gk_GetMaxMemoryUsed();
+size_t gk_GetCurMemoryUsed(void);
+size_t gk_GetMaxMemoryUsed(void);
 
 
 
@@ -126,14 +127,14 @@ void gk_showcorruption(pdbf *p);
 void gk_set_exit_on_error(int value);
 void errexit(char *,...);
 void gk_errexit(int signum, char *,...);
-int gk_sigtrap();
-int gk_siguntrap();
+int gk_sigtrap(void);
+int gk_siguntrap(void);
 void gk_sigthrow(int signum);
-void gk_SetSignalHandlers();
-void gk_UnsetSignalHandlers();
+void gk_SetSignalHandlers(void);
+void gk_UnsetSignalHandlers(void);
 void gk_NonLocalExit_Handler(int signum);
 char *gk_strerror(int errnum);
-void PrintBackTrace();
+void PrintBackTrace(void);
 
 
 /*-------------------------------------------------------------
@@ -285,7 +286,7 @@ int omp_get_nested(void);
 /*-------------------------------------------------------------
  * CSR-related functions
  *-------------------------------------------------------------*/
-gk_csr_t *gk_csr_Create();
+gk_csr_t *gk_csr_Create(void);
 void gk_csr_Init(gk_csr_t *mat);
 void gk_csr_Free(gk_csr_t **mat);
 void gk_csr_FreeContents(gk_csr_t *mat);
@@ -332,7 +333,7 @@ float ComputeStdDev(int  n, float *values);
 
 /* mcore.c */
 gk_mcore_t *gk_mcoreCreate(size_t coresize);
-gk_mcore_t *gk_gkmcoreCreate();
+gk_mcore_t *gk_gkmcoreCreate(void);
 void gk_mcoreDestroy(gk_mcore_t **r_mcore, int showstats);
 void gk_gkmcoreDestroy(gk_mcore_t **r_mcore, int showstats);
 void *gk_mcoreMalloc(gk_mcore_t *mcore, size_t nbytes);
@@ -350,7 +351,7 @@ int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *
 
 
 /* graph.c */
-gk_graph_t *gk_graph_Create();
+gk_graph_t *gk_graph_Create(void);
 void gk_graph_Init(gk_graph_t *graph);
 void gk_graph_Free(gk_graph_t **graph);
 void gk_graph_FreeContents(gk_graph_t *graph);

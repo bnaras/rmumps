@@ -186,17 +186,18 @@ C~                   WRITE(LP, 150) 'L0_OMP stats'
           IF ( INFO(1).LT.0 ) GOTO 500
           IF ( I_AM_SLAVE ) THEN
                CALL DMUMPS_ANA_DISTM_UNDERL0OMP(
-     &           id%LPOOL_B_L0_OMP, id%IPOOL_B_L0_OMP(1),
+     &           id%LPOOL_B_L0_OMP, id%IPOOL_B_L0_OMP(1:),
      &           id%L_VIRT_L0_OMP,
-     &           id%VIRT_L0_OMP(1), id%VIRT_L0_OMP_MAPPING(1),
-     &           id%L_PHYS_L0_OMP, id%PHYS_L0_OMP(1), id%PERM_L0_OMP(1),
-     &           id%PTR_LEAFS_L0_OMP(1),
-     &           id%KEEP(1), id%N, id%NE_STEPS(1), id%STEP(1),
-     &           id%FRERE_STEPS(1), id%FILS(1), id%DAD_STEPS(1), 
-     &           id%ND_STEPS(1), 
-     &           locMYID_NODES, id%PROCNODE_STEPS(1),
-     &           id%I4_L0_OMP(1,1), NBSTATS_I4, 
-     &           id%I8_L0_OMP(1,1), NBSTATS_I8, KEEP(400),
+     &           id%VIRT_L0_OMP(1:), id%VIRT_L0_OMP_MAPPING(1:),
+     &           id%L_PHYS_L0_OMP, id%PHYS_L0_OMP(1:),
+     & id%PERM_L0_OMP(1:),
+     &           id%PTR_LEAFS_L0_OMP(1:),
+     &           id%KEEP(1), id%N, id%NE_STEPS(1:), id%STEP(1:),
+     &           id%FRERE_STEPS(1:), id%FILS(1:), id%DAD_STEPS(1:), 
+     &           id%ND_STEPS(1:), 
+     &           locMYID_NODES, id%PROCNODE_STEPS(1:),
+     &           id%I4_L0_OMP(1:,1:), NBSTATS_I4, 
+     &           id%I8_L0_OMP(1:,1:), NBSTATS_I8, KEEP(400),
      &           SIZECB_UNDER_L0, SIZECB_UNDER_L0_IF_LRCB,
      &           TNSTK_afterL0, MAXFR_UNDER_L0, 
      &           MAX_FRONT_SURFACE_LOCAL_L0, MAX_SIZE_FACTOR_L0, 
@@ -271,10 +272,10 @@ C~                        WRITE(LP, 150) 'L0_OMP FLAGGED LEAVES'
      &              id%IPOOL_A_L0_OMP(id%LPOOL_A_L0_OMP)
                  CALL DMUMPS_PREP_ANA_DISTM_ABOVEL0(
      &               id%N, id%NSLAVES, id%COMM_NODES, id%MYID_NODES, 
-     &               id%STEP(1), id%DAD_STEPS(1),id%ICNTL,LP,LPOK,
+     &               id%STEP(1:), id%DAD_STEPS(1:),id%ICNTL,LP,LPOK,
      &               id%INFO, 
-     &               id%PHYS_L0_OMP(1), id%L_PHYS_L0_OMP, 
-     &               id%IPOOL_A_L0_OMP(1), LIPOOL_local,
+     &               id%PHYS_L0_OMP(1:), id%L_PHYS_L0_OMP, 
+     &               id%IPOOL_A_L0_OMP(1:), LIPOOL_local,
      &               id%KEEP, TNSTK_afterL0,
      &               FLAGGED_LEAVES
      &              )
@@ -338,9 +339,10 @@ C~                           WRITE(LP, 150) 'Allocation IPOOL'
              NE_STEPSPTR => id%NE_STEPS
           ENDIF
            KEEP(139) = MAXFR_UNDER_L0
-           CALL DMUMPS_ANA_DISTM( locMYID_NODES, id%N, id%STEP(1),
-     & id%FRERE_STEPS(1), id%FILS(1), IPOOLPTR(1), LIPOOL, NE_STEPSPTR
-     & (1), id%DAD_STEPS(1), id%ND_STEPS(1), id%PROCNODE_STEPS(1),
+           CALL DMUMPS_ANA_DISTM( locMYID_NODES, id%N, id%STEP(1:),
+     & id%FRERE_STEPS(1:), id%FILS(1:), IPOOLPTR(1:), LIPOOL,
+     & NE_STEPSPTR
+     & (1:), id%DAD_STEPS(1:), id%ND_STEPS(1:), id%PROCNODE_STEPS(1:),
      & id%NSLAVES, ABOVE_L0,SIZECB_UNDER_L0,SIZECB_UNDER_L0_IF_LRCB,
      & MAXFR_UNDER_L0, MAX_FRONT_SURFACE_LOCAL_L0, MAX_SIZE_FACTOR_L0, 
      & ENTRIES_IN_FACTORS_UNDER_L0, ENTRIES_IN_FACTORS_MASTERS_LO,
@@ -350,10 +352,10 @@ C~                           WRITE(LP, 150) 'Allocation IPOOL'
      & KEEP8(36), KEEP8(47), KEEP8(37), KEEP8(38), KEEP8(39),
      & KEEP8(40), KEEP8(41), KEEP8(42), KEEP8(43), KEEP8(44), KEEP8(45),
      & KEEP8(46), KEEP8(51), KEEP8(52), KEEP(224),KEEP(225),KEEP(27),
-     & RINFO(1),id%CNTL(1), KEEP(1), KEEP8(1), LOCAL_M, LOCAL_N,
+     & RINFO(1),id%CNTL(1), KEEP(1:), KEEP8(1:), LOCAL_M, LOCAL_N,
      & SBUF_RECOLD8, SBUF_SEND_FR, SBUF_REC_FR, SBUF_SEND_LR,
-     & SBUF_REC_LR, id%COST_SUBTREES, KEEP(28), locI_AM_CAND(1),
-     & max(KEEP(56),1), id%ISTEP_TO_INIV2(1), id%CANDIDATES(1,1), 
+     & SBUF_REC_LR, id%COST_SUBTREES, KEEP(28), locI_AM_CAND(1:),
+     & max(KEEP(56),1), id%ISTEP_TO_INIV2(1:), id%CANDIDATES(1:,1:), 
      & INFO(1), INFO(2), KEEP8(15),MAX_SIZE_FACTOR_TMP, 
      & KEEP8(9), ENTRIES_IN_FACTORS_LOC_MASTERS,
      & idintr%root%yes, idintr%root%NPROW, idintr%root%NPCOL

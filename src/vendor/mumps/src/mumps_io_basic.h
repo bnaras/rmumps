@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -123,7 +124,7 @@ MUMPS_INT mumps_io_get_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,
 MUMPS_INT mumps_io_alloc_pointers(MUMPS_INT * nb_file_type, MUMPS_INT * dim);
 MUMPS_INT mumps_io_init_vars(MUMPS_INT* myid_arg,MUMPS_INT* size_element,MUMPS_INT* async_arg,MUMPS_INT keep255);
 MUMPS_INT mumps_io_set_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,MUMPS_INT* type);
-MUMPS_INT mumps_io_open_files_for_read();
+MUMPS_INT mumps_io_open_files_for_read(void);
 MUMPS_INT mumps_io_set_last_file(MUMPS_INT* dim,MUMPS_INT* type);
 MUMPS_INT mumps_io_write__(void *file, void *loc_add, size_t write_size, MUMPS_OFF_T where,MUMPS_INT type);
 #if ! defined (MUMPS_WIN32)
@@ -140,10 +141,10 @@ MUMPS_OFF_T mumps_io_read_win32__(void * file,void * loc_addr,size_t size, MUMPS
 #endif
 #if ! defined (MUMPS_WIN32) && ! defined (WITHOUT_PTHREAD)
 # if defined (WITH_PFUNC)
-MUMPS_INT mumps_io_protect_pointers();
-MUMPS_INT mumps_io_unprotect_pointers();
-MUMPS_INT mumps_io_init_pointers_lock();
-MUMPS_INT mumps_io_destroy_pointers_lock();
+MUMPS_INT mumps_io_protect_pointers(void);
+MUMPS_INT mumps_io_unprotect_pointers(void);
+MUMPS_INT mumps_io_init_pointers_lock(void);
+MUMPS_INT mumps_io_destroy_pointers_lock(void);
 # endif /* WITH_PFUNC */
 #endif /* MUMPS_WIN32 */
 #endif /* MUMPS_IO_BASIC_H */

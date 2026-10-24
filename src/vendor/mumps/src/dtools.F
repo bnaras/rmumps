@@ -292,7 +292,7 @@ C~             WRITE(*,*) " Header at IPS =", IW(IPS:IPS+KEEP(IXSZ)+5)
      &    SON_A, IACHK, SIZFR_SON_A)
           CALL DMUMPS_OOC_IO_LU_PANEL_I
      &          ( STRAT, TYPEFile, 
-     &           SON_A(IACHK), SIZFR_SON_A, MonBloc,
+     &           SON_A(IACHK:), SIZFR_SON_A, MonBloc,
      &           NextPivDummy, NextPivDummy,
      &           IW(IOLDPS_CB), LIWFAC, 
      &           MYID, KEEP8(31), IFLAG,LAST_CALL )
@@ -2297,6 +2297,8 @@ C~   &        ,INFOG(43)
       TYPE(LRB_TYPE), intent(inout) :: BLR_PANEL(NB_BLR-CURRENT_BLR)
       DOUBLE PRECISION, intent(inout)       :: A(LA)
       INTEGER :: MAXI_CLUSTER
+C     rmumps: LWORK is declared before its use in the bound of WORK
+      INTEGER                      :: LWORK
       DOUBLE PRECISION    :: RWORK(2*MAXI_CLUSTER*OMP_NUM)
       DOUBLE PRECISION :: BLOCK(MAXI_CLUSTER,MAXI_CLUSTER*OMP_NUM)
       DOUBLE PRECISION :: WORK(LWORK*OMP_NUM)
@@ -2308,7 +2310,7 @@ C~   &        ,INFOG(43)
       INTEGER, intent(in)          :: NPIV, ISHIFT, KPERCENT,
      &                                K458, K473, TOL_OPT
       LOGICAL, intent(in)          :: LBANDSLAVE
-      INTEGER                      :: LWORK, NELIM
+      INTEGER                      :: NELIM
       DOUBLE PRECISION,intent(in)              :: TOLEPS
       CHARACTER(len=1) :: DIR
       LOGICAL, intent(in)          :: LRMIXED_ACTIVATED

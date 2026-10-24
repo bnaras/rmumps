@@ -23,6 +23,9 @@ Version 5.9.1-0.9000 (development)
    the top-level copies of the MUMPS headers are removed
  - results do not depend on earlier calls: the generator MUMPS uses
    internally is reset before every call, and never touches R's
+ - the Fortran sources compile with gfortran >= 10 without
+   -fallow-argument-mismatch, and the package builds without significant
+   warnings under -Wall -pedantic (gfortran, gcc and clang)
  - copyright holders and inst/COPYRIGHTS updated for the bundled code;
    the CeCILL-C and Apache-2.0 license texts are included
 

@@ -19,7 +19,7 @@
 #include "rmumps_cshim.h" /* rmumps: inserted by tools/vendor.R */
 #if defined(MUMPS_WIN32) || defined(WITHOUT_PTHREAD) || defined(USE_XKBLAS)
 /* Async. pinning not available for Windows */
-void mumps_register_thread_return()
+void mumps_register_thread_return(void)
 {
 }
 #else
@@ -195,7 +195,7 @@ void mumps_init_request_pool(int size_pool)
 }
 /*
 */
-void mumps_finalize_request_pool()
+void mumps_finalize_request_pool(void)
 {
 #if defined(DEBUG_GPU)
   printf("=> mumps_finalize_request_pool()\n");
@@ -342,7 +342,7 @@ int mumps_request_wait_all(
 }
 #endif
 #else
-void mumps_register_thread_return()
+void mumps_register_thread_return(void)
 {
   /*
    * Registering tools will be available in the future.

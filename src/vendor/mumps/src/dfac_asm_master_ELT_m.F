@@ -749,7 +749,7 @@ C~   &     ' ERROR 1 during ass_niv1_ELT', NFRONT, NFRONT_EFF
                CALL MUMPS_LOAD_DISABLE()
                CALL DMUMPS_FREE_BLOCK_CB_STATIC(
      &          SSARBR, MYID, N, ISTCHK,
-     &          MUMPS_TPS_ARR(ITHREAD)%IW(1),
+     &          MUMPS_TPS_ARR(ITHREAD)%IW(1:),
      &          MUMPS_TPS_ARR(ITHREAD)%LIW,
      &          MUMPS_TPS_ARR(ITHREAD)%LRLU,
      &          MUMPS_TPS_ARR(ITHREAD)%LRLUS,

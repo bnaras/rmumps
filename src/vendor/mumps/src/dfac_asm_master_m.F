@@ -891,7 +891,7 @@ C~   &      "Internal error: ETATASS.EQ.1 and IN-PLACE ACTIVATED"
                CALL MUMPS_LOAD_DISABLE()
                CALL DMUMPS_FREE_BLOCK_CB_STATIC(
      &          SSARBR, MYID, N, ISTCHK,
-     &          MUMPS_TPS_ARR(ITHREAD)%IW(1),
+     &          MUMPS_TPS_ARR(ITHREAD)%IW(1:),
      &          MUMPS_TPS_ARR(ITHREAD)%LIW,
      &          MUMPS_TPS_ARR(ITHREAD)%LRLU,
      &          MUMPS_TPS_ARR(ITHREAD)%LRLUS,

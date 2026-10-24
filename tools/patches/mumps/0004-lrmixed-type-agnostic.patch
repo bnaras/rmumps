@@ -1,0 +1,514 @@
+Why: The mixed-precision routines DMUMPS_LRMIXED_CAST, _PLUS and _GEMM
+ (dlr_core.F, new in 5.9) take matrices of any precision through INTEGER
+ dummies and only pass them on to the conversion/BLAS kernels; every call
+ with REAL or DOUBLE PRECISION data is an argument mismatch, rejected by
+ gfortran >= 10. Their dummies are now exempt from type, kind and rank
+ checking (!GCC$ / !DEC$ ATTRIBUTES NO_ARG_CHECK, !DIR$ IGNORE_TKR (TKRC)),
+ which requires passing A and B rather than A(1) and B(1) on (same
+ address) and explicit, equally type-agnostic interfaces for the kernels
+ of lr_common.F they call (new mumps_lrmixed_kernels.h). Every caller
+ needs explicit interfaces of the dispatch routines (new
+ dmumps_lrmixed_interfaces.h): DMUMPS_LR_CORE provides them to its users
+ (dsol_lr.F included), the external routines of dlr_core.F and
+ DMUMPS_BLR_SAVE_DIAG_BLOCK include them. dsol_lr.F passes PT_RHS(1)
+ instead of the whole
+ rank-1 PT_RHS in the calls to the LRxFR/FRxFR routines that elsewhere
+ receive an element (same storage, lower bound 1).
+Upstream: not sent; worth offering with the MPI interfaces (0003).
+Obsolete when: upstream declares these buffers type-agnostic.
+
+diff --git a/src/dlr_core.F b/src/dlr_core.F
+index 0fc02ec..c3ce4a9 100644
+--- a/src/dlr_core.F
++++ b/src/dlr_core.F
+@@ -22,6 +22,10 @@ C (see header of the routine).
+       USE DMUMPS_LR_DATA_M
+ !$    USE OMP_LIB
+       IMPLICIT NONE
++C     rmumps: interfaces of the mixed-precision dispatch routines defined
++C     at the end of this file (type-agnostic buffers), for this module and
++C     every unit that uses it
++      INCLUDE 'dmumps_lrmixed_interfaces.h'
+       CONTAINS
+ C *******************************!
+ C ALLOCATION!
+@@ -2303,61 +2307,68 @@ C --------------------------------------------------------------------
+ C       This routine casts a generic integer matrix A of precision precA 
+ C       into generic integer matrix B of precision precB   
+         INTEGER :: nrows, ncols, ldA, ldB, precA, precB
+-        INTEGER :: A(*), B(*) 
++        INTEGER :: A(*), B(*)
++C       rmumps: A and B hold data of any precision and are only passed
++C       on, so they are exempt from argument checking (see
++C       dmumps_lrmixed_interfaces.h for callers in other files)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++        INCLUDE 'mumps_lrmixed_kernels.h'
+         IF (precA.EQ.prec_dbl .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_DD(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_DD(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_sgl) THEN
+-          CALL MUMPS_LRMIXED_CAST_DS(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_DS(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_sgl .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_SD(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_SD(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_sgl .AND. precB.EQ.prec_sgl) THEN
+-          CALL MUMPS_LRMIXED_CAST_SS(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_SS(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_sgl .AND. precB.EQ.prec_16) THEN
+-          CALL MUMPS_LRMIXED_CAST_S16(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_S16(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_16 .AND. precB.EQ.prec_sgl) THEN
+-          CALL MUMPS_LRMIXED_CAST_16S(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_16S(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_16) THEN
+-          CALL MUMPS_LRMIXED_CAST_D16(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_D16(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_16 .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_16D(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_16D(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_24) THEN
+-          CALL MUMPS_LRMIXED_CAST_D24(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_D24(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_24 .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_24D(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_24D(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_sgl .AND. precB.EQ.prec_24) THEN
+-          CALL MUMPS_LRMIXED_CAST_S24(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_S24(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_24 .AND. precB.EQ.prec_sgl) THEN
+-          CALL MUMPS_LRMIXED_CAST_24S(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_24S(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_40) THEN
+-          CALL MUMPS_LRMIXED_CAST_D40(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_D40(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_40 .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_40D(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_40D(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_48) THEN
+-          CALL MUMPS_LRMIXED_CAST_D48(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_D48(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_48 .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_48D(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_48D(A, B, nrows, ncols,
+      &              ldA, ldB)
+ C Binary56:
+         ELSEIF (precA.EQ.prec_dbl .AND. precB.EQ.prec_56) THEN
+-          CALL MUMPS_LRMIXED_CAST_D56(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_D56(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSEIF (precA.EQ.prec_56 .AND. precB.EQ.prec_dbl) THEN
+-          CALL MUMPS_LRMIXED_CAST_56D(A(1), B(1), nrows, ncols,
++          CALL MUMPS_LRMIXED_CAST_56D(A, B, nrows, ncols,
+      &              ldA, ldB)
+         ELSE 
+           write(*,*) 'conversion impossible: format non pris en charge'
+@@ -2372,6 +2383,11 @@ C       This routine performs Y <- X+Y where X and Y are generic
+ C       integer matrices in precision precX and precY, respectively
+         INTEGER :: nrows, ncols, ldX, ldY, precX, precY
+         INTEGER :: X(*), Y(*)
++C       rmumps: see DMUMPS_LRMIXED_CAST
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++        INCLUDE 'mumps_lrmixed_kernels.h'
+         IF (precX .EQ. prec_dbl .AND. precY .EQ. prec_dbl) THEN
+           CALL MUMPS_LRMIXED_PLUS_DD(X, Y, nrows, ncols, ldX, ldY)
+         ELSEIF (precX .EQ. prec_dbl .AND. precY .EQ. prec_sgl) THEN
+@@ -2803,6 +2819,8 @@ C          TRUNC_ERR = dnrm2( N-RK, VN1( RK+1 ), 1 )
+        SUBROUTINE DMUMPS_LRMIXED_STOC2CALC_LRB(LRB, K34, K451, KEEP8,
+      &    KEEP_stoc)
+         USE DMUMPS_LR_TYPE
++C       rmumps: interfaces of the mixed-precision dispatch routines
++        INCLUDE 'dmumps_lrmixed_interfaces.h'
+ C
+ C Parameters
+ C ==========
+@@ -3049,12 +3067,14 @@ C vv MIXHPC
+       SUBROUTINE DMUMPS_LRMIXED_LRxFR(LorU,  
+      &                  LRB, B, LDB, C, LDC, NCOLS,
+      &                  ALPHA, K34, K451, KEEP8, RHS, RB, QRB,
+-     &                  thread_workspace, tws_size) 
++     &                  thread_workspace, tws_size)
+         use iso_c_binding
+         USE DMUMPS_LR_TYPE
+ C       This routine performs C <- alpha*LRB*B + C, where LRB is a
+ C       mixed precision LR block
+         implicit none
++C       rmumps: interfaces of the mixed-precision dispatch routines
++        INCLUDE 'dmumps_lrmixed_interfaces.h'
+ C       LorU: 0 = L, 1 = U        
+         INTEGER, intent(in):: LorU
+         TYPE(LRB_TYPE), intent(inout) :: LRB
+@@ -3364,6 +3384,11 @@ C       declaration of DALPHA is needed
+         INTEGER :: M, N, K, LDA, LDB, LDC, prec
+         DOUBLE PRECISION :: ALPHA, BETA
+         CHARACTER(len=1) :: TRANSA, TRANSB
++C       rmumps: see DMUMPS_LRMIXED_CAST
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DIR$ IGNORE_TKR (TKRC) A, B, C
++        INCLUDE 'mumps_lrmixed_kernels.h'
+         IF (prec.EQ.prec_dbl) THEN
+             CALL MUMPS_LRMIXED_DGEMM(TRANSA, TRANSB, M, N, K, ALPHA, 
+      &           A, LDA, B, LDB, BETA, C, LDC)
+diff --git a/src/dmumps_lr_data_m.F b/src/dmumps_lr_data_m.F
+index ee68810..30a4717 100644
+--- a/src/dmumps_lr_data_m.F
++++ b/src/dmumps_lr_data_m.F
+@@ -970,6 +970,8 @@ C
+        SUBROUTINE DMUMPS_BLR_SAVE_DIAG_BLOCK (
+      &    IWHANDLER, IPANEL, D, KEEP34 )
+          use iso_c_binding
++C        rmumps: interfaces of the mixed-precision dispatch routines
++         INCLUDE 'dmumps_lrmixed_interfaces.h'
+ C
+ C      Purpose:
+ C      =======
+diff --git b/src/dmumps_lrmixed_interfaces.h b/src/dmumps_lrmixed_interfaces.h
+new file mode 100644
+index 0000000..8d64471
+--- /dev/null
++++ b/src/dmumps_lrmixed_interfaces.h
+@@ -0,0 +1,35 @@
++C
++C     rmumps: explicit interfaces of the mixed-precision dispatch
++C     routines of dlr_core.F, for callers in other files. Their matrix
++C     arguments hold data of any precision and are only passed on to
++C     the conversion and BLAS kernels, so they are exempt from type,
++C     kind and rank checking, as in the routine definitions.
++C
++      INTERFACE
++      SUBROUTINE DMUMPS_LRMIXED_CAST(A, B, nrows, ncols, ldA, ldB,
++     &                               precA, precB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB, precA, precB
++      END SUBROUTINE DMUMPS_LRMIXED_CAST
++      SUBROUTINE DMUMPS_LRMIXED_PLUS(X, Y, nrows, ncols, ldX, ldY,
++     &                               precX, precY)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++      INTEGER :: X(*), Y(*)
++      INTEGER :: nrows, ncols, ldX, ldY, precX, precY
++      END SUBROUTINE DMUMPS_LRMIXED_PLUS
++      SUBROUTINE DMUMPS_LRMIXED_GEMM(TRANSA, TRANSB, M, N, K, ALPHA,
++     &                   A, LDA, B, LDB, BETA, C, LDC, prec)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DIR$ IGNORE_TKR (TKRC) A, B, C
++      INTEGER :: A(*), B(*), C(*)
++      INTEGER :: M, N, K, LDA, LDB, LDC, prec
++      DOUBLE PRECISION :: ALPHA, BETA
++      CHARACTER(len=1) :: TRANSA, TRANSB
++      END SUBROUTINE DMUMPS_LRMIXED_GEMM
++      END INTERFACE
+diff --git a/src/dsol_lr.F b/src/dsol_lr.F
+index 2cd710e..89a12ab 100644
+--- a/src/dsol_lr.F
++++ b/src/dsol_lr.F
+@@ -1343,7 +1343,7 @@ C                      write(*,*) "MYSTUFF", m, krem, k
+      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &            ARRAYCB(POSBLOCK), LDCB,
+      &            NRHS_B, -1.0D0,
+-     &            K34, K451, KEEP8, PT_RHS, PT_RB(1), PT_QRB,
++     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+      &            thread_workspaces, WSMAX)
+               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
+ C               Entirely on FS side              
+@@ -1352,7 +1352,7 @@ C               Entirely on FS side
+      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &            ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
+      &            NRHS_B, -1.0D0, 
+-     &            K34, K451, KEEP8, PT_RHS, PT_RB(1), PT_QRB,
++     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+      &            thread_workspaces, WSMAX)
+               ELSE
+ C               Entirely on CB side              
+@@ -1361,7 +1361,7 @@ C               Entirely on CB side
+      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &            ARRAYCB(POSBLOCK), LDCB, 
+      &            NRHS_B, -1.0D0,
+-     &            K34, K451, KEEP8, PT_RHS, PT_RB(1), PT_QRB,
++     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+      &            thread_workspaces, WSMAX)
+               ENDIF
+             ENDIF
+@@ -1376,7 +1376,7 @@ C               Entirely on CB side
+      &                LRB, 1, 1, M,
+      &                ARRAYPIV(POSDIAG,POSPIVCOL),LDPIV,
+      &                ARRAYCB(POSBLOCK), LDCB,
+-     &                PT_RHS, TEMP_QRB, thread_workspaces, WSMAX)
++     &                PT_RHS(1), TEMP_QRB, thread_workspaces, WSMAX)
+               ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
+ C               Case of overlap between the FS and non FS
+                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+@@ -1385,13 +1385,13 @@ C               Case of overlap between the FS and non FS
+      &                LRB, 1, 1, M,
+      &                ARRAYPIV(POSDIAG,POSPIVCOL),LDPIV,
+      &                ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
+-     &                PT_RHS, TEMP_QRB, thread_workspaces, WSMAX)
++     &                PT_RHS(1), TEMP_QRB, thread_workspaces, WSMAX)
+                 CALL DMUMPS_LRMIXED_FRxFR('N', 'N',
+      &                M-(NPIV-IBEG_BLOCK+1), NRHS_B, N, MONE, 
+      &                LRB, NPIV-IBEG_BLOCK+2, 1, M,
+      &                ARRAYPIV(POSDIAG,POSPIVCOL),LDPIV,
+      &                ARRAYCB(POSCB), LDCB,
+-     &                PT_RHS, TEMP_QRB, thread_workspaces, WSMAX)
++     &                PT_RHS(1), TEMP_QRB, thread_workspaces, WSMAX)
+               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
+ C               Entirely on FS side              
+                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+@@ -1400,7 +1400,7 @@ C               Entirely on FS side
+      &                LRB, 1, 1, M,
+      &                ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &                ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
+-     &                PT_RHS, TEMP_QRB, thread_workspaces, WSMAX)
++     &                PT_RHS(1), TEMP_QRB, thread_workspaces, WSMAX)
+               ELSE
+ C               Entirely on CB side              
+                 POSBLOCK = POSCB + int(IBEG_BLOCK-1-NPIV,8)
+@@ -1409,7 +1409,7 @@ C               Entirely on CB side
+      &                LRB, 1, 1, M,
+      &                ARRAYPIV(POSDIAG,POSPIVCOL),LDPIV,
+      &                ARRAYCB(POSBLOCK), LDCB,
+-     &                PT_RHS, TEMP_QRB, thread_workspaces, WSMAX)
++     &                PT_RHS(1), TEMP_QRB, thread_workspaces, WSMAX)
+               ENDIF
+             ELSE
+               if (prec.le.1.and.associated(LRB%Q)) then
+@@ -1738,7 +1738,7 @@ C                 Entirely on CB side
+                   CALL DMUMPS_LRMIXED_LRxFR(0, LRB,
+      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &              ARRAYCB(POSBLOCK), LDCB, NRHS_B, -1.0D0,
+-     &              K34, K451, KEEP8, PT_RHS, PT_RB(1), PT_QRB)
++     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB)
+                 ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
+ C                 Entirely on FS side              
+                   POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
+@@ -1746,14 +1746,14 @@ C                 Entirely on FS side
+      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &              ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
+      &              NRHS_B, -1.0D0, K34, K451, KEEP8, 
+-     &              PT_RHS, PT_RB(1), PT_QRB)
++     &              PT_RHS(1), PT_RB(1), PT_QRB)
+                 ELSE
+ C                 Entirely on CB side              
+                   POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
+                   CALL DMUMPS_LRMIXED_LRxFR(0, LRB,
+      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
+      &              ARRAYCB(POSBLOCK), LDCB, NRHS_B, -1.0D0,
+-     &              K34, K451, KEEP8, PT_RHS, PT_RB(1), PT_QRB)
++     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB)
+                 ENDIF
+               ENDIF
+             ENDIF
+diff --git b/src/mumps_lrmixed_kernels.h b/src/mumps_lrmixed_kernels.h
+new file mode 100644
+index 0000000..7a44284
+--- /dev/null
++++ b/src/mumps_lrmixed_kernels.h
+@@ -0,0 +1,183 @@
++C
++C     rmumps: explicit interfaces of the precision kernels of lr_common.F
++C     called by the mixed-precision dispatch routines of dlr_core.F. The
++C     dispatch routines receive their matrices as type-agnostic dummies
++C     and pass them on unchanged, which requires explicit interfaces
++C     whose matrix arguments are type-agnostic too.
++C
++      INTERFACE
++      SUBROUTINE MUMPS_LRMIXED_CAST_16D(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_16D
++      SUBROUTINE MUMPS_LRMIXED_CAST_16S(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_16S
++      SUBROUTINE MUMPS_LRMIXED_CAST_24D(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_24D
++      SUBROUTINE MUMPS_LRMIXED_CAST_24S(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_24S
++      SUBROUTINE MUMPS_LRMIXED_CAST_40D(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_40D
++      SUBROUTINE MUMPS_LRMIXED_CAST_48D(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_48D
++      SUBROUTINE MUMPS_LRMIXED_CAST_56D(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_56D
++      SUBROUTINE MUMPS_LRMIXED_CAST_D16(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_D16
++      SUBROUTINE MUMPS_LRMIXED_CAST_D24(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_D24
++      SUBROUTINE MUMPS_LRMIXED_CAST_D40(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_D40
++      SUBROUTINE MUMPS_LRMIXED_CAST_D48(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_D48
++      SUBROUTINE MUMPS_LRMIXED_CAST_D56(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_D56
++      SUBROUTINE MUMPS_LRMIXED_CAST_DD(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_DD
++      SUBROUTINE MUMPS_LRMIXED_CAST_DS(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_DS
++      SUBROUTINE MUMPS_LRMIXED_CAST_S16(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_S16
++      SUBROUTINE MUMPS_LRMIXED_CAST_S24(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_S24
++      SUBROUTINE MUMPS_LRMIXED_CAST_SD(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_SD
++      SUBROUTINE MUMPS_LRMIXED_CAST_SS(A, B, nrows, ncols, ldA, ldB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER :: nrows, ncols, ldA, ldB
++      END SUBROUTINE MUMPS_LRMIXED_CAST_SS
++      SUBROUTINE MUMPS_LRMIXED_PLUS_DD(X, Y, nrows, ncols, ldX, ldY)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++      INTEGER :: X(*), Y(*)
++      INTEGER :: nrows, ncols, ldX, ldY
++      END SUBROUTINE MUMPS_LRMIXED_PLUS_DD
++      SUBROUTINE MUMPS_LRMIXED_PLUS_DS(X, Y, nrows, ncols, ldX, ldY)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++      INTEGER :: X(*), Y(*)
++      INTEGER :: nrows, ncols, ldX, ldY
++      END SUBROUTINE MUMPS_LRMIXED_PLUS_DS
++      SUBROUTINE MUMPS_LRMIXED_PLUS_SD(X, Y, nrows, ncols, ldX, ldY)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++      INTEGER :: X(*), Y(*)
++      INTEGER :: nrows, ncols, ldX, ldY
++      END SUBROUTINE MUMPS_LRMIXED_PLUS_SD
++      SUBROUTINE MUMPS_LRMIXED_PLUS_SS(X, Y, nrows, ncols, ldX, ldY)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
++!DIR$ IGNORE_TKR (TKRC) X, Y
++      INTEGER :: X(*), Y(*)
++      INTEGER :: nrows, ncols, ldX, ldY
++      END SUBROUTINE MUMPS_LRMIXED_PLUS_SS
++      SUBROUTINE MUMPS_LRMIXED_DGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
++     &               A, LDA, B, LDB, BETA, C, LDC)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DIR$ IGNORE_TKR (TKRC) A, B, C
++      INTEGER :: A(*), B(*), C(*)
++      INTEGER :: M, N, K, LDA, LDB, LDC
++      DOUBLE PRECISION :: ALPHA, BETA
++      CHARACTER(len=1) :: TRANSA, TRANSB
++      END SUBROUTINE MUMPS_LRMIXED_DGEMM
++      SUBROUTINE MUMPS_LRMIXED_SGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
++     &               A, LDA, B, LDB, BETA, C, LDC)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
++!DIR$ IGNORE_TKR (TKRC) A, B, C
++      INTEGER :: A(*), B(*), C(*)
++      INTEGER :: M, N, K, LDA, LDB, LDC
++      DOUBLE PRECISION :: ALPHA, BETA
++      CHARACTER(len=1) :: TRANSA, TRANSB
++      END SUBROUTINE MUMPS_LRMIXED_SGEMM
++      END INTERFACE

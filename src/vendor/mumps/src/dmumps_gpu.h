@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -121,7 +122,7 @@ DMUMPS_GPU_ASYNC_PIN_MEMORY_C(DMUMPS_COMPLEX *A, MUMPS_INT8 *ADIM);
 #define DMUMPS_GPU_WAIT_ENDOFPINNING_C \
   F_SYM_ARITH_GPU(gpu_wait_endofpinning_c,GPU_WAIT_ENDOFPINNING_C)
 void MUMPS_CALL
-DMUMPS_GPU_WAIT_ENDOFPINNING_C();
+DMUMPS_GPU_WAIT_ENDOFPINNING_C(void);
 /* Asynchronous unpinning */
 #define DMUMPS_GPU_ASYNC_UNPIN_MEMORY_C \
   F_SYM_ARITH_GPU(gpu_async_unpin_memory_c,GPU_ASYNC_UNPIN_MEMORY_C)
@@ -136,6 +137,6 @@ DMUMPS_GPU_MODIFY_ARITH_TRHRESHOLD(MUMPS_INT *OLD, MUMPS_INT *NEW);
 void MUMPS_CALL
 DMUMPS_GPU_SET_UNDER_L0_STATUS_C(MUMPS_INT *VALEUR);
 #else
-void MUMPS_CALL dmumps_gpu_return();
+void MUMPS_CALL dmumps_gpu_return(void);
 #endif
 #endif /* DMUMPS_GPU_H */

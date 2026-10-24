@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -141,7 +142,7 @@ MUMPS_OOC_START_LOW_LEVEL(MUMPS_INT *ierr);
 #define MUMPS_OOC_PRINT_STATS \
     F_SYMBOL(ooc_print_stats,OOC_PRINT_STATS)
 void MUMPS_CALL
-MUMPS_OOC_PRINT_STATS();
+MUMPS_OOC_PRINT_STATS(void);
 #define MUMPS_OOC_REMOVE_FILE_C \
     F_SYMBOL(ooc_remove_file_c,OOC_REMOVE_FILE_C)
 void MUMPS_CALL

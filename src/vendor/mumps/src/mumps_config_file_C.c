@@ -37,7 +37,7 @@ MUMPS_GET_CONFIG_FILE_C(MUMPS_INT *len_config_file, char* config_file, mumps_ftn
   config_file = strncpy(config_file, tmp_config_file, l1); 
 }
 void MUMPS_CALL
-MUMPS_CONFIG_FILE_RETURN_C()
+MUMPS_CONFIG_FILE_RETURN_C(void)
 {
   /*
   This feature will be available in the future

@@ -1,0 +1,132 @@
+Why: MUMPS calls some C routines with arguments of several types or
+ kinds: MUMPS_SIZE_C and MUMPS_ADDR_C take addresses of data of any type,
+ and the PORD and METIS entry points are called with INTEGER or
+ INTEGER(8) arrays depending on how the orderings were built (only one
+ branch runs). gfortran >= 10 rejects the differing calls. The new
+ mumps_c_interfaces.h declares these routines with type-, kind- and
+ rank-agnostic arguments, and is included where they are called.
+Upstream: not sent; worth offering with 0003.
+Obsolete when: upstream provides explicit interfaces for its C routines.
+
+diff --git a/src/ana_orderings_wrappers_m.F b/src/ana_orderings_wrappers_m.F
+index b6a40bf..a44af56 100644
+--- a/src/ana_orderings_wrappers_m.F
++++ b/src/ana_orderings_wrappers_m.F
+@@ -18,6 +18,10 @@ C
+ #endif
+       MODULE MUMPS_ANA_ORD_WRAPPERS
+       IMPLICIT NONE
++C     rmumps: explicit interfaces of the PORD and METIS entry points,
++C     which these wrappers call with INTEGER or INTEGER(8) arrays
++C     depending on how the orderings were built
++      INCLUDE 'mumps_c_interfaces.h'
+        CONTAINS
+ #if defined(metis) || defined(parmetis) || defined(metis4) || defined(parmetis3)
+ #if defined(metis4) || defined(parmetis3)
+diff --git a/src/dini_defaults.F b/src/dini_defaults.F
+index 3d329fb..b7eabc7 100644
+--- a/src/dini_defaults.F
++++ b/src/dini_defaults.F
+@@ -43,6 +43,8 @@ C
+ C     K34= 4 and K10 = 2, except on CRAY machines or when compilation
+ C     flag -i8 is used, in which case, K34 = 8 and K10 = 1
+ C
++C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER, INTENT(OUT) :: K34, K149, K10, K150
+       INTEGER(8) :: SIZE_INT, SIZE_REAL_OR_DOUBLE ! matches MUMPS_INT8
+       INTEGER I(2)
+diff --git a/src/dmumps_driver.F b/src/dmumps_driver.F
+index 76e8eb9..2371210 100644
+--- a/src/dmumps_driver.F
++++ b/src/dmumps_driver.F
+@@ -36,6 +36,8 @@ C
+ !$    USE OMP_LIB
+ C
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+ C
+ C  =======
+ C  Purpose
+diff --git a/src/dmumps_f77.F b/src/dmumps_f77.F
+index 1d17375..c2a78ac 100644
+--- a/src/dmumps_f77.F
++++ b/src/dmumps_f77.F
+@@ -42,6 +42,8 @@ C
+      &     )
+       USE DMUMPS_STRUC_DEF
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER OOC_PREFIX_MAX_LENGTH, OOC_TMPDIR_MAX_LENGTH
+       INTEGER PB_MAX_LENGTH
+       PARAMETER(OOC_PREFIX_MAX_LENGTH=255, OOC_TMPDIR_MAX_LENGTH=1023)
+diff --git b/src/mumps_c_interfaces.h b/src/mumps_c_interfaces.h
+new file mode 100644
+index 0000000..614948d
+--- /dev/null
++++ b/src/mumps_c_interfaces.h
+@@ -0,0 +1,49 @@
++C
++C     rmumps: explicit interfaces of C routines that MUMPS calls with
++C     arguments of several types or kinds (addresses, or integer arrays
++C     whose kind depends on how PORD/METIS were built). C ignores the
++C     Fortran type, so the arguments are exempt from type, kind and rank
++C     checking.
++C
++      INTERFACE
++      SUBROUTINE MUMPS_ADDR_C(A, ADDR)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(8) :: ADDR
++      END SUBROUTINE MUMPS_ADDR_C
++      SUBROUTINE MUMPS_SIZE_C(A, B, DIFF)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER(8) :: DIFF
++      END SUBROUTINE MUMPS_SIZE_C
++      SUBROUTINE MUMPS_PORDF(NVTX, NEDGES, XADJ, ADJNCY, NV, NCMPA)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: NVTX, NEDGES, XADJ, ADJNCY, NV
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: NVTX, NEDGES, XADJ, ADJNCY, NV
++!DIR$ IGNORE_TKR (TKRC) NVTX, NEDGES, XADJ, ADJNCY, NV
++      INTEGER :: NVTX(*), NEDGES(*), XADJ(*), ADJNCY(*), NV(*)
++      INTEGER :: NCMPA
++      END SUBROUTINE MUMPS_PORDF
++      SUBROUTINE MUMPS_PORDF_WND(NVTX, NEDGES, XADJ, ADJNCY, NV, NCMPA,
++     &                           TOTW)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: NVTX, NEDGES, XADJ, ADJNCY, NV, TOTW
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: NVTX, NEDGES, XADJ, ADJNCY, NV, TOTW
++!DIR$ IGNORE_TKR (TKRC) NVTX, NEDGES, XADJ, ADJNCY, NV, TOTW
++      INTEGER :: NVTX(*), NEDGES(*), XADJ(*), ADJNCY(*), NV(*), TOTW(*)
++      INTEGER :: NCMPA
++      END SUBROUTINE MUMPS_PORDF_WND
++      SUBROUTINE METIS_NODEND(NVTXS, XADJ, ADJNCY, VWGT, OPTIONS,
++     &                        PERM, IPERM)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: NVTXS, XADJ, ADJNCY, VWGT, OPTIONS
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: NVTXS, XADJ, ADJNCY, VWGT, OPTIONS
++!DIR$ IGNORE_TKR (TKRC) NVTXS, XADJ, ADJNCY, VWGT, OPTIONS
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: PERM, IPERM
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: PERM, IPERM
++!DIR$ IGNORE_TKR (TKRC) PERM, IPERM
++      INTEGER :: NVTXS(*), XADJ(*), ADJNCY(*), VWGT(*), OPTIONS(*)
++      INTEGER :: PERM(*), IPERM(*)
++      END SUBROUTINE METIS_NODEND
++      END INTERFACE
+diff --git a/src/mumps_memory_mod.F b/src/mumps_memory_mod.F
+index de9435d..173dd40 100644
+--- a/src/mumps_memory_mod.F
++++ b/src/mumps_memory_mod.F
+@@ -23,6 +23,8 @@ C
+       INTEGER(8), PRIVATE :: ISIZE, I8SIZE, SSIZE, DSIZE, CSIZE, ZSIZE
+       CONTAINS
+       SUBROUTINE MUMPS_MEMORY_SET_DATA_SIZES()
++C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER             :: I(2)
+       INTEGER(8)          :: I8(2)
+       REAL(kind(1.e0))    :: S(2)

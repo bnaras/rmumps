@@ -20,8 +20,6 @@ VENDOR_DEFS = -DAdd_ -Dmetis -Dpord -DNO_SAVE_RESTORE -DWITHOUT_PTHREAD \
 
 PKG_CPPFLAGS = -I../inst/include -Ishim $(VENDOR_INC) $(VENDOR_DEFS)
 PKG_CFLAGS = $(C_VISIBILITY)
-# TEMPORARY (until the Fortran conformance patches of phase P3 are in):
-# -fallow-argument-mismatch is gfortran-only and must not ship.
 PKG_FFLAGS = $(F_VISIBILITY) -Ivendor/mumps/include -Ivendor/mumps/libseq \
-	-Dmetis -Dpord -DNO_SAVE_RESTORE -fallow-argument-mismatch
+	-Dmetis -Dpord -DNO_SAVE_RESTORE
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)

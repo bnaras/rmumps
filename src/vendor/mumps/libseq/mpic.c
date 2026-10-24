@@ -69,7 +69,7 @@ void LIBSEQ_CALL mumps_checkaddrequal(char *a, char*b, LIBSEQ_INT8 *i)
    MUMPS_CHECKADDREQUAL(a,b,i);
  }
 
-double LIBSEQ_CALL MPI_Wtime()
+double LIBSEQ_CALL MPI_Wtime(void)
 {
   double val;
   mumps_elapse(&val);

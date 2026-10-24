@@ -349,9 +349,9 @@ C       updates using BLR_U
                ENDIF
                CALL dgemm('N', 'N', LRB%K, NELIM, LRB%N, ONE,
      &              LRB%R(1,1), LRB%K, A(LPOS), NFRONT,
-     &              ZERO, TEMP_BLOCK, LRB%K) 
+     &              ZERO, TEMP_BLOCK(1,1), LRB%K) 
                CALL dgemm('N', 'N', LRB%M, NELIM, LRB%K, MONE,
-     &              LRB%Q(1,1), LRB%M, TEMP_BLOCK, LRB%K,
+     &              LRB%Q(1,1), LRB%M, TEMP_BLOCK(1,1), LRB%K,
      &              ONE, A(UPOS), NFRONT) 
                deallocate(TEMP_BLOCK)
              ENDIF
@@ -428,9 +428,9 @@ C~   &         'not enough memory? memory requested = ', IERROR
                ENDIF
                CALL dgemm(UTRANS , 'T' , NELIM, KL, NL , ONE ,
      &              A_U(UPOS) , LDU , BLR_L(I)%R(1,1) , KL ,
-     &              ZERO , TEMP_BLOCK , NELIM) 
+     &              ZERO , TEMP_BLOCK(1,1) , NELIM) 
                CALL dgemm('N' , 'T' , NELIM , ML , KL , MONE ,
-     &              TEMP_BLOCK , NELIM , BLR_L(I)%Q(1,1) , ML ,
+     &              TEMP_BLOCK(1,1) , NELIM , BLR_L(I)%Q(1,1) , ML ,
      &              ONE , A_L(IPOS) , LDL) 
                deallocate(TEMP_BLOCK)
              ENDIF
@@ -541,9 +541,9 @@ CFIXME allocate once of size (NELIM,MAXICLUSTER) ouside loop I
      &           + int(BEGS_BLR_U(CURRENT_BLR+1)+IS-NELIM-1,8)
                CALL dgemm('N' , 'T' , NELIM, KL, NL , ONE ,
      &                A(POSELT_TOP) , NFRONT , BLR_L(I)%R(1,1) , KL ,
-     &                ZERO , TEMP_BLOCK , NELIM) 
+     &                ZERO , TEMP_BLOCK(1,1) , NELIM) 
                CALL dgemm('N' , 'T' , NELIM , ML , KL , MONE ,
-     &                TEMP_BLOCK , NELIM , BLR_L(I)%Q(1,1) , ML ,
+     &                TEMP_BLOCK(1,1) , NELIM , BLR_L(I)%Q(1,1) , ML ,
      &                ONE , A(POSELT_INCB) , NFRONT) 
                deallocate(TEMP_BLOCK)
                ENDIF

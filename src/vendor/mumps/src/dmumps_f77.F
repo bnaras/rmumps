@@ -43,6 +43,8 @@ C
      &     )
       USE DMUMPS_STRUC_DEF
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER OOC_PREFIX_MAX_LENGTH, OOC_TMPDIR_MAX_LENGTH
       INTEGER PB_MAX_LENGTH
       PARAMETER(OOC_PREFIX_MAX_LENGTH=255, OOC_TMPDIR_MAX_LENGTH=1023)

@@ -600,11 +600,11 @@ C~   &         'Error return from dtrtrs in roor solve: IERR =',IERR
                   RHS( NN - DEFICIENCY + 1: NN, I ) = ZERO  
                ENDDO
                DO I=1,NRHS
-                  CALL DMUMPS_UXVSBP(NN,root%IPIV(1),RHS(1,I),WK)
+                  CALL DMUMPS_UXVSBP(NN,root%IPIV(1:),RHS(1,I),WK)
                ENDDO
            ELSEIF(MTYPE.EQ.1) THEN
                DO I=1,NRHS
-                 CALL DMUMPS_UXVSFP(NN,root%IPIV(1),RHS(1,I),WK)
+                 CALL DMUMPS_UXVSFP(NN,root%IPIV(1:),RHS(1,I),WK)
                ENDDO
                CALL dtrtrs('U','T','N',NN-DEFICIENCY,NRHS,
      &              A,LDA,RHS,LDRHS,IERR)
@@ -648,7 +648,7 @@ C~                WRITE(*,*) 'Error return from dormqr: IERR=', IERR
                   ENDDO
                ENDDO
                DO I=1,IEND_ROOT_DEF-IBEG_ROOT_DEF+1
-                  CALL DMUMPS_UXVSBP(NN,root%IPIV(1),RHS(1,I),WK)
+                  CALL DMUMPS_UXVSBP(NN,root%IPIV(1:),RHS(1,I),WK)
                ENDDO 
            ELSEIF(MTYPE.EQ.1) THEN
 C~             WRITE(*,*) 'Computation of a null space basis'

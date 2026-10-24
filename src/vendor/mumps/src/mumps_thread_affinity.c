@@ -244,7 +244,7 @@ MUMPS_HWLOC_INIT(MUMPS_INT *error)
   }
 }/* mumps_hwloc_init */
 void MUMPS_CALL
-MUMPS_HWLOC_TERMINATE()
+MUMPS_HWLOC_TERMINATE(void)
 {
   if (machine_topology)
   {
@@ -1439,7 +1439,7 @@ MUMPS_MTKO_REACTIVATE(MUMPS_INT *threads_nb, MUMPS_INT *error)
 /* } */
 #else /* MPI_TO_K_OMP */
 void MUMPS_CALL
-MUMPS_THREAD_AFFINITY_RETURN()
+MUMPS_THREAD_AFFINITY_RETURN(void)
 {
   /*
    * Thread affinity tools will be available in the future.

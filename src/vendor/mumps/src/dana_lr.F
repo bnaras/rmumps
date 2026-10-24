@@ -113,7 +113,7 @@ C~       write(*,*) "Allocation error of CUT in GET_CUT"
      &                 NHALO, TRACE, WORKH, NODE, LEN, HALOEDGENBR,
      &                 GEN2HALO)
             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
-     &      JCNHALO(max(HALOEDGENBR,1)), STAT=IERR)
+     &      JCNHALO(max(HALOEDGENBR,1_8)), STAT=IERR)
             IF (IERR.GT.0) THEN
 C~            IF (LPOK) WRITE(LP,*) 
 C~   &        " Error allocate integer array of size: ", 
@@ -132,7 +132,7 @@ C~   &         int(NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR
      &                 NHALO, TRACE, WORKH, NODE, LEN, HALOEDGENBR,
      &                 GEN2HALO)
             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
-     &      JCNHALO(max(HALOEDGENBR,1)), STAT=IERR)
+     &      JCNHALO(max(HALOEDGENBR,1_8)), STAT=IERR)
             IF (IERR.GT.0) THEN
 C~            IF (LPOK) WRITE(LP,*) 
 C~   &        " Error allocate integer array of size: ", 
@@ -279,7 +279,7 @@ C~          WRITE(6,*) " Internal ERROR K482=", K482
      &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
      &                 GEN2HALO)
             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
-     &      JCNHALO(max(HALOEDGENBR,1)), VWGT(NHALO), STAT=IERR)
+     &      JCNHALO(max(HALOEDGENBR,1_8)), VWGT(NHALO), STAT=IERR)
             IF (IERR.GT.0) THEN
 C~            IF (LPOK) WRITE(LP,*) 
 C~   &        " Error allocate integer array of size: ", 
@@ -302,7 +302,7 @@ C~   &         int(2*NHALO+(KEEP10*(NHALO+1)),8) + HALOEDGENBR
      &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
      &                 GEN2HALO)
             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
-     &      JCNHALO(max(HALOEDGENBR,1)), VWGT(NHALO), STAT=IERR)
+     &      JCNHALO(max(HALOEDGENBR,1_8)), VWGT(NHALO), STAT=IERR)
             IF (IERR.GT.0) THEN
 C~            IF (LPOK) WRITE(LP,*) 
 C~   &        " Error allocate integer array of size: ", 
@@ -463,7 +463,7 @@ C~          WRITE(6,*) " Internal ERROR K482=", K482
       INTEGER, INTENT(IN)     :: TRACE(N)
       INTEGER(8),INTENT(IN)   :: HALOEDGENBR
       INTEGER(8), INTENT(OUT) :: IPTRHALO(NHALO+1)
-      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1))
+      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1_8))
       INTEGER                 :: IQ(NHALO)
       INTEGER::I,J,NB,II,JJ,HALOI,HALOJ
       DO I=NSEP+1, NHALO
@@ -715,7 +715,7 @@ C~       write(*,*) "Allocation error in GET_GLOBAL_GROUPS"
       INTEGER, INTENT(IN)     :: IW(LW), TRACE(N)
       INTEGER(8),INTENT(IN)   :: HALOEDGENBR
       INTEGER(8), INTENT(OUT) :: IPTRHALO(NHALO+1)
-      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1))
+      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1_8))
       INTEGER::I,IPTR_CNT,JCN_CNT,HALOI
       INTEGER(8) :: J, CNT
       CNT = 0

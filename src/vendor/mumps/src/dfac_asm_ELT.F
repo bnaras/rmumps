@@ -1,3 +1,4 @@
+C     rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md)
 C
 C  This file is part of MUMPS 5.9.1, released
 C  on Mon Jul 20 09:00:43 UTC 2026
@@ -59,7 +60,7 @@ C
           NASS         = -NASS
           IW(IOLDPS+1+KEEP(IXSZ)) = NASS
           CALL DMUMPS_ASM_SLAVE_ELEMENTS( INODE, N, NELT, IW, LIW,
-     &    IOLDPS, A_PTR(POSELT), LA_PTR, 1_8, KEEP, KEEP8, ITLOC, FILS,
+     &    IOLDPS, A_PTR(POSELT:), LA_PTR, 1_8, KEEP, KEEP8, ITLOC, FILS,
      &    PTRAIW, PTRARW,
      &    INTARR, DBLARR, KEEP8(27), KEEP8(26), FRT_PTR, FRT_ELT,
      &    RHS_MUMPS, LRGROUPS)

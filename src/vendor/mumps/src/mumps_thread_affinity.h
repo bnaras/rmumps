@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -41,7 +42,7 @@ MUMPS_HWLOC_INIT(MUMPS_INT *error);
 #define MUMPS_HWLOC_TERMINATE \
   F_SYMBOL(hwloc_terminate,HWLOC_TERMINATE)
 void MUMPS_CALL
-MUMPS_HWLOC_TERMINATE();
+MUMPS_HWLOC_TERMINATE(void);
 #endif
 #if !defined(MTKO_NO_MASK_FUSION)
 /**
@@ -225,5 +226,5 @@ MUMPS_GET_NUMA_NODE_OF_CPU(MUMPS_INT *cpu_id, MUMPS_INT *numa_node_id);
 #define MUMPS_THREAD_AFFINITY_RETURN \
   F_SYMBOL(thread_affinity_return,THREAD_AFFINITY_RETURN)
 void MUMPS_CALL
-MUMPS_THREAD_AFFINITY_RETURN();
+MUMPS_THREAD_AFFINITY_RETURN(void);
 #endif /* MUMPS_THREAD_AFFINITY_H */

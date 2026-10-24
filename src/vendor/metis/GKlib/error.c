@@ -75,7 +75,7 @@ void gk_errexit(int signum, char *f_str,...)
     of a longjmp
 */
 /***************************************************************************/
-int gk_sigtrap() 
+int gk_sigtrap(void) 
 {
   if (gk_cur_jbufs+1 >= MAX_JBUFS)
     return 0;
@@ -92,7 +92,7 @@ int gk_sigtrap()
 /*! This function sets the handlers for the signals to their default handlers
  */
 /***************************************************************************/
-int gk_siguntrap() 
+int gk_siguntrap(void) 
 {
   if (gk_cur_jbufs == -1)
     return 0;
@@ -118,7 +118,7 @@ void gk_sigthrow(int signum)
 * This function sets a number of signal handlers and sets the return point 
 * of a longjmp
 ****************************************************************************/
-void gk_SetSignalHandlers()
+void gk_SetSignalHandlers(void)
 {
   /* rmumps: not used by METIS; never install signal handlers */
 }
@@ -127,7 +127,7 @@ void gk_SetSignalHandlers()
 /***************************************************************************
 * This function sets the handlers for the signals to their default handlers
 ****************************************************************************/
-void gk_UnsetSignalHandlers()
+void gk_UnsetSignalHandlers(void)
 {
 }
   
@@ -168,7 +168,7 @@ char *gk_strerror(int errnum)
 /*************************************************************************
 * This function prints a backtrace of calling functions
 **************************************************************************/
-void PrintBackTrace()
+void PrintBackTrace(void)
 {
 #ifdef HAVE_EXECINFO_H
   void *array[10];

@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -23,7 +24,7 @@ void mumps_init_request_pool(int size_pool);
 /*
  * Request pool finalization.
  */
-void mumps_finalize_request_pool();
+void mumps_finalize_request_pool(void);
 /*
  * Asynchronous host register.
  */
@@ -39,9 +40,9 @@ int mumps_request_wait(uint64_t index);
 /*
  * Wait for all pending requests.
  */
-int mumps_request_wait_all();
+int mumps_request_wait_all(void);
 #else
-void mumps_register_thread_return();
+void mumps_register_thread_return(void);
 {
   /* Registering tools will be available in the future. */
 }

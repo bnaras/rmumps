@@ -1220,9 +1220,9 @@ C~   &       write(cv_lp,*)'memory allocation error in ',subname
            err_rep='GET_SPLIT_4_PERF'
            CALL MUMPS_GET_SPLIT_4_PERF(inode, nfront, npiv,
      &     dble(npropmap),
-     &     k1, lnpivsplit, npivsplit, n, cv_frere(1), 
-     &     cv_keep(1),
-     &     cv_fils(1), cv_BLKON, cv_SIZEOFBLOCKS(1),
+     &     k1, lnpivsplit, npivsplit, n, cv_frere(1:), 
+     &     cv_keep(1:),
+     &     cv_fils(1:), cv_BLKON, cv_SIZEOFBLOCKS(1:),
      &     istat)
            k3=k1
            doit = .true.
@@ -1295,10 +1295,10 @@ C~   &           err_rep,' in ',subname
          if ( ( k1.le.1).or.(k3.le.1).or.(.NOT.doit) ) cycle
          err_rep='SPLITNODE_INKPART'
          call MUMPS_SPLITNODE_INTREE( inode, nfront, npiv, k1,
-     &        lnpivsplit, npivsplit, cv_keep(1), n, cv_fils(1),
-     &        cv_frere(1),
-     &        cv_nfsiz(1), cv_ne(1), cv_info(5), 
-     &        cv_nsteps, cv_nodetype(1), ierr
+     &        lnpivsplit, npivsplit, cv_keep(1:), n, cv_fils(1:),
+     &        cv_frere(1:),
+     &        cv_nfsiz(1:), cv_ne(1:), cv_info(5), 
+     &        cv_nsteps, cv_nodetype(1:), ierr
      &                      , SIZEOFBLOCKS, LSIZEOFBLOCKS
      &                      , BLKON
      &      )
@@ -3877,7 +3877,7 @@ C~   &    'Error reported by MUMPS_SORT_MSORT in ',subname
       character (len=48):: subname
       subname='SELECT_TYPE3'
       CALL MUMPS_SELECT_K38(cv_n, slavef, cv_mp, cv_icntl(13),
-     &     cv_keep(1), cv_frere(1), cv_nfsiz(1), istat)
+     &     cv_keep(1:), cv_frere(1:), cv_nfsiz(1:), istat)
       IF (istat .NE. 0) THEN
 C~          if(cv_lp.gt.0)
 C~   &           write(cv_lp,*)
@@ -3929,8 +3929,9 @@ C~   &           'memory allocation error in ',subname
                montype= cv_nodetype(inode)
                if (montype.eq.tsplit_beg) then 
                   CALL MUMPS_SETUP_CAND_CHAIN(cv_n, cv_nb_niv2, 
-     &                 cv_frere(1), cv_nodetype(1),
-     &                 cv_par2_nodes(1), cv_procnode(1), cv_cand(1,1),
+     &                 cv_frere(1:), cv_nodetype(1:),
+     &                 cv_par2_nodes(1:), cv_procnode(1:), cv_cand(1:,
+     &1:),
      &                 inode,
      &                 slavef, dummy, nbcand, istat)
                endif

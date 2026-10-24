@@ -1,0 +1,185 @@
+Why: The in-place 32/64-bit conversions of tools_common.F
+ (MUMPS_ICOPY_32TO64_64C_IP_REC, MUMPS_ICOPY_64TO32_64C_IP_REC and their
+ REAL counterparts) pass an element of an INTEGER (REAL) array to an
+ INTEGER(8) (DOUBLE PRECISION) dummy, a type mismatch rejected by
+ gfortran >= 10. The 64-bit half is now passed through a pointer of the
+ right type created with C_F_POINTER on the same storage (the array gains
+ the TARGET attribute); the generated code is unchanged.
+Upstream: not sent; worth offering.
+Obsolete when: upstream changes these routines.
+
+diff --git a/src/tools_common.F b/src/tools_common.F
+index 6a75b04..ca22989 100644
+--- a/src/tools_common.F
++++ b/src/tools_common.F
+@@ -1448,20 +1448,33 @@ C
+       RETURN
+       END SUBROUTINE MUMPS_ICOPY_32TO64_64C
+       SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP(IN_OUT_TAB48, SIZETAB,
+-     &    SIZETABX2 ) 
++     &    SIZETABX2 )
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+       INTEGER, intent(inout) :: IN_OUT_TAB48(SIZETABX2)
++C     rmumps: the TARGET dummy of the routine below needs an explicit
++C     interface
++      INTERFACE
++      RECURSIVE SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP_REC(
++     &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
++      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
++      INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
++      END SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP_REC
++      END INTERFACE
+       CALL MUMPS_ICOPY_32TO64_64C_IP_REC(IN_OUT_TAB48, SIZETAB,
+      &    SIZETABX2)
+       RETURN
+       END SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP
+       RECURSIVE SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP_REC(
+      &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
++      USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+-      INTEGER :: IN_OUT_TAB48(SIZETABX2)
++      INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
++C     rmumps: INTEGER(8) view of the destination (was passed as an
++C     INTEGER element: a type mismatch)
++      INTEGER(8), POINTER :: OUT8(:)
+       IF (SIZETAB.LE. 1000_8) THEN
+         CALL MUMPS_ICOPY_32TO64_64C_IP_C(IN_OUT_TAB48,
+      &       SIZETAB)
+@@ -1469,9 +1482,10 @@ C
+         SIZE2  = SIZETAB / 2
+         SIZE1  = SIZETAB - SIZE2
+         IBEG24 = SIZE1+1                 
+-        IBEG28 = 2*SIZE1+1_8             
++        IBEG28 = 2*SIZE1+1_8
++        CALL C_F_POINTER(C_LOC(IN_OUT_TAB48(IBEG28)), OUT8, [SIZE2])
+         CALL MUMPS_ICOPY_32TO64_64C(IN_OUT_TAB48(IBEG24),
+-     &                           SIZE2, IN_OUT_TAB48(IBEG28))
++     &                           SIZE2, OUT8)
+         CALL MUMPS_ICOPY_32TO64_64C_IP_REC(IN_OUT_TAB48,
+      &                           SIZE1, 2_8*SIZE1)
+       ENDIF
+@@ -1504,16 +1518,29 @@ C
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+       INTEGER, intent(inout) :: IN_OUT_TAB48(SIZETABX2)
++C     rmumps: the TARGET dummy of the routine below needs an explicit
++C     interface
++      INTERFACE
++      RECURSIVE SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_REC(
++     &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
++      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
++      INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
++      END SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_REC
++      END INTERFACE
+       CALL MUMPS_ICOPY_64TO32_64C_IP_REC(IN_OUT_TAB48, SIZETAB,
+      &                                   SIZETABX2)
+       RETURN
+       END SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP
+       RECURSIVE SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_REC(
+      &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
++      USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+-      INTEGER :: IN_OUT_TAB48(SIZETABX2)
++      INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
++C     rmumps: INTEGER(8) view of the source (was passed as an INTEGER
++C     element: a type mismatch)
++      INTEGER(8), POINTER :: IN8(:)
+       IF (SIZETAB.LE. 1000_8) THEN
+         CALL MUMPS_ICOPY_64TO32_64C_IP_C(IN_OUT_TAB48,
+      &       SIZETAB)
+@@ -1524,7 +1551,8 @@ C
+         IBEG28 = SIZE1 + SIZE1 + 1_8
+         CALL MUMPS_ICOPY_64TO32_64C_IP_REC(IN_OUT_TAB48,
+      &                                     SIZE1, 2_8*SIZE1)
+-        CALL MUMPS_ICOPY_64TO32_64C(IN_OUT_TAB48(IBEG28),
++        CALL C_F_POINTER(C_LOC(IN_OUT_TAB48(IBEG28)), IN8, [SIZE2])
++        CALL MUMPS_ICOPY_64TO32_64C(IN8,
+      &                           SIZE2, IN_OUT_TAB48(IBEG24))
+       ENDIF
+       RETURN
+@@ -2576,15 +2604,28 @@ C
+       SUBROUTINE MUMPS_RCOPY_32TO64_64C_IP(IN_OUT_TAB48, SIZETAB)
+       INTEGER(8), intent(in) :: SIZETAB
+       REAL, intent(inout) :: IN_OUT_TAB48(2*SIZETAB)
++C     rmumps: the TARGET dummy of the routine below needs an explicit
++C     interface
++      INTERFACE
++      RECURSIVE SUBROUTINE MUMPS_RCOPY_32TO64_64C_IP_REC(
++     &                     IN_OUT_TAB48, SIZETAB)
++      INTEGER(8), intent(in) :: SIZETAB
++      REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
++      END SUBROUTINE MUMPS_RCOPY_32TO64_64C_IP_REC
++      END INTERFACE
+       CALL MUMPS_RCOPY_32TO64_64C_IP_REC(IN_OUT_TAB48, SIZETAB)
+       RETURN
+       END SUBROUTINE MUMPS_RCOPY_32TO64_64C_IP
+       RECURSIVE SUBROUTINE MUMPS_RCOPY_32TO64_64C_IP_REC(
+      &                     IN_OUT_TAB48, SIZETAB)
++      USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB
+-      REAL :: IN_OUT_TAB48(2*SIZETAB)
++      REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
++C     rmumps: DOUBLE PRECISION view of the destination (was passed as a
++C     REAL element: a type mismatch)
++      DOUBLE PRECISION, POINTER :: OUT8(:)
+       IF (SIZETAB.LE. 1000_8) THEN
+         CALL MUMPS_RCOPY_32TO64_64C_IP_C(IN_OUT_TAB48,
+      &       SIZETAB)
+@@ -2593,8 +2634,9 @@ C
+         SIZE1  = SIZETAB - SIZE2
+         IBEG24 = SIZE1+1                 
+         IBEG28 = 2*SIZE1+1_8             
++        CALL C_F_POINTER(C_LOC(IN_OUT_TAB48(IBEG28)), OUT8, [SIZE2])
+         CALL MUMPS_RCOPY_32TO64_64C(IN_OUT_TAB48(IBEG24),
+-     &                           SIZE2, IN_OUT_TAB48(IBEG28))
++     &                           SIZE2, OUT8)
+         CALL MUMPS_RCOPY_32TO64_64C_IP_REC(IN_OUT_TAB48,
+      &                           SIZE1)
+       ENDIF
+@@ -2624,15 +2666,28 @@ C
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB
+       REAL, intent(inout) :: IN_OUT_TAB48(2*SIZETAB)
++C     rmumps: the TARGET dummy of the routine below needs an explicit
++C     interface
++      INTERFACE
++      RECURSIVE SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP_REC(
++     &                     IN_OUT_TAB48, SIZETAB)
++      INTEGER(8), intent(in) :: SIZETAB
++      REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
++      END SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP_REC
++      END INTERFACE
+       CALL MUMPS_RCOPY_64TO32_64C_IP_REC(IN_OUT_TAB48, SIZETAB)
+       RETURN
+       END SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP
+       RECURSIVE SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP_REC(
+      &                     IN_OUT_TAB48, SIZETAB)
++      USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
+       INTEGER(8), intent(in) :: SIZETAB
+-      REAL :: IN_OUT_TAB48(2*SIZETAB)
++      REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
++C     rmumps: DOUBLE PRECISION view of the source (was passed as a REAL
++C     element: a type mismatch)
++      DOUBLE PRECISION, POINTER :: IN8(:)
+       IF (SIZETAB.LE. 1000_8) THEN
+         CALL MUMPS_RCOPY_64TO32_64C_IP_C(IN_OUT_TAB48,
+      &       SIZETAB)
+@@ -2643,7 +2698,8 @@ C
+         IBEG28 = SIZE1 + SIZE1 + 1_8
+         CALL MUMPS_RCOPY_64TO32_64C_IP_REC(IN_OUT_TAB48,
+      &                                        SIZE1)
+-        CALL MUMPS_RCOPY_64TO32_64C(IN_OUT_TAB48(IBEG28),
++        CALL C_F_POINTER(C_LOC(IN_OUT_TAB48(IBEG28)), IN8, [SIZE2])
++        CALL MUMPS_RCOPY_64TO32_64C(IN8,
+      &                           SIZE2, IN_OUT_TAB48(IBEG24))
+       ENDIF
+       RETURN

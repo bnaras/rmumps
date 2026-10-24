@@ -355,7 +355,7 @@ C
             NBFIN = NBFIN - NBROOT
             IF (SLAVEF.GT.1) THEN
                 DUMMY(1) = NBROOT
-                CALL DMUMPS_MCAST2(DUMMY, 1, MPI_INTEGER, MYID_NODES,
+                CALL DMUMPS_MCAST2(DUMMY(1), 1, MPI_INTEGER, MYID_NODES,
      &          COMM_NODES, RACINE, SLAVEF, KEEP )
             END IF
          ENDIF

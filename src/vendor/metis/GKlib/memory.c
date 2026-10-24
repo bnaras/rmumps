@@ -98,7 +98,7 @@ void gk_FreeMatrix(void ***r_matrix, size_t ndim1, size_t ndim2)
 /*! This function initializes tracking of heap allocations. 
 */
 /*************************************************************************/
-int gk_malloc_init()
+int gk_malloc_init(void)
 {
   if (gkmcore == NULL)
     gkmcore = gk_gkmcoreCreate();
@@ -232,7 +232,7 @@ void gk_free(void **ptr1,...)
 * This function returns the current ammount of dynamically allocated
 * memory that is used by the system
 **************************************************************************/
-size_t gk_GetCurMemoryUsed()
+size_t gk_GetCurMemoryUsed(void)
 {
   if (gkmcore == NULL)
     return 0;
@@ -245,7 +245,7 @@ size_t gk_GetCurMemoryUsed()
 * This function returns the maximum ammount of dynamically allocated 
 * memory that was used by the system
 **************************************************************************/
-size_t gk_GetMaxMemoryUsed()
+size_t gk_GetMaxMemoryUsed(void)
 {
   if (gkmcore == NULL)
     return 0;

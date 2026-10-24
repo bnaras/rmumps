@@ -1290,7 +1290,7 @@ C~   &           INFO(2)
      &          INFO(1), INFO(2), LP, LPOK, 
      &          LMAT, IDUMMY8, KEEP
 #if ! defined(NOANA_BLKAUTO)
-     &          ,OPTION, MAPCOL_PTR(1), SIZE_MAPCOL 
+     &          ,OPTION, MAPCOL_PTR(1:), SIZE_MAPCOL 
 #endif
      &  )
       CALL MUMPS_PROPINFO(  ICNTL(1), INFO(1),
@@ -1300,7 +1300,7 @@ C~   &           INFO(2)
       IF (OPTION.EQ.3) THEN
        CALL MUMPS_AB_CHECK_FINALIZE_MAPCOL ( 
      &     MYID, COMM, NPROCS, NPROCS,
-     &     MAPCOL_PTR(1), SIZE_MAPCOL, 
+     &     MAPCOL_PTR(1:), SIZE_MAPCOL, 
      &     MAPCOL_VALIDATED, CONTIGUOUS_COL,
      &     LP, LPOK, INFO(1) )
          IF (.NOT.MAPCOL_VALIDATED) THEN
@@ -1359,7 +1359,7 @@ C~   &           INFO(2)
      &        INFO, ICNTL, KEEP, COMM, MYID, 
      &        NPROCS, NDOF, LUMAT, LP, LPOK,
      &        DOF2BLOCK(1), NBLK, BLKFORMAT_DETECTED,
-     &        MAPCOL_PTR(1), SIZE_MAPCOL,
+     &        MAPCOL_PTR(1:), SIZE_MAPCOL,
      &        REMAP_CONTIG, K244,
      &        NPROCS, IDUMMY_ARRAY(1), 1
      &        )
@@ -1498,7 +1498,7 @@ C~   &           INFO(2)
      &          INFO(1), INFO(2), LP, LPOK, 
      &          LMAT, OFFDIAG,  KEEP
 #if ! defined(NOANA_BLKAUTO)
-     &          ,OPTION, MAPCOL_PTR(1), SIZE_MAPCOL 
+     &          ,OPTION, MAPCOL_PTR(1:), SIZE_MAPCOL 
 #endif
      &          )
       CALL MUMPS_PROPINFO(  ICNTL(1), INFO(1),
@@ -1517,7 +1517,7 @@ C~   &           INFO(2)
        ELSE
          CALL MUMPS_AB_CHECK_FINALIZE_MAPCOL ( 
      &     MYID, COMM, NPROCS,  NPROCS, 
-     &     MAPCOL_PTR(1), SIZE_MAPCOL,  
+     &     MAPCOL_PTR(1:), SIZE_MAPCOL,  
      &     MAPCOL_VALIDATED,  CONTIGUOUS_COL,
      &     LP, LPOK, INFO(1) )
        ENDIF
@@ -1624,7 +1624,7 @@ C~   &           INFO(2)
      &        INFO, ICNTL, KEEP, COMM, MYID, 
      &        NPROCS, NDOF, LUMAT, LP, LPOK,
      &        DOF2BLOCK(1), NBLK, BLKFORMAT_DETECTED, 
-     &        MAPCOL_PTR(1), SIZE_MAPCOL, 
+     &        MAPCOL_PTR(1:), SIZE_MAPCOL, 
      &        REMAP_CONTIG, K244, 
      &        NPROCS_PARAORD, PARAORD_to_idCOMM, 
      &        NPROCS_PARAORD
@@ -2297,7 +2297,7 @@ C~   &                  " MUMPS_AB_GATHER_GRAPH"
       INTEGER :: IDUMMY_ARRAY(1), NBRECORDS, allocok
       TYPE(LMATRIX_T) :: LUMAT_REMAP
       INTEGER(8) :: NSEND8, NLOCAL8
-      INTEGER*8  :: swap8
+      INTEGER(8)  :: swap8
       INTEGER    :: swap
       LOGICAL    :: swapl
       TYPE(COL_LMATRIX_T), DIMENSION(:), POINTER :: PTR_COL
@@ -2493,7 +2493,7 @@ C~   &                  " MUMPS_AB_GATHER_GRAPH"
       INTEGER    :: allocok
       INTEGER    :: I, J, JJ, IB, JB, NB, swap, JDIAG
       INTEGER(8) :: NB_8, PT_CUR, SIZE_TO_ALLOC_8
-      INTEGER*8  :: NZ8, swap8
+      INTEGER(8)  :: NZ8, swap8
       LOGICAL    :: swapl
       nullify(BLOCK_PTR)
       LUMATcomp%NBCOL          = NBLK

@@ -5770,7 +5770,7 @@ C~   &    INFOG19
       INTEGER, intent(in) :: NSLAVES
       LOGICAL, intent(in) :: PRINT_MAXAVG
       INTEGER, intent(in) :: COMM
-      CHARACTER*48 MSG 
+      CHARACTER(LEN=48) MSG 
 C  Local
       INTEGER(8) MAX_VAL
       INTEGER IERR, MASTER

@@ -68,7 +68,7 @@ void MUMPS_CALL resize_workspaces(MUMPS_INT* n, MUMPS_INT* err) {
         }
     }
 }
-void MUMPS_CALL release_workspaces() {
+void MUMPS_CALL release_workspaces(void) {
     int i;
 //    printf("[DEV] release workspaces\n");
     for (i = 0; i < nb_slots; i++) {

@@ -19,6 +19,10 @@ C
 #endif
       MODULE MUMPS_ANA_ORD_WRAPPERS
       IMPLICIT NONE
+C     rmumps: explicit interfaces of the PORD and METIS entry points,
+C     which these wrappers call with INTEGER or INTEGER(8) arrays
+C     depending on how the orderings were built
+      INCLUDE 'mumps_c_interfaces.h'
        CONTAINS
 #if defined(metis) || defined(parmetis) || defined(metis4) || defined(parmetis3)
 #if defined(metis4) || defined(parmetis3)
@@ -81,7 +85,7 @@ C~      IF (LPOK) WRITE(LP,'(A)')
 C~   &    "ERROR memory allocation in METIS_NODEND_MIXEDto32"
         RETURN
       ENDIF
-      CALL MUMPS_ICOPY_64TO32(IPE8(1), NCMP+1, IPE)
+      CALL MUMPS_ICOPY_64TO32(IPE8(1:), NCMP+1, IPE)
       CALL METIS_NODEND(NCMP, IPE, IW(1),
      &           NUMFLAG, OPTIONS_METIS,
      &           IKEEP2(1), IKEEP1(1) )
@@ -115,7 +119,7 @@ C~      IF (LPOK) WRITE(LP,'(A)')
 C~   &    "ERROR memory allocation in METIS_NODEND_MIXEDto32"
         RETURN
       ENDIF
-      CALL MUMPS_ICOPY_64TO32(IPE8(1), NCMP+1, IPE)
+      CALL MUMPS_ICOPY_64TO32(IPE8(1:), NCMP+1, IPE)
       CALL METIS_NODEND( NCMP, IPE, IW(1), FRERE(1),
      & OPTIONS_METIS, IKEEP2(1), IKEEP1(1))
       DEALLOCATE(IPE)
@@ -232,7 +236,7 @@ C~          IF (LPOK) WRITE(LP,'(A)')
 C~   &      "ERROR 1 memory allocation in METIS_METIS_NODEND_MIXEDto64"
             RETURN
           ENDIF
-          CALL MUMPS_ICOPY_32TO64_64C(IW(1), IPE8(NCMP+1)-1_8, IW8 )
+          CALL MUMPS_ICOPY_32TO64_64C(IW(1:), IPE8(NCMP+1)-1_8, IW8 )
         ENDIF
         ALLOCATE(IKEEP18(NCMP), IKEEP28(NCMP), stat=allocok)
         IF (allocok > 0) THEN
@@ -252,8 +256,8 @@ C~   &      "ERROR 2 memory allocation in METIS_METIS_NODEND_MIXEDto64"
      &             NUMFLAG, OPTIONS_METIS,
      &             IKEEP28, IKEEP18 )
         ENDIF
-        CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1))
-        CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1))
+        CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1:))
+        CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1:))
         IF (INPLACE64_GRAPH_COPY) THEN
          IF (INPLACE64_RESTORE_GRAPH) THEN
           CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
@@ -304,7 +308,7 @@ C~          IF (LPOK) WRITE(LP,'(A)')
 C~   &      "ERROR 1 memory allocation in METIS_METIS_NODEND_MIXEDto64"
             RETURN
           ENDIF
-          CALL MUMPS_ICOPY_32TO64_64C(IW(1), IPE8(NCMP+1)-1_8, IW8 )
+          CALL MUMPS_ICOPY_32TO64_64C(IW(1:), IPE8(NCMP+1)-1_8, IW8 )
         ENDIF
         ALLOCATE(FRERE8(NCMP),
      &         IKEEP18(NCMP), IKEEP28(NCMP),
@@ -319,7 +323,7 @@ C~        IF (LPOK) WRITE(LP,'(A)')
 C~   &    "ERROR 2 memory allocation in METIS_NODEND_MIXEDto64"
           RETURN
         ENDIF
-        CALL MUMPS_ICOPY_32TO64    (FRERE(1), NCMP, FRERE8)
+        CALL MUMPS_ICOPY_32TO64    (FRERE(1:), NCMP, FRERE8)
         CALL MUMPS_ICOPY_32TO64    (OPTIONS_METIS, LOPTIONS_METIS,
      &                                 OPTIONS_METIS8)
         IF (INPLACE64_GRAPH_COPY) THEN
@@ -329,8 +333,8 @@ C~   &    "ERROR 2 memory allocation in METIS_NODEND_MIXEDto64"
           CALL METIS_NODEND( int(NCMP,8), IPE8(1), IW8, FRERE8,
      &                       OPTIONS_METIS8, IKEEP28, IKEEP18 )
         ENDIF
-        CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1))
-        CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1))
+        CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1:))
+        CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1:))
         IF (INPLACE64_GRAPH_COPY) THEN
          IF (INPLACE64_RESTORE_GRAPH) THEN
             CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
@@ -741,7 +745,7 @@ C~   &               ' Error on output from SCOTCH, NCMPA=', NCMPA
       include 'scotchf.h'
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
       LOGICAL, INTENT(IN)    :: LPOK
@@ -802,7 +806,7 @@ C~   &    "ERROR memory allocation in MUMPS_SCOTCH_KWAY_MIXEDto32"
       include 'scotchf.h'
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
       LOGICAL, INTENT(IN)    :: LPOK
@@ -866,7 +870,7 @@ C~   &       "ERROR memory allocation in MUMPS_SCOTCH_KWAY_MIXEDto64 "
       IMPLICIT NONE
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
       LOGICAL, INTENT(IN)    :: LPOK
@@ -901,7 +905,7 @@ C~   &    "ERROR memory allocation in MUMPS_METIS_KWAY_MIXEDto32"
       IMPLICIT NONE
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
       LOGICAL, INTENT(IN)    :: LPOK
@@ -937,7 +941,7 @@ C~   &       "ERROR memory allocation in MUMPS_METIS_KWAY_MIXEDto64 "
       IMPLICIT NONE
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO),
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO),
      &              VWGT(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
@@ -973,7 +977,7 @@ C~   &    "ERROR memory allocation in MUMPS_METIS_KWAY_AB_MIXEDto32"
       IMPLICIT NONE
       INTEGER(8) :: HALOEDGENBR
       INTEGER    :: NHALO, NBGROUPS
-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO),
+      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO),
      &              VWGT(NHALO)
       INTEGER(8) :: IPTRHALO(NHALO+1)
       INTEGER, INTENT(IN)    :: LP, KEEP10
@@ -1039,7 +1043,7 @@ C~      IF (LPOK) WRITE(LP,'(A)')
 C~   &    "ERROR memory allocation in MUMPS_PORD_MIXEDto32"
         RETURN
       ENDIF
-      CALL MUMPS_ICOPY_64TO32(XADJ8(1), NVTX+1, XADJ)
+      CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX+1, XADJ)
       CALL MUMPS_PORDF( NVTX, int(NEDGES8), XADJ, IW(1),
      &                                    NV, NCMPA )
       DO I= 1, NVTX
@@ -1086,7 +1090,7 @@ C~        IF (LPOK) WRITE(LP,'(A)')
 C~   &      "ERROR memory allocation in MUMPS_PORD_MIXEDto64"
           RETURN
          ENDIF
-         CALL MUMPS_ICOPY_32TO64_64C(IW(1), NEDGES8, IW8)
+         CALL MUMPS_ICOPY_32TO64_64C(IW(1:), NEDGES8, IW8)
         ENDIF
         ALLOCATE(NV8(NVTX), stat=allocok)
         IF (allocok > 0) THEN
@@ -1104,7 +1108,7 @@ C~   &      "ERROR memory allocation in MUMPS_PORD_MIXEDto64"
      &                                        NV8, NCMPA )
          DEALLOCATE(IW8)
         ENDIF
-        CALL MUMPS_ICOPY_64TO32(XADJ8(1), NVTX, PARENT)
+        CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX, PARENT)
         CALL MUMPS_ICOPY_64TO32(NV8, NVTX, NV)
         DEALLOCATE(NV8)
       ENDIF
@@ -1141,7 +1145,7 @@ C~      IF (LPOK) WRITE(LP,'(A)')
 C~   &    "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto32"
         RETURN
       ENDIF
-      CALL MUMPS_ICOPY_64TO32(XADJ8(1),NVTX+1,XADJ)
+      CALL MUMPS_ICOPY_64TO32(XADJ8(1:),NVTX+1,XADJ)
       CALL MUMPS_PORDF_WND( NVTX, int(NEDGES8),
      &                             XADJ, IW(1),
      &                             NV, NCMPA, N )
@@ -1175,7 +1179,7 @@ C~   &    "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto32"
         CALL MUMPS_PORDF_WND( int(NVTX,8), NEDGES8,
      &                             XADJ8(1), IW(1),
      &                             NV, NCMPA, int(N,8) )
-        CALL MUMPS_ICOPY_64TO32(XADJ8(1), NVTX, PARENT)
+        CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX, PARENT)
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
           CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), NEDGES8,
@@ -1189,7 +1193,7 @@ C~          IF (LPOK) WRITE(LP,'(A)')
 C~   &      "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto64"
             RETURN
           ENDIF
-          CALL MUMPS_ICOPY_32TO64_64C(IW(1), NEDGES8, IW8)
+          CALL MUMPS_ICOPY_32TO64_64C(IW(1:), NEDGES8, IW8)
         ENDIF
         ALLOCATE(NV8(NVTX), stat=allocok)
         IF (allocok > 0) THEN
@@ -1210,7 +1214,7 @@ C~   &      "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto64"
      &                             NV8, NCMPA, int(N,8) )
           DEALLOCATE(IW8)
         ENDIF
-        CALL MUMPS_ICOPY_64TO32(XADJ8(1), NVTX, PARENT)
+        CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX, PARENT)
         CALL MUMPS_ICOPY_64TO32(NV8, NVTX, NV)
         DEALLOCATE(NV8)
       ENDIF

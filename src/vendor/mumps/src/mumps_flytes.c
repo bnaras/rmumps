@@ -29,7 +29,7 @@
  * this is inspired from
  * https://gitlab.com/AntJego/adaptative-precision-blr */
 #if defined(NOMIXHPC)
-void MUMPS_CALL mumps_flyte_return() {};
+void MUMPS_CALL mumps_flyte_return(void) {};
 #else
 #if defined(__x86_64__) || defined(_M_X64)
 #define ARCH_X86 1

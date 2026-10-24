@@ -287,9 +287,9 @@ C~   &              ': ERROR allocation during DMUMPS_PROCESS_BLOCFACTO'
             CALL DMUMPS_MPI_UNPACK_LR_PARTIAL 
      &                        (BUFR, LBUFR, LBUFR_BYTES, 
      &                             POSITION, NPIV, NELIM, 'H',
-     &                             BLR_U(1), NB_BLR_U, 
+     &                             BLR_U(1:), NB_BLR_U, 
      &                             JBEG_BLOCK,
-     &                             BEGS_BLR_U(1),
+     &                             BEGS_BLR_U(1:),
      &                             KEEP8, COMM, IERR, IFLAG, IERROR)
             IF (JBEG_BLOCK.NE.1) SHIFT_BEGS_BLR_U = 1
             IF (IFLAG.LT.0) GOTO 700

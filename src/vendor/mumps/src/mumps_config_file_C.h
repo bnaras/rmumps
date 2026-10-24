@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -23,5 +24,5 @@ MUMPS_GET_CONFIG_FILE_C(MUMPS_INT *len_config_file, char* config_file, mumps_ftn
 #define MUMPS_CONFIG_FILE_RETURN_C \
     F_SYMBOL(config_file_return_c,CONFIG_FILE_RETURN_C)
 void MUMPS_CALL
-MUMPS_CONFIG_FILE_RETURN_C();
+MUMPS_CONFIG_FILE_RETURN_C(void);
 #endif /* MUMPS_CONFIG_FILE_C_H */

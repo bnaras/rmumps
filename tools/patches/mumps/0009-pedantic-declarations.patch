@@ -1,0 +1,185 @@
+Why: Constructs reported as extensions by gfortran -pedantic (CRAN's
+ Debian flags), which R CMD check counts as significant warnings:
+ - max(HALOEDGENBR,1) mixes INTEGER(8) and default INTEGER ("Different
+   type kinds"): now max(HALOEDGENBR,1_8) (ana_orderings_wrappers_m.F,
+   dana_lr.F);
+ - array bounds that use a dummy declared later ("Symbol is used before
+   it is typed"): the declarations of LDT (dsol_lr.F, twice) and LWORK
+   (dtools.F) move up.
+ INTEGER*n and CHARACTER*n declarations are rewritten by transform T5.
+Upstream: not sent; worth offering.
+Obsolete when: upstream fixes these declarations.
+
+diff --git a/src/ana_orderings_wrappers_m.F b/src/ana_orderings_wrappers_m.F
+index a44af56..aaf3e14 100644
+--- a/src/ana_orderings_wrappers_m.F
++++ b/src/ana_orderings_wrappers_m.F
+@@ -744,7 +744,7 @@ C     depending on how the orderings were built
+       include 'scotchf.h'
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+       LOGICAL, INTENT(IN)    :: LPOK
+@@ -805,7 +805,7 @@ C     depending on how the orderings were built
+       include 'scotchf.h'
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+       LOGICAL, INTENT(IN)    :: LPOK
+@@ -869,7 +869,7 @@ C     depending on how the orderings were built
+       IMPLICIT NONE
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+       LOGICAL, INTENT(IN)    :: LPOK
+@@ -904,7 +904,7 @@ C     depending on how the orderings were built
+       IMPLICIT NONE
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO)
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+       LOGICAL, INTENT(IN)    :: LPOK
+@@ -940,7 +940,7 @@ C     depending on how the orderings were built
+       IMPLICIT NONE
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO),
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO),
+      &              VWGT(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+@@ -976,7 +976,7 @@ C     depending on how the orderings were built
+       IMPLICIT NONE
+       INTEGER(8) :: HALOEDGENBR
+       INTEGER    :: NHALO, NBGROUPS
+-      INTEGER    :: JCNHALO(max(HALOEDGENBR,1)), PARTS(NHALO),
++      INTEGER    :: JCNHALO(max(HALOEDGENBR,1_8)), PARTS(NHALO),
+      &              VWGT(NHALO)
+       INTEGER(8) :: IPTRHALO(NHALO+1)
+       INTEGER, INTENT(IN)    :: LP, KEEP10
+diff --git a/src/dana_lr.F b/src/dana_lr.F
+index f5394dd..30cf19f 100644
+--- a/src/dana_lr.F
++++ b/src/dana_lr.F
+@@ -112,7 +112,7 @@ C
+      &                 NHALO, TRACE, WORKH, NODE, LEN, HALOEDGENBR,
+      &                 GEN2HALO)
+             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+-     &      JCNHALO(max(HALOEDGENBR,1)), STAT=IERR)
++     &      JCNHALO(max(HALOEDGENBR,1_8)), STAT=IERR)
+             IF (IERR.GT.0) THEN
+               IF (LPOK) WRITE(LP,*) 
+      &        " Error allocate integer array of size: ", 
+@@ -131,7 +131,7 @@ C
+      &                 NHALO, TRACE, WORKH, NODE, LEN, HALOEDGENBR,
+      &                 GEN2HALO)
+             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+-     &      JCNHALO(max(HALOEDGENBR,1)), STAT=IERR)
++     &      JCNHALO(max(HALOEDGENBR,1_8)), STAT=IERR)
+             IF (IERR.GT.0) THEN
+               IF (LPOK) WRITE(LP,*) 
+      &        " Error allocate integer array of size: ", 
+@@ -278,7 +278,7 @@ C
+      &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
+      &                 GEN2HALO)
+             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+-     &      JCNHALO(max(HALOEDGENBR,1)), VWGT(NHALO), STAT=IERR)
++     &      JCNHALO(max(HALOEDGENBR,1_8)), VWGT(NHALO), STAT=IERR)
+             IF (IERR.GT.0) THEN
+               IF (LPOK) WRITE(LP,*) 
+      &        " Error allocate integer array of size: ", 
+@@ -301,7 +301,7 @@ C
+      &                 NHALO, TRACE, WORKH, NODE, HALOEDGENBR,
+      &                 GEN2HALO)
+             ALLOCATE(PARTS(NHALO), IPTRHALO(NHALO+1),
+-     &      JCNHALO(max(HALOEDGENBR,1)), VWGT(NHALO), STAT=IERR)
++     &      JCNHALO(max(HALOEDGENBR,1_8)), VWGT(NHALO), STAT=IERR)
+             IF (IERR.GT.0) THEN
+               IF (LPOK) WRITE(LP,*) 
+      &        " Error allocate integer array of size: ", 
+@@ -462,7 +462,7 @@ C
+       INTEGER, INTENT(IN)     :: TRACE(N)
+       INTEGER(8),INTENT(IN)   :: HALOEDGENBR
+       INTEGER(8), INTENT(OUT) :: IPTRHALO(NHALO+1)
+-      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1))
++      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1_8))
+       INTEGER                 :: IQ(NHALO)
+       INTEGER::I,J,NB,II,JJ,HALOI,HALOJ
+       DO I=NSEP+1, NHALO
+@@ -714,7 +714,7 @@ C
+       INTEGER, INTENT(IN)     :: IW(LW), TRACE(N)
+       INTEGER(8),INTENT(IN)   :: HALOEDGENBR
+       INTEGER(8), INTENT(OUT) :: IPTRHALO(NHALO+1)
+-      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1))
++      INTEGER, INTENT(OUT)    :: JCNHALO(max(HALOEDGENBR,1_8))
+       INTEGER::I,IPTR_CNT,JCN_CNT,HALOI
+       INTEGER(8) :: J, CNT
+       CNT = 0
+diff --git a/src/dsol_lr.F b/src/dsol_lr.F
+index 89a12ab..b68873a 100644
+--- a/src/dsol_lr.F
++++ b/src/dsol_lr.F
+@@ -539,12 +539,14 @@ C     -- end of loops on panels
+ C         arguments
+           integer, intent(in) :: m, nrhs_b, k, npiv
+           DOUBLE PRECISION, dimension(:,:), intent(inout)     :: Q
++C         rmumps: ldt is declared before its use in the bound of TMP
++          integer, intent(in) :: ldt
+           DOUBLE PRECISION, dimension(ldt, *), intent(inout)     :: TMP
+           integer(8), intent(in) :: lcb
+           integer, intent(in)    :: ldpiv
+           DOUBLE PRECISION, intent(inout) :: arraypiv(ldpiv,*)
+           DOUBLE PRECISION, intent(inout) :: arraycb(lcb)
+-          integer, intent(in) :: ldt, ldcb
++          integer, intent(in) :: ldcb
+           integer, intent(in) :: ibeg_block, iend_block
+           logical, intent(in) :: is_t2_slave
+           integer(8), intent(in) :: poscb, pospiv
+@@ -657,11 +659,13 @@ C      END SUBROUTINE GEMM_LR_FWD
+ C         arguments
+           integer, intent(in) :: m, nrhs_b, k, npiv
+           DOUBLE PRECISION, dimension(:, :), intent(inout)     :: Q
++C         rmumps: ldt is declared before its use in the bound of TMP
++          integer, intent(in) :: ldt
+           DOUBLE PRECISION, dimension(ldt, *), intent(inout)     :: TMP
+           integer(8), intent(in) :: lcb, lpiv
+           DOUBLE PRECISION, intent(inout) :: arraypiv(lpiv,*)
+           DOUBLE PRECISION, intent(inout) :: arraycb(lcb)
+-          integer, intent(in) :: ldt, ldcb, ldpiv
++          integer, intent(in) :: ldcb, ldpiv
+           integer, intent(in) :: ibeg_block, iend_block
+           logical, intent(in) :: is_t2_slave
+           integer(8), intent(in) :: poscb, pospiv
+diff --git a/src/dtools.F b/src/dtools.F
+index 845335b..14d143c 100644
+--- a/src/dtools.F
++++ b/src/dtools.F
+@@ -2296,6 +2296,8 @@ C
+       TYPE(LRB_TYPE), intent(inout) :: BLR_PANEL(NB_BLR-CURRENT_BLR)
+       DOUBLE PRECISION, intent(inout)       :: A(LA)
+       INTEGER :: MAXI_CLUSTER
++C     rmumps: LWORK is declared before its use in the bound of WORK
++      INTEGER                      :: LWORK
+       DOUBLE PRECISION    :: RWORK(2*MAXI_CLUSTER*OMP_NUM)
+       DOUBLE PRECISION :: BLOCK(MAXI_CLUSTER,MAXI_CLUSTER*OMP_NUM)
+       DOUBLE PRECISION :: WORK(LWORK*OMP_NUM)
+@@ -2307,7 +2309,7 @@ C
+       INTEGER, intent(in)          :: NPIV, ISHIFT, KPERCENT,
+      &                                K458, K473, TOL_OPT
+       LOGICAL, intent(in)          :: LBANDSLAVE
+-      INTEGER                      :: LWORK, NELIM
++      INTEGER                      :: NELIM
+       DOUBLE PRECISION,intent(in)              :: TOLEPS
+       CHARACTER(len=1) :: DIR
+       LOGICAL, intent(in)          :: LRMIXED_ACTIVATED
