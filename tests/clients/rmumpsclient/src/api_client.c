@@ -4,7 +4,12 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
 #include <rmumps/rmumps_api.h>
+
+/* Entry points are static (or hidden, see Makevars) and reached through the
+ * registration table only. An exported name can be bound to a symbol of
+ * another library on Linux: a global meta() here called ncurses' meta(). */
 
 static rmumps_api api;
 
@@ -33,7 +38,7 @@ static void quiet(DMUMPS_STRUC_C *id)
 }
 
 /* Solves A x = rhs, A given as 1-based triplets. */
-SEXP safe_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs, SEXP sym)
+static SEXP safe_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs, SEXP sym)
 {
   DMUMPS_STRUC_C id;
   char msg[256];
@@ -70,7 +75,7 @@ SEXP safe_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs, SEXP sym)
 }
 
 /* Return code and message for a structure size that does not match. */
-SEXP size_mismatch(void)
+static SEXP size_mismatch(void)
 {
   DMUMPS_STRUC_C id;
   char msg[256];
@@ -85,7 +90,7 @@ SEXP size_mismatch(void)
   return res;
 }
 
-SEXP null_struct(void)
+static SEXP null_struct(void)
 {
   char msg[256];
   return Rf_ScalarInteger(api.dmumps_c_safe(NULL, sizeof(DMUMPS_STRUC_C), msg,
@@ -93,13 +98,13 @@ SEXP null_struct(void)
 }
 
 /* A client built for another layout: must get a clean R error. */
-SEXP abi_mismatch(void)
+static SEXP abi_mismatch(void)
 {
   R_GetCCallable("rmumps", "rmumps_dmumps_c_safe_abi99");
   return R_NilValue;
 }
 
-SEXP meta(void)
+static SEXP meta(void)
 {
   SEXP res = PROTECT(Rf_allocVector(VECSXP, 4));
   SET_VECTOR_ELT(res, 0, Rf_ScalarInteger(api.api_version()));
@@ -124,7 +129,7 @@ static const R_CallMethodDef call_entries[] = {
   {NULL, NULL, 0}
 };
 
-void R_init_rmumpsclient(DllInfo *dll)
+void attribute_visible R_init_rmumpsclient(DllInfo *dll)
 {
   R_registerRoutines(dll, NULL, call_entries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
