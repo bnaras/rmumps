@@ -101,6 +101,37 @@ test_that("an R error inside MUMPS poisons the instance cleanly", {
   expect_equal(am2$solve(rep(1, 5)), rep(0.5, 5))
 })
 
+test_that("MUMPS writes nothing to stdout or stderr, even when asked to", {
+  # Output from compiled code bypasses R's connections, so run a child R
+  # process and look at what reaches its file descriptors.
+  skip_on_cran()
+  code <- c(
+    "suppressPackageStartupMessages(library(rmumps))",
+    "set.seed(1); n <- 30",
+    "i <- c(1:n, sample(n, 60, TRUE)); j <- c(1:n, sample(n, 60, TRUE))",
+    "x <- c(rep(10, n), runif(60))",
+    "for (perm in c(RMUMPS_PERM_AMD, RMUMPS_PERM_AMF, RMUMPS_PERM_PORD,",
+    "               RMUMPS_PERM_METIS, RMUMPS_PERM_QAMD, RMUMPS_PERM_AUTO)) {",
+    "  for (sym in 0:2) {",
+    "    if (sym > 0) { k <- i >= j; ii <- i[k]; jj <- j[k]; xx <- x[k] }",
+    "    else { ii <- i; jj <- j; xx <- x }",
+    "    am <- Rmumps$new(ii - 1L, jj - 1L, xx, n, sym)",
+    "    am$set_icntl(c(6L, 6L, 6L, 4L), 1:4)  # maximum verbosity",
+    "    am$set_permutation(perm)",
+    "    s <- am$solve(rep(1, n)); s <- am$solvet(rep(1, n)); d <- am$det()",
+    "    inv <- am$inv()",
+    "  }",
+    "}",
+    "cat('DONE')")
+  f <- tempfile(fileext = ".R")
+  writeLines(code, f)
+  out <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"), c("--vanilla", shQuote(f)),
+                                  stdout = TRUE, stderr = TRUE,
+                                  env = paste0("R_LIBS=", paste(.libPaths(), collapse = .Platform$path.sep))))
+  unlink(f)
+  expect_identical(out, "DONE")
+})
+
 test_that("C entry points are registered", {
   dll <- getLoadedDLLs()[["rmumps"]]
   expect_false(is.null(dll))

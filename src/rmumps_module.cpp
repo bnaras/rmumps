@@ -847,7 +847,7 @@ void Rmumps::tri_init(MUMPS_INT *irn, MUMPS_INT *jcn, double *a, MUMPS_INT sym) 
   param.ICNTL(9)=1; // solve a x = b (not a^t x = b)
   param.ICNTL(10)=0; // no iterative refinement
   param.ICNTL(11)=0; // no error analysis
-  param.ICNTL(12)=0; // not used (as sym != 2)
+  param.ICNTL(12)=0; // automatic ordering strategy (used only when sym == 2)
   param.ICNTL(13)=0; // parallel factorization of the root node
   param.ICNTL(14)=50; // 50% working space increase during numeric phase
   // 15-17 are not used

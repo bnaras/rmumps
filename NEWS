@@ -23,6 +23,9 @@ Version 5.9.1-0.9000 (development)
    the top-level copies of the MUMPS headers are removed
  - results do not depend on earlier calls: the generator MUMPS uses
    internally is reset before every call, and never touches R's
+ - control parameters: rmumps sets the same ICNTL values as before
+   (reviewed against the 5.9.1 defaults); parameters it does not set take
+   the MUMPS 5.9.1 defaults, e.g. ICNTL(58) = 2 (symbolic factorization)
  - the Fortran sources compile with gfortran >= 10 without
    -fallow-argument-mismatch, and the package builds without significant
    warnings under -Wall -pedantic (gfortran, gcc and clang)
