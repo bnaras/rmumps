@@ -151,7 +151,7 @@ C~          WRITE(*,*) 'Error in PROCESS_MAITRE2:',NROW,NCOL
      &                            DYN_SIZE, SON_A )
           CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
      &        SON_A( 1_8 +
-     &        int(NBROWS_ALREADY_SENT,8) * int(NCOL_EFF,8) ),
+     &        int(NBROWS_ALREADY_SENT,8) * int(NCOL_EFF,8): ),
      &        NOREAL_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR )
         ELSE
           CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,

@@ -4109,13 +4109,13 @@ C     Initialize RINFO(4) in case BLR was not activated
 C 
 C  Should work even if the master does some work
 C
-      CALL MPI_REDUCE( RINFO(2), RINFOG(2), 2,
+      CALL MPI_REDUCE( RINFO(2), RINFOG(2:), 2,
      &                 MPI_DOUBLE_PRECISION,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
 C     Reduce needed to dimension small working array
 C     on all procs during DMUMPS_GATHER_SOLUTION
       KEEP(247) = 0
-      CALL MPI_REDUCE( KEEP(246), KEEP(247), 1, MPI_INTEGER, 
+      CALL MPI_REDUCE( KEEP(246), KEEP(247:), 1, MPI_INTEGER, 
      &                 MPI_MAX, MASTER, id%COMM, IERR)
 C
 C     Reduce compression times: get max compression times
@@ -4123,7 +4123,7 @@ C     Reduce compression times: get max compression times
      &     MPI_DOUBLE_PRECISION,
      &     MPI_MAX, MASTER, id%COMM, IERR)
 C
-      CALL MPI_REDUCE( RINFO(2), RINFOG(2), 2,
+      CALL MPI_REDUCE( RINFO(2), RINFOG(2:), 2,
      &                 MPI_DOUBLE_PRECISION,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
       CALL MUMPS_REDUCEI8( id%KEEP8(31)+id%KEEP8(64),id%KEEP8(6),
@@ -4147,25 +4147,25 @@ C
         CALL MUMPS_SETI8TOI4(id%KEEP8(128), id%INFOG(10))
       ENDIF
 C     Use MPI_MAX for this one to get largest front size
-      CALL MPI_ALLREDUCE( id%INFO(11), INFOG(11), 1, MPI_INTEGER,
+      CALL MPI_ALLREDUCE( id%INFO(11), INFOG(11:), 1, MPI_INTEGER,
      &                 MPI_MAX, id%COMM, IERR)
 C     make maximum effective frontal size available on all procs
 C     for solve phase
 C     (Note that INFO(11) includes root size on root master)
       KEEP(133) = INFOG(11)
-      CALL MPI_REDUCE( id%INFO(12), INFOG(12), 3, MPI_INTEGER,
+      CALL MPI_REDUCE( id%INFO(12), INFOG(12:), 3, MPI_INTEGER,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
-      CALL MPI_REDUCE( id%INFO(40), INFOG(50), 1, MPI_INTEGER,
+      CALL MPI_REDUCE( id%INFO(40), INFOG(50:), 1, MPI_INTEGER,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
-      CALL MPI_REDUCE( KEEP(103), INFOG(25), 1, MPI_INTEGER,
+      CALL MPI_REDUCE( KEEP(103), INFOG(25:), 1, MPI_INTEGER,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
       KEEP(229) = INFOG(25)
-      CALL MPI_REDUCE( KEEP(105), INFOG(25), 1, MPI_INTEGER,
+      CALL MPI_REDUCE( KEEP(105), INFOG(25:), 1, MPI_INTEGER,
      &                 MPI_SUM, MASTER, id%COMM, IERR)
       KEEP(230) = INFOG(25)
 C
       id%INFO(25) = KEEP(98)
-      CALL MPI_ALLREDUCE( id%INFO(25), INFOG(25), 1, MPI_INTEGER,
+      CALL MPI_ALLREDUCE( id%INFO(25), INFOG(25:), 1, MPI_INTEGER,
      &                 MPI_SUM, id%COMM, IERR)
 C     Extra copies due to in-place stacking
       CALL MUMPS_REDUCEI8( id%KEEP8(8), id%KEEP8(108), MPI_SUM,
@@ -4490,7 +4490,7 @@ C       restore KEEP(20)
 C        -- make available to users the local number of null pivots detected 
 C        -- with ICNTL(24) = 1.
          id%INFO(18) = KEEP(109)
-         CALL MPI_ALLREDUCE( KEEP(109), KEEP(112), 1, MPI_INTEGER,
+         CALL MPI_ALLREDUCE( KEEP(109), KEEP(112:), 1, MPI_INTEGER,
      &        MPI_SUM, id%COMM, IERR)
       ELSE
          id%INFO(18)  = 0
@@ -4739,13 +4739,13 @@ C
 C     =====================================
 C     Statistics relative to min/max pivots
 C     =====================================
-      CALL MPI_REDUCE( id%DKEEP(19), RINFOG(19), 1, 
+      CALL MPI_REDUCE( id%DKEEP(19), RINFOG(19:), 1, 
      &                 MPI_DOUBLE_PRECISION,
      &                 MPI_MIN, MASTER, id%COMM, IERR )
-      CALL MPI_REDUCE( id%DKEEP(20), RINFOG(20), 1, 
+      CALL MPI_REDUCE( id%DKEEP(20), RINFOG(20:), 1, 
      &                 MPI_DOUBLE_PRECISION,
      &                 MPI_MIN, MASTER, id%COMM, IERR )
-      CALL MPI_REDUCE( id%DKEEP(21), RINFOG(21), 1, 
+      CALL MPI_REDUCE( id%DKEEP(21), RINFOG(21:), 1, 
      &                 MPI_DOUBLE_PRECISION,
      &                 MPI_MAX, MASTER, id%COMM, IERR )
 C     =========================================

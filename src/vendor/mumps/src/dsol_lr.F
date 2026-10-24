@@ -197,7 +197,7 @@ C        I.0
      &       WORKSPACE(1:BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE)
            CALL DMUMPS_LRMIXED_CAST(
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_STOC%VAL(1), 
-     &       DIAG(1),
+     &       DIAG(1:),
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE, 1,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
@@ -306,7 +306,8 @@ C       ===========================================================
            DIAG(1:BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE) => 
      &       WORKSPACE(1:BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE)
            CALL DMUMPS_LRMIXED_CAST(
-     &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_STOC%VAL(1), DIAG(1),
+     &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_STOC%VAL(1),
+     & DIAG(1:),
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE, 1,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
@@ -450,7 +451,7 @@ C       Cast RHS
             POS_B = POS_B + (M * NRHS_B * 
      &                 COSTS_PREC(CALC2STOC(PREC)) +K34-1) / K34
             CALL DMUMPS_LRMIXED_CAST(WCB(PTRX),
-     &          PT_RHS(PREC,I)%val(1), M, 
+     &          PT_RHS(PREC,I)%val(1:), M, 
      &          NRHS_B, LDX, M, 1, CALC2STOC(PREC))
           ENDDO
         ENDDO
@@ -864,7 +865,7 @@ C         Cast RHS in each precision in TEMP_RHS
             POS_B = POS_B+
      &        (N*NRHS_B*COSTS_PREC(CALC2STOC(PREC)) +K34-1) / K34
             CALL DMUMPS_LRMIXED_CAST(ARRAYPIV(POSDIAG,POSPIVCOL),
-     &        PT_RHS(PREC)%val(1), N, 
+     &        PT_RHS(PREC)%val(1:), N, 
      &        NRHS_B, LDPIV, N, 1, CALC2STOC(PREC))
           ENDDO
       ENDIF
@@ -1153,7 +1154,7 @@ C                        write(*,*) "MYSTUFF", n, krem, k
                        CALL DMUMPS_LRMIXED_CAST(
      &                     stoc_ptr(
      &                       costs_prec(prec)*(kint-1)+1),
-     &                     R_ptr(1,1), Krem, LRB%N, 
+     &                     R_ptr(1:,1:), Krem, LRB%N, 
      &                     Kprec, Krem, PREC, 1)
                      endif
                      CALL dgemm('N', 'N', Krem, NRHS_B, N, ONE,
@@ -1330,7 +1331,7 @@ C                      write(*,*) "MYSTUFF", m, krem, k
                       CALL DMUMPS_LRMIXED_CAST(
      &                  stoc_ptr(m*costs_prec(prec)*
      &                             (kint-1)+1),
-     &                  Q_ptr(1,1), M, Krem,
+     &                  Q_ptr(1:,1:), M, Krem,
      &                  M, M, PREC, 1)
                     endif
                     CALL GEMM_Q_FWD(M, NRHS_B, Krem, NPIV, 
@@ -1438,7 +1439,7 @@ C               Entirely on CB side
                 if (prec.gt.1) then
                   CALL DMUMPS_LRMIXED_CAST(
      &              stoc_ptr(costs_prec(prec)*M*(kint-1)+1),
-     &              Q_ptr(1,1), M, KREM,
+     &              Q_ptr(1:,1:), M, KREM,
      &              M, M, PREC, 1)
                 ENDIF
 ! LRMIXED
@@ -1606,7 +1607,7 @@ C         Cast RHS in each precision in TEMP_RHS
             POS_B = POS_B+
      &        (N*NRHS_B*COSTS_PREC(CALC2STOC(PREC)) +K34-1) / K34
             CALL DMUMPS_LRMIXED_CAST(ARRAYPIV(POSDIAG,POSPIVCOL),
-     &        PT_RHS(PREC)%val(1), N, 
+     &        PT_RHS(PREC)%val(1:), N, 
      &        NRHS_B, LDPIV, N, 1, CALC2STOC(PREC))
           ENDDO
       ENDIF
@@ -1979,7 +1980,7 @@ C       Cast RHS
             POS_B = POS_B + (M * NRHS_B * 
      &                 COSTS_PREC(CALC2STOC(PREC)) +K34-1) / K34
             CALL DMUMPS_LRMIXED_CAST(WCB(POSBLOCK),
-     &          PT_RHS(PREC,I)%val(1), M, 
+     &          PT_RHS(PREC,I)%val(1:), M, 
      &          NRHS_B, LD_WCB, M, 1, CALC2STOC(PREC))
           ENDDO
         ENDDO
@@ -2096,7 +2097,8 @@ C     &     BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE
            DIAG(1:BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE) => 
      &       WORKSPACE(1:BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE)
            CALL DMUMPS_LRMIXED_CAST(
-     &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_STOC%VAL(1), DIAG(1),
+     &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_STOC%VAL(1),
+     & DIAG(1:),
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE, 1,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
      &       BLR_ARRAY(IWHDLR)%DIAG_BLOCKS(I)%DIAG_SIZE,
@@ -2186,13 +2188,13 @@ C       Cast block of RHS that has just been computed
 C             CB side
               POSBLOCK = POSCB +int(IBEG_BLR-1-NPIV_GLOBAL,8)
               CALL DMUMPS_LRMIXED_CAST(WCB(POSBLOCK),
-     &          PT_RHS(PREC,I)%val(1), M, 
+     &          PT_RHS(PREC,I)%val(1:), M, 
      &          NRHS_B, LD_WCB, M, 1, CALC2STOC(PREC))
             ELSEIF (IEND_BLR.LE.NPIV_GLOBAL) THEN
 C             FS side
               POSBLOCK = POSPIV + int(IBEG_BLR-1,8)
               CALL DMUMPS_LRMIXED_CAST(RHSINTR(POSBLOCK,POSPIVCOL),
-     &          PT_RHS(PREC,I)%val(1), M, 
+     &          PT_RHS(PREC,I)%val(1:), M, 
      &          NRHS_B, LRHSINTR, M, 1, CALC2STOC(PREC))
             ELSE
 C             A cheval              
@@ -2616,7 +2618,7 @@ C                      write(*,*) "MYSTUFF", m, krem, k
                       CALL DMUMPS_LRMIXED_CAST(
      &                  stoc_ptr(m*costs_prec(prec)*
      &                             (kint-1)+1),
-     &                  Q_ptr(1,1), M, Krem,
+     &                  Q_ptr(1:,1:), M, Krem,
      &                  M, M, PREC, 1)
                     endif
                     CALL GEMM_Q_BWD(M, NRHS_B, Krem, NPIV, 
@@ -2796,7 +2798,7 @@ C                      write(*,*) "MYSTUFF", n, current_k, k
      &                     thread_workspaces(1:(LRB%N*krem))
                        CALL DMUMPS_LRMIXED_CAST(
      &                     stoc_ptr(costs_prec(prec)*(kint-1)+1),
-     &                     R_ptr(1,1), Krem, LRB%N, 
+     &                     R_ptr(1:,1:), Krem, LRB%N, 
      &                     Kprec, Krem, PREC, 1)
                      endif
                      CALL dgemm('T', 'N', N, NRHS_B, Krem, MONE,
@@ -2902,7 +2904,7 @@ C               Entirely on CB side
                 if (prec.gt.1) then
                   CALL DMUMPS_LRMIXED_CAST(
      &              stoc_ptr(costs_prec(prec)*M*(kint-1)+1),
-     &              Q_ptr(1,1), M, KREM,
+     &              Q_ptr(1:,1:), M, KREM,
      &              M, M, PREC, 1)
                 ENDIF
 !               CALL GEMM_Q_BWD(M, NRHS_B, krem, NPIV, 

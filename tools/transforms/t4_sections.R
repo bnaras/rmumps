@@ -7,7 +7,9 @@
 # section P(I:): when P is contiguous (always the case for MUMPS' allocated
 # arrays) the callee receives the same address; otherwise the compiler
 # makes a copy. A multi-dimensional element is rewritten only when every
-# subscript is 1 (P(1,1) -> P(1:,1:), the whole array for lower bounds 1).
+# subscript but the last is 1 (P(1,1) -> P(1:,1:), the whole array, and
+# P(1,J) -> P(1:,J:), columns J and after, for lower bounds 1): only then is
+# the section the element sequence that starts at the element.
 #
 # The sites are listed in tools/conformance/<component>-sections.tsv
 # (file, routine, callee, argument; built by tools/conformance-harvest.R
@@ -64,10 +66,12 @@ t4_colons <- function(m, a, b) {
   bounds <- c(open, commas, e)
   subs <- vapply(seq_len(length(bounds) - 1L), function(k)
     gsub(" ", "", paste(ch[(bounds[k] + 1L):(bounds[k + 1L] - 1L)], collapse = "")), "")
-  if (!all(subs == "1")) return(NULL)
+  # all subscripts but the last must be 1: the element sequence starting at
+  # P(1,...,1,J) is then exactly the section P(1:,...,1:,J:)
+  if (!all(subs[-length(subs)] == "1") || !nzchar(subs[length(subs)])) return(NULL)
   vapply(seq_len(length(bounds) - 1L), function(k) {
     seg <- (bounds[k] + 1L):(bounds[k + 1L] - 1L)
-    seg[ch[seg] == "1"][1L]
+    max(seg[ch[seg] != " "])
   }, 1L)
 }
 
@@ -84,17 +88,22 @@ t4_insert <- function(lines, code, pos) {
   l <- lines[li]
   col <- 6L + off
   new <- paste0(substr(l, 1L, col), ":", substr(l, col + 1L, nchar(l)))
-  if (nchar(new) <= 72L) {
+  # only code past column 72 matters: a trailing ! comment may run beyond
+  # it (the compiler ignores columns 73 and after either way)
+  masked <- paste0(substr(new, 1L, 6L), ff_mask(substr(new, 7L, nchar(new)))$text)
+  code_end <- max(c(0L, gregexpr("[^ ]", masked)[[1]]))
+  if (code_end <= 72L) {
     lines[li] <- new
     return(lines)
   }
   # move the end of the line to a continuation line, preferably after the
-  # last comma (outside character literals) that still fits in column 72,
-  # otherwise right after the inserted ':'
+  # last comma of the code (outside character literals and comments) that
+  # still fits in column 72, otherwise right after the inserted ':'
   ch <- strsplit(new, "", fixed = TRUE)[[1]]
   inlit <- t1_in_literal(new)
   cut <- col + 1L
-  cand <- which(ch == "," & !inlit & seq_along(ch) <= 72L & seq_along(ch) > 7L)
+  cand <- which(ch == "," & !inlit & seq_along(ch) <= min(72L, code_end) &
+                seq_along(ch) > 7L)
   if (length(cand)) cut <- max(cand)
   lines[li] <- substr(new, 1L, cut)
   append(lines, paste0("     &", substr(new, cut + 1L, nchar(new))), after = li)

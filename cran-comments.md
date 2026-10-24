@@ -14,7 +14,8 @@ rmumps 5.9.1-1 updates the bundled MUMPS from 5.2.1 to 5.9.1.
 - The Fortran sources no longer need `-fallow-argument-mismatch`: the
   argument mismatches of MUMPS were fixed by interfaces and patches, and the
   package compiles without significant warnings under `-Wall -pedantic`
-  with gfortran 16, gcc 16 and clang 21.
+  with gfortran 16, gcc 16 and clang 21. They also compile with LLVM
+  flang 21.
 - SCOTCH is no longer bundled.
 - Copyright holders of all bundled code are listed in `Authors@R` and
   `inst/COPYRIGHTS`; the CeCILL-C (MUMPS) and Apache-2.0 (METIS) license
@@ -27,10 +28,22 @@ rmumps 5.9.1-1 updates the bundled MUMPS from 5.2.1 to 5.9.1.
   builds with `-Wall -pedantic` (clang and gcc 16 as C compiler), a
   `-fcheck=pointer,array-temps` Fortran build, and the C/C++ code under
   AddressSanitizer and UndefinedBehaviorSanitizer.
-- To be run before upload (not yet done): win-builder (R-devel, R-release),
-  mac-builder, a Linux check with the CRAN Debian flags, LLVM flang,
-  `--use-LTO`, and gcc ASan/UBSan and valgrind runs including the Fortran
-  code.
+- Debian testing (arm64, in a container), R 4.6.1:
+  - gcc/gfortran 16.2 with the CRAN Debian flags
+    (`-g -O2 -Wall -pedantic -mtune=native`): `R CMD check --as-cran`
+    clean apart from a WARNING about the `-Wno-*` C++ flags that were set
+    in the local `~/.R/Makevars` to mimic the CRAN configuration;
+  - clang 21 and LLVM flang 21 (`flang-21`, `libflang_rt.runtime`):
+    `R CMD check --as-cran` Status OK;
+  - gcc ASan/UBSan, Fortran included (package built with
+    `-fsanitize=address,undefined`, R preloading libasan): no reports in
+    the tests and examples;
+  - valgrind 3.27 memcheck on the tests and examples: no errors, no
+    leaks.
+- To be run before upload (not yet done): win-builder (R-devel, R-release)
+  and mac-builder. An LTO build (`-flto -Wlto-type-mismatch`) currently
+  reports type mismatches between Fortran callers and C/Fortran
+  definitions of 37 routines; to be fixed before upload.
 
 ## R CMD check results
 

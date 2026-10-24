@@ -2160,6 +2160,7 @@ C     Deallocate what was allocated in MIXED and keep UNIFORM
       RETURN
       END SUBROUTINE DMUMPS_LRMIXED_CONVERT_LRB
       SUBROUTINE DMUMPS_DECONVERT_LRB(LRB, IFLAG, IERROR, KEEP8)
+        USE ISO_C_BINDING, ONLY: C_LOC, C_F_POINTER
 C Parameters
 C ==========
         TYPE(LRB_TYPE) :: LRB
@@ -2169,6 +2170,8 @@ C Local variables
 C ===============
         INTEGER :: PREC, Kprec, K_CUMUL
         TYPE(LRB_TYPE) :: LRB2
+C       rmumps: view of R from R(K_CUMUL,1) on, see below
+        DOUBLE PRECISION, POINTER, CONTIGUOUS :: R_VIEW(:)
         IF (LRB%ISLR .AND. LRB%K.GT.0) THEN
           CALL ALLOC_LRB(LRB2,LRB%K,LRB%M,LRB%N,.true.,IFLAG,
      &     IERROR,KEEP8)
@@ -2179,10 +2182,16 @@ C ===============
             Kprec = LRB%K_STOC(PREC)
             IF (KPREC.NE.0) THEN
               CALL DMUMPS_LRMIXED_CAST(LRB%Q_STOC(PREC)%val(1:),
-     &            LRB%Q(1,K_CUMUL), LRB%M, Kprec, LRB%M, LRB%M, 
+     &            LRB%Q(1:,K_CUMUL:), LRB%M, Kprec, LRB%M, LRB%M, 
      &               PREC, PREC_FAC)
+C             rmumps: the output is the row block K_CUMUL.. of R (leading
+C             dimension LRB%K), which no contiguous section describes;
+C             pass a view that starts at R(K_CUMUL,1) instead of the
+C             element (same address)
+              CALL C_F_POINTER(C_LOC(LRB%R(K_CUMUL,1)), R_VIEW,
+     &            [SIZE(LRB%R,KIND=8) - K_CUMUL + 1])
               CALL DMUMPS_LRMIXED_CAST(LRB%R_STOC(PREC)%val(1:),
-     &            LRB%R(K_CUMUL,1), Kprec, LRB%N, Kprec, LRB%K, 
+     &            R_VIEW, Kprec, LRB%N, Kprec, LRB%K,
      &               PREC, PREC_FAC)
             ENDIF
             K_CUMUL = K_CUMUL + Kprec
@@ -2195,7 +2204,7 @@ C ===============
             DO PREC=1,NPREC_STOC
               IF(ASSOCIATED(LRB%Q_STOC(prec)%VAL)) THEN
                 CALL DMUMPS_LRMIXED_CAST(LRB%Q_STOC(PREC)%val(1:),
-     &              LRB%Q(1,1),LRB%M, LRB%N, LRB%M, LRB%M,
+     &              LRB%Q(1:,1:),LRB%M, LRB%N, LRB%M, LRB%M,
      &                 PREC, PREC_FAC)
                 EXIT
               END IF
@@ -2219,12 +2228,16 @@ C ==========
         INTEGER, INTENT(IN) :: START_PREC_K, END_PREC_K
         INTEGER, INTENT(INOUT) :: IFLAG, IERROR
         DOUBLE PRECISION, INTENT(INOUT) :: R_WORKSPACE(:,:) !LD,N
+        TARGET :: R_WORKSPACE
 C Local variables
 C ===============
         INTEGER :: PREC, Kprec, K_CUMUL, Kbeg
         INTEGER :: Krem
         integer(kind=1), pointer, dimension(:) :: stoc_ptr
         integer :: ptr_shape(1)
+C       rmumps: view of R_WORKSPACE from R_WORKSPACE(K_CUMUL,1) on, see
+C       DMUMPS_DECONVERT_LRB
+        DOUBLE PRECISION, POINTER, CONTIGUOUS :: R_VIEW(:)
         IF (LRB%ISLR .AND. LRB%K.GT.0) THEN
           K_CUMUL=1
           DO PREC=START_PREC,END_PREC
@@ -2243,9 +2256,11 @@ C ===============
             ptr_shape(1) = costs_prec(prec)*Kprec*LRB%N
             call c_f_pointer(c_loc(LRB%R_stoc(prec)%val),
      &         stoc_ptr, ptr_shape)
+            call c_f_pointer(c_loc(R_WORKSPACE(K_CUMUL,1)), R_VIEW,
+     &         [SIZE(R_WORKSPACE,KIND=8) - K_CUMUL + 1])
             CALL DMUMPS_LRMIXED_CAST(
      &          stoc_ptr((kbeg-1)*costs_prec(prec)+1),
-     &          R_WORKSPACE(K_CUMUL,1), Krem, LRB%N, Kprec, LD, 
+     &          R_VIEW, Krem, LRB%N, Kprec, LD,
      &             PREC, 1)
             K_CUMUL = K_CUMUL + Krem
           END DO
@@ -2291,7 +2306,7 @@ C ===============
      &         stoc_ptr, ptr_shape)
             CALL DMUMPS_LRMIXED_CAST(
      &          stoc_ptr(LRB%M*(kbeg-1)*costs_prec(prec)+1),
-     &          Q_WORKSPACE(1,K_CUMUL), LRB%M, Krem, LRB%M, LD, 
+     &          Q_WORKSPACE(1:,K_CUMUL:), LRB%M, Krem, LRB%M, LD, 
      &             PREC, 1)
             K_CUMUL = K_CUMUL + Krem
           END DO
@@ -2314,7 +2329,6 @@ C       on, so they are exempt from argument checking (see
 C       dmumps_lrmixed_interfaces.h for callers in other files)
 !GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
 !DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
-!DIR$ IGNORE_TKR (TKRC) A, B
         INCLUDE 'mumps_lrmixed_kernels.h'
         IF (precA.EQ.prec_dbl .AND. precB.EQ.prec_dbl) THEN
           CALL MUMPS_LRMIXED_CAST_DD(A, B, nrows, ncols,
@@ -2387,7 +2401,6 @@ C       integer matrices in precision precX and precY, respectively
 C       rmumps: see DMUMPS_LRMIXED_CAST
 !GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
 !DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
-!DIR$ IGNORE_TKR (TKRC) X, Y
         INCLUDE 'mumps_lrmixed_kernels.h'
         IF (precX .EQ. prec_dbl .AND. precY .EQ. prec_dbl) THEN
           CALL MUMPS_LRMIXED_PLUS_DD(X, Y, nrows, ncols, ldX, ldY)
@@ -3168,7 +3181,7 @@ C       Actually some of these steps may be skipped if precision format 1, 2 or 
              ! the last prec. used is less accurate than the working one
              if (last_prec_stoc.gt.pcalc_stoc) then
                CALL DMUMPS_LRMIXED_PLUS(QRB(last_prec_calc)%VAL(1:), 
-     &             Cptr(1), MorN, NCOLS, MorN, LD_C, last_prec_stoc, 1)
+     &             Cptr(1:), MorN, NCOLS, MorN, LD_C, last_prec_stoc, 1)
              end if
           else
              if (LorU.eq.0) then
@@ -3186,7 +3199,7 @@ C       Actually some of these steps may be skipped if precision format 1, 2 or 
              if (last_prec_stoc.gt.pcalc_stoc) then
 C              cast previousQRB to current precision
                CALL DMUMPS_LRMIXED_CAST(QRB(last_prec_calc)%VAL(1:), 
-     &           Cptr(1), MorN, NCOLS, 
+     &           Cptr(1:), MorN, NCOLS, 
      &           LD_C, LD_C, last_prec_stoc, pcalc_stoc)
              end if
           endif
@@ -3201,14 +3214,14 @@ C              cast previousQRB to current precision
               call c_f_pointer(c_loc(thread_workspace),
      &                         R_ptr, ptr2_shape)
               CALL DMUMPS_LRMIXED_CAST(LRB%R_STOC(PSTOC)%VAL(1:),
-     &       R_ptr(1,1), !LRB%R_CALC(PCALC,PCALC)%VAL(1+OFFSET_R_CALC), 
+     &       R_ptr(1:,1:), !LRB%R_CALC(PCALC,PCALC)%VAL(1+OFFSET_R_CALC), 
      &       KPREC_STOC, N, KPREC_STOC, KPREC_STOC, 
      &          PSTOC, PCALC_STOC)
             end if
 C           RB=R{p}*B{p}
             CALL DMUMPS_LRMIXED_GEMM('N', 'N', KPREC_STOC, NCOLS, N, 
      &          1.0D0, R_ptr(1,1), KPREC_STOC,
-     &          Bptr(1), LD_B, 0.0D0,
+     &          Bptr(1:), LD_B, 0.0D0,
      &          RB, KPREC_STOC, PCALC_STOC)
             ptr2_shape(1) = M*COSTS_PREC(PCALC_STOC)
             ptr2_shape(2) = Kprec_stoc
@@ -3219,14 +3232,14 @@ C           RB=R{p}*B{p}
               call c_f_pointer(c_loc(thread_workspace),
      &                         Q_ptr, ptr2_shape)
               CALL DMUMPS_LRMIXED_CAST(LRB%Q_STOC(PSTOC)%VAL(1:),
-     &       q_ptr(1,1), !LRB%Q_CALC(PCALC,PCALC)%VAL(1+OFFSET_Q_CALC), 
+     &       q_ptr(1:,1:), !LRB%Q_CALC(PCALC,PCALC)%VAL(1+OFFSET_Q_CALC), 
      &       M, KPREC_STOC, M, M, PSTOC, PCALC_STOC)
             end if
 C           QRB{P}=ALPHA*Q{P}*RB + GAMMA*QRB{P}:
             CALL DMUMPS_LRMIXED_GEMM('N', 'N', M, NCOLS, KPREC_STOC,
      &          ALPHA, q_ptr(1,1), M,
      &          RB, KPREC_STOC, GAMMA,
-     &          Cptr(1), LD_C, PCALC_STOC)
+     &          Cptr(1:), LD_C, PCALC_STOC)
           ELSE
             ptr2_shape(1) = M*COSTS_PREC(PCALC_STOC)
             ptr2_shape(2) = Kprec_stoc
@@ -3237,12 +3250,12 @@ C           QRB{P}=ALPHA*Q{P}*RB + GAMMA*QRB{P}:
               call c_f_pointer(c_loc(thread_workspace),
      &                          Q_ptr, ptr2_shape)
               CALL DMUMPS_LRMIXED_CAST(LRB%Q_STOC(PSTOC)%VAL(1:),
-     &      q_ptr(1,1), !LRB%Q_CALC(PCALC,PCALC)%VAL(1+OFFSET_Q_CALC), 
+     &      q_ptr(1:,1:), !LRB%Q_CALC(PCALC,PCALC)%VAL(1+OFFSET_Q_CALC), 
      &      M, KPREC_STOC, M, M, PSTOC, PCALC_STOC)
             end if
 C           RB=QT{p}*B{p}
             CALL DMUMPS_LRMIXED_GEMM('T', 'N', KPREC_STOC, NCOLS, M, 
-     &          1.0D0, Q_ptr(1,1), M, Bptr(1), LD_B, 
+     &          1.0D0, Q_ptr(1,1), M, Bptr(1:), LD_B, 
      &          0.0D0, RB, KPREC_STOC, PCALC_STOC)
             ptr2_shape(1) = Kprec_stoc*COSTS_PREC(PCALC_STOC)
             ptr2_shape(2) = N
@@ -3253,14 +3266,14 @@ C           RB=QT{p}*B{p}
               call c_f_pointer(c_loc(thread_workspace),
      &                         R_ptr, ptr2_shape)
               CALL DMUMPS_LRMIXED_CAST(LRB%R_STOC(PSTOC)%VAL(1:),
-     &       R_ptr(1,1), !LRB%R_CALC(PCALC,PCALC)%VAL(1+OFFSET_R_CALC), 
+     &       R_ptr(1:,1:), !LRB%R_CALC(PCALC,PCALC)%VAL(1+OFFSET_R_CALC), 
      &       KPREC_STOC, N, KPREC_STOC, KPREC_STOC, 
      &       PSTOC, PCALC_STOC)
             end if
 C           QRB{P}=ALPHA*RT{P}*RB + GAMMA*QRB{P}:
             CALL DMUMPS_LRMIXED_GEMM('T', 'N', N, NCOLS, KPREC_STOC,
      &          ALPHA, R_ptr(1,1), KPREC_STOC, RB, KPREC_STOC, 
-     &          GAMMA, Cptr(1), LD_C, PCALC_STOC)
+     &          GAMMA, Cptr(1:), LD_C, PCALC_STOC)
           ENDIF
           last_prec_calc = pcalc
           last_prec_stoc = pcalc_stoc
@@ -3269,7 +3282,7 @@ C           QRB{P}=ALPHA*RT{P}*RB + GAMMA*QRB{P}:
            ptr1_shape(1) = LDC*NCOLS*COSTS_PREC(1)
            call c_f_pointer(c_loc(C),Cptr,ptr1_shape)
            CALL DMUMPS_LRMIXED_PLUS(QRB(last_prec_calc)%VAL(1:), 
-     &         Cptr(1), MorN, NCOLS, MorN, LDC, last_prec_stoc,
+     &         Cptr(1:), MorN, NCOLS, MorN, LDC, last_prec_stoc,
      &         CALC2STOC(1))
          end if
       END SUBROUTINE DMUMPS_LRMIXED_LRxFR
@@ -3344,7 +3357,7 @@ C       declaration of DALPHA is needed
      &      Aptr, ptr_shape)
           CALL DMUMPS_LRMIXED_CAST(
      &      FRB%Q_stoc(PREC)%VAL(1:),
-     &      Aptr(1), FRB%M, FRB%N,
+     &      Aptr(1:), FRB%M, FRB%N,
      &      LDA, LDA,
      &      PREC, pcalc_stoc)
         ENDIF
@@ -3370,8 +3383,8 @@ C       declaration of DALPHA is needed
         CALL DMUMPS_LRMIXED_GEMM(TRANSA, TRANSB,
      &      M, N, K,
      &      DALPHA, Aptr(i-1+LDA*COSTS_PREC(PCALC_STOC)*(j-1)+1), LDA, 
-     &             Bptr(1), LD_B, 
-     &      GAMMA, Cptr(1), LD_C, PCALC_STOC)
+     &             Bptr(1:), LD_B, 
+     &      GAMMA, Cptr(1:), LD_C, PCALC_STOC)
         if (PCALC_STOC.GT.1) then
            CALL DMUMPS_LRMIXED_PLUS(
      &         Cptr(1), C, M, N, LD_C, LDC, pcalc_stoc, CALC2STOC(1))
@@ -3388,7 +3401,6 @@ C       declaration of DALPHA is needed
 C       rmumps: see DMUMPS_LRMIXED_CAST
 !GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
 !DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
-!DIR$ IGNORE_TKR (TKRC) A, B, C
         INCLUDE 'mumps_lrmixed_kernels.h'
         IF (prec.EQ.prec_dbl) THEN
             CALL MUMPS_LRMIXED_DGEMM(TRANSA, TRANSB, M, N, K, ALPHA, 

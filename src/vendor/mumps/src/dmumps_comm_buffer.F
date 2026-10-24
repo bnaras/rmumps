@@ -165,10 +165,10 @@ C
         IF ( IERR .LT. 0 ) GOTO 100
         POSITION = 0
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( FPERE, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         IF (PACKED_CB) THEN
           LCONT_SENT=-LCONT
@@ -176,38 +176,38 @@ C
           LCONT_SENT=LCONT
         ENDIF
         CALL MPI_PACK( LCONT_SENT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NBROWS_ALREADY_SENT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NBROWS_PACKET, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         IF (NBROWS_ALREADY_SENT == 0) THEN
           CALL MPI_PACK( LCONT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( NASS-NPIV, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( LCONT , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( IZERO, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( IONE,  1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( IZERO, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( IWROW, LCONT, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( IWCOL, LCONT, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
         ENDIF
         IF ( LCONT .NE. 0 ) THEN
@@ -216,7 +216,7 @@ C
            DO I = NBROWS_ALREADY_SENT+1,
      &            NBROWS_ALREADY_SENT+NBROWS_PACKET
             CALL MPI_PACK( A( J1 ), I, MPI_DOUBLE_PRECISION,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
              J1 = J1 + NFRONT
            END DO
@@ -224,7 +224,7 @@ C
            DO I = NBROWS_ALREADY_SENT+1,
      &            NBROWS_ALREADY_SENT+NBROWS_PACKET
             CALL MPI_PACK( A( J1 ), LCONT, MPI_DOUBLE_PRECISION,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                        POSITION, COMM, IERR_MPI )
              J1 = J1 + NFRONT
            END DO
@@ -283,34 +283,34 @@ C~   &               POSITION
         ENDIF
         POSITION = 0
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( IFATH, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( EFF_CB_SIZE  , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NPIV , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBDEB , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBFIN , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         DO K = 1, NRHS
                CALL MPI_PACK( CB ( 1 + LD_CB * (K-1) ),
      &                        EFF_CB_SIZE, MPI_DOUBLE_PRECISION,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         END DO
         IF ( NPIV .GT. 0 ) THEN
           DO K=1, NRHS
           CALL MPI_PACK( SOL(1+LD_PIV*(K-1)),
      &                         NPIV, MPI_DOUBLE_PRECISION,
-     &                         BUF_CB%CONTENT( IPOS ), SIZE,
+     &                         BUF_CB%CONTENT( IPOS: ), SIZE,
      &                         POSITION, COMM, IERR_MPI )
           ENDDO
         END IF
@@ -370,48 +370,48 @@ C~   &               SIZE, POSITION
         ENDIF
         POSITION = 0
         CALL MPI_PACK( NODE1, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         IF ( NODE2 .NE. 0 ) THEN
           CALL MPI_PACK( NODE2, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( NCB, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         ENDIF
         CALL MPI_PACK( JBDEB, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBFIN, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( LONG,  1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         IF ( LONG .GT. 0 ) THEN
           CALL MPI_PACK( IW, LONG, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
           IF (NODE2.EQ.0) THEN
             DO K=1, NRHS_B
               IF (NPIV.GT.0) THEN
               CALL MPI_PACK( RHSINTR(IPOSINRHSINTR,JBDEB+K-1), NPIV,
      &                          MPI_DOUBLE_PRECISION,
-     &                          BUF_CB%CONTENT( IPOS ), SIZE,
+     &                          BUF_CB%CONTENT( IPOS: ), SIZE,
      &                          POSITION, COMM, IERR_MPI )
               ENDIF
               IF (LONG-NPIV .NE.0) THEN
                 CALL MPI_PACK( W(NPIV+1+(K-1)*LDW), LONG-NPIV,
      &                          MPI_DOUBLE_PRECISION,
-     &                          BUF_CB%CONTENT( IPOS ), SIZE,
+     &                          BUF_CB%CONTENT( IPOS: ), SIZE,
      &                          POSITION, COMM, IERR_MPI )
               ENDIF
             END DO
           ELSE
             DO K=1, NRHS_B
               CALL MPI_PACK( W(1+(K-1)*LDW), LONG, MPI_DOUBLE_PRECISION,
-     &                          BUF_CB%CONTENT( IPOS ), SIZE,
+     &                          BUF_CB%CONTENT( IPOS: ), SIZE,
      &                          POSITION, COMM, IERR_MPI )
             END DO
           ENDIF
@@ -533,42 +533,42 @@ C~        WRITE(*,*) 'Error in TRY_SEND_MAITRE2:',NELIM, NROW
         ENDIF
         POSITION = 0
         CALL MPI_PACK( IPERE, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( ISON,  1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSLAVES, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NROW, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NCOL, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NBROWS_ALREADY_SENT, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NBROWS_PACKET, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
         IF (NBROWS_ALREADY_SENT .EQ. 0) THEN
           IF (NSLAVES.GT.0) THEN
             CALL MPI_PACK( SLAVES, NSLAVES, MPI_INTEGER,
-     &                BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                POSITION, COMM, IERR_MPI )
           ENDIF
           CALL MPI_PACK( IROW, NROW, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( ICOL, NCOL, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
           IF ( TYPE_SON .eq. 2 ) THEN
             CALL MPI_PACK( TAB_POS_IN_PERE(1,INIV2), NSLAVES+1, 
      &                 MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI )
           ENDIF
         ENDIF
@@ -577,7 +577,7 @@ C~        WRITE(*,*) 'Error in TRY_SEND_MAITRE2:',NELIM, NROW
      &                   NBROWS_ALREADY_SENT+NBROWS_PACKET
             CALL MPI_PACK( VAL(1,I), NCOL_SEND, 
      &               MPI_DOUBLE_PRECISION,
-     &               BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &               BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &               POSITION, COMM, IERR_MPI )
           ENDDO
         ENDIF
@@ -1117,51 +1117,51 @@ C~   &      " IERR= ",IERR
         IF ( IERR .LT. 0 ) GOTO 100
         POSITION = 0
         CALL MPI_PACK( IPERE, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         CALL MPI_PACK( ISON, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         CALL MPI_PACK( NBROW, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         IF (KEEP(50)==0) THEN
           CALL MPI_PACK( LROW, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         ELSE
           IF (CB_IS_LR.AND.
      &        NBLRB_ALREADY_SENT+NBLRB_PACKET .EQ. NBLRB_TOTAL) THEN
             CALL MPI_PACK( -MAX_ROW_LENGTH, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
           ELSE
             CALL MPI_PACK( MAX_ROW_LENGTH, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
           ENDIF
         ENDIF
         CALL MPI_PACK( NBROWS_ALREADY_SENT, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         CALL MPI_PACK( NBROWS_PACKET, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
         CALL MPI_PACK( CB_IS_LR_INT, 1, MPI_INTEGER,
-     &          BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &          BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &          POSITION, COMM, IERR_MPI  )
         IF ( PDEST .NE. PDEST_MASTER ) THEN
           IF (KEEP(50)==0) THEN
           CALL MPI_PACK( IW_CBSON( HS + NROW +  NPIV + 1 ), LROW,
      &                 MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
           ELSE
            IF (MAX_ROW_LENGTH > 0) THEN
            CALL MPI_PACK( IW_CBSON( HS + NROW +  NPIV + 1 ),
      &                 MAX_ROW_LENGTH,
      &                 MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &                 BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &                 POSITION, COMM, IERR_MPI  )
            ENDIF
           ENDIF
@@ -1181,7 +1181,7 @@ C~   &      " IERR= ",IERR
      &          IPOS_IN_SLAVE )
            INDICE_PERE = IPOS_IN_SLAVE
            CALL MPI_PACK( INDICE_PERE, 1, MPI_INTEGER,
-     &          BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &          BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &          POSITION, COMM, IERR_MPI )
         ENDDO
         IF (CB_IS_LR.AND.(NBROW.GT.0)) THEN
@@ -1231,14 +1231,14 @@ C~   &      " IERR= ",IERR
          ENDIF
          CALL MPI_PACK( A_CBSON( APOS ), THIS_ROW_LENGTH,
      &        MPI_DOUBLE_PRECISION,
-     &        BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &        BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &        POSITION, COMM, IERR_MPI )
         ENDDO
  200    CONTINUE
         IF (COMPUTE_MAX) THEN
            CALL MPI_PACK(NFS4FATHER,1,
      &          MPI_INTEGER,
-     &          BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &          BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &          POSITION, COMM, IERR_MPI )
            IF (NFS4FATHER .GT. 0) THEN
             IF (CB_IS_LR) THEN
@@ -1246,7 +1246,7 @@ C~   &      " IERR= ",IERR
      &            IW_CBSON(1+XXF), M_ARRAY)
               CALL MPI_PACK(M_ARRAY(1), NFS4FATHER,
      &             MPI_DOUBLE_PRECISION,
-     &             BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &             BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &             POSITION, COMM, IERR_MPI )
               CALL DMUMPS_BLR_FREE_M_ARRAY ( IW_CBSON(1+XXF) )
             ELSE
@@ -1298,7 +1298,7 @@ C~       WRITE(*,*) "Error in PARPIV/DMUMPS_BUF_SEND_CONTRIB_TYPE2"
               ENDIF
               CALL MPI_PACK(BUF_MAX_ARRAY, NFS4FATHER,
      &             MPI_DOUBLE_PRECISION,
-     &             BUF_CB%CONTENT( IPOS ), SIZE_PACK,
+     &             BUF_CB%CONTENT( IPOS: ), SIZE_PACK,
      &             POSITION, COMM, IERR_MPI )
             ENDIF 
            ENDIF
@@ -1575,37 +1575,44 @@ C~   &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
         SIZE_MSG_BYTES = SIZET - OVHSIZE * (NDEST-1) * KEEP(34)
         POSITION = 0
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         NPIVSENT = NPIV
         IF (LASTPANEL) NPIVSENT = -NPIV
         CALL MPI_PACK( NPIVSENT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         IF ( LASTPANEL .OR. KEEP(50).ne.0 ) THEN
           CALL MPI_PACK( FPERE, 1, MPI_INTEGER,
-     &                   BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                   BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                   POSITION, COMM, IERR_MPI )
         END IF
         IF ( LASTPANEL .AND. KEEP(50) .NE. 0 ) THEN
             CALL MPI_PACK( NB_BLOC_FAC, 1, MPI_INTEGER,
-     &                   BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                   BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                   POSITION, COMM, IERR_MPI )
         END IF
         CALL MPI_PACK( NEWCOL_SENT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBEG_BLOCK, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NELIM, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NPARTSASS, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( CURRENT_BLR_PANEL, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         IF (LR_ACTIV_BlocFACTO) THEN
           LR_ACTIVATED_INT = 1
@@ -1613,22 +1620,24 @@ C~   &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
           LR_ACTIVATED_INT = 0
         ENDIF
         CALL MPI_PACK( LR_ACTIVATED_INT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         IF ( KEEP(50) .ne. 0 ) THEN
           CALL MPI_PACK( NSLAVES_TOT, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
         ENDIF
         CALL MPI_PACK( SIZE_BEGS_BLR_COL, 1, MPI_INTEGER,
-     &                          BUF_CB%CONTENT( IPOSMSG ), 
+     &                          BUF_CB%CONTENT( IPOSMSG: ), 
      &                          SIZE_MSG_BYTES,
      &                          POSITION, COMM, IERR_MPI )
         IF ( SIZE_BEGS_BLR_COL.GT.0 ) THEN
           IF (SIZE_BEGS_BLR_COL.GT.0) THEN
               CALL MPI_PACK( BEGS_BLR_COL, SIZE_BEGS_BLR_COL, 
      &                          MPI_INTEGER,
-     &                          BUF_CB%CONTENT( IPOSMSG ), 
+     &                          BUF_CB%CONTENT( IPOSMSG: ), 
      &                          SIZE_MSG_BYTES,
      &                          POSITION, COMM, IERR_MPI )
           ENDIF
@@ -1640,7 +1649,7 @@ C~   &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
      &         (KEEP(50).EQ.0.AND.JBEG_BLOCK.EQ.1)
      &        ) THEN
              CALL MPI_PACK( IPIV, NPIV, MPI_INTEGER,
-     &                      BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                      BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                      POSITION, COMM, IERR_MPI )
           ENDIF
           IF (LR_ACTIV_BlocFACTO) THEN
@@ -1648,7 +1657,7 @@ C~   &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
                 DO I = 1, NPIV
                   CALL MPI_PACK( VAL(1,I), NPIV+NELIM,
      &                    MPI_DOUBLE_PRECISION,
-     &                    BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                    BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                    POSITION, COMM, IERR_MPI )
                 END DO
               ENDIF
@@ -1661,7 +1670,8 @@ C~   &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
             DO I = 1, NPIV
               CALL MPI_PACK( VAL(JBEG_BLOCK,I), NCOL_SEND,
      &                        MPI_DOUBLE_PRECISION,
-     &                        BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                        BUF_CB%CONTENT( IPOSMSG: ),
+     & SIZE_MSG_BYTES,
      &                        POSITION, COMM, IERR_MPI )
             END DO
           ENDIF
@@ -1873,28 +1883,28 @@ C~   &               ' Size,position= ',SIZE_MSG_BYTES,POSITION
         SIZE_MSG_BYTES = SIZET - OVHSIZE * (NDEST-1) * KEEP(34)
         POSITION = 0
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( IPOSK, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JPOSK+JBEG_BLOCK-1, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NPIV, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( FPERE, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         LASTBL_INPANEL = (NBCOLS_ALREADY_SENT+NCOL_SEND.EQ.NCOLU)
         IF (LASTBL_INPANEL) THEN
           CALL MPI_PACK( -NCOL_SEND, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         ELSE
           CALL MPI_PACK( NCOL_SEND, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         ENDIF
         IF (LR_ACTIV_BlocFACTO) THEN
@@ -1903,10 +1913,10 @@ C~   &               ' Size,position= ',SIZE_MSG_BYTES,POSITION
           LR_ACTIVATED_INT = 0
         ENDIF
         CALL MPI_PACK( LR_ACTIVATED_INT, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( IPANEL, 1, MPI_INTEGER,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         IF (LR_ACTIV_BlocFACTO) THEN
            CALL DMUMPS_MPI_PACKSCALE_LR_PARTIAL( BLR_LS,
@@ -1921,7 +1931,7 @@ C~   &               ' Size,position= ',SIZE_MSG_BYTES,POSITION
         CALL MPI_PACK( UIP21K(1_8+int(JBEG_BLOCK-1,8)*int(NPIV,8)),
      &                  NPIV * NCOL_SEND,
      &                  MPI_DOUBLE_PRECISION,
-     &                  BUF_CB%CONTENT( IPOSMSG ), SIZE_MSG_BYTES,
+     &                  BUF_CB%CONTENT( IPOSMSG: ), SIZE_MSG_BYTES,
      &                  POSITION, COMM, IERR_MPI )
         ENDIF
         NOTHING_WAS_SENT = .FALSE.
@@ -2084,28 +2094,28 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
         IF ( IERR .LT. 0 ) GOTO 100
         POSITION = 0
         CALL MPI_PACK( ISON, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSUBSET_ROW, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSUPROW, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSUBSET_COL, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSUPCOL, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( N_ALREADY_SENT, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( N_PACKET, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( BBPCBP, 1, MPI_INTEGER,
-     &                 BUF_CB%CONTENT( IPOS ),
+     &                 BUF_CB%CONTENT( IPOS: ),
      &                 SIZE_PACK, POSITION, COMM, IERR_MPI )
         IF ( NSUBSET_ROW * NSUBSET_COL .NE. 0 ) THEN
           IF (N_ALREADY_SENT .EQ. 0 .AND.
@@ -2121,7 +2131,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                 * ( ( IPOS_ROOT - 1 ) / ( MBLOCK * NPROW ) )
      &                 + mod( IPOS_ROOT - 1, MBLOCK ) + 1
               CALL MPI_PACK( ILOC_ROOT, 1, MPI_INTEGER,
-     &                      BUF_CB%CONTENT( IPOS ),
+     &                      BUF_CB%CONTENT( IPOS: ),
      &                      SIZE_PACK, POSITION, COMM, IERR_MPI )
             ENDDO
             DO ISUB = NSUBSET_COL-NSUPCOL+1, NSUBSET_COL
@@ -2131,7 +2141,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                  * ( ( JPOS_ROOT - 1 ) / ( NBLOCK * NPCOL ) )
      &                  + mod( JPOS_ROOT - 1, NBLOCK ) + 1
               CALL MPI_PACK( JLOC_ROOT, 1, MPI_INTEGER,
-     &                       BUF_CB%CONTENT( IPOS ),
+     &                       BUF_CB%CONTENT( IPOS: ),
      &                       SIZE_PACK, POSITION, COMM, IERR_MPI )
             ENDDO
             IF ( TABSIZE.GE.int(NSUPROW,8)*int(NSUPCOL,8) ) THEN
@@ -2146,7 +2156,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
               ENDDO
               CALL MPI_PACK(TAB(1), NSUPROW*NSUPCOL,
      &         MPI_DOUBLE_PRECISION, 
-     &         BUF_CB%CONTENT( IPOS ),
+     &         BUF_CB%CONTENT( IPOS: ),
      &         SIZE_PACK, POSITION, COMM, IERR_MPI )
             ELSE
               DO JSUB = NSUBSET_ROW - NSUPROW+1, NSUBSET_ROW
@@ -2155,7 +2165,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
                   I = SUBSET_COL(ISUB)
                   CALL MPI_PACK(VAL_SON(J,I), 1,
      &            MPI_DOUBLE_PRECISION, 
-     &            BUF_CB%CONTENT( IPOS ),
+     &            BUF_CB%CONTENT( IPOS: ),
      &            SIZE_PACK, POSITION, COMM, IERR_MPI )
                 ENDDO
               ENDDO
@@ -2173,7 +2183,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                 * ( ( IPOS_ROOT - 1 ) / ( MBLOCK * NPROW ) )
      &                 + mod( IPOS_ROOT - 1, MBLOCK ) + 1
               CALL MPI_PACK( ILOC_ROOT, 1, MPI_INTEGER,
-     &                      BUF_CB%CONTENT( IPOS ),
+     &                      BUF_CB%CONTENT( IPOS: ),
      &                      SIZE_PACK, POSITION, COMM, IERR_MPI )
             END DO
             DO JSUB = 1, NSUBSET_COL_EFF - NSUPCOL_EFF
@@ -2187,7 +2197,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                  * ( ( JPOS_ROOT - 1 ) / ( NBLOCK * NPCOL ) )
      &                  + mod( JPOS_ROOT - 1, NBLOCK ) + 1
               CALL MPI_PACK( JLOC_ROOT, 1, MPI_INTEGER,
-     &                       BUF_CB%CONTENT( IPOS ),
+     &                       BUF_CB%CONTENT( IPOS: ),
      &                       SIZE_PACK, POSITION, COMM, IERR_MPI )
             END DO
             DO JSUB = NSUBSET_COL_EFF-NSUPCOL_EFF+1, NSUBSET_COL_EFF
@@ -2197,7 +2207,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                  * ( ( JPOS_ROOT - 1 ) / ( NBLOCK * NPCOL ) )
      &                  + mod( JPOS_ROOT - 1, NBLOCK ) + 1
               CALL MPI_PACK( JLOC_ROOT, 1, MPI_INTEGER,
-     &                       BUF_CB%CONTENT( IPOS ),
+     &                       BUF_CB%CONTENT( IPOS: ),
      &                       SIZE_PACK, POSITION, COMM, IERR_MPI )
             ENDDO
           ELSE
@@ -2212,7 +2222,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                 * ( ( IPOS_ROOT - 1 ) / ( MBLOCK * NPROW ) )
      &                 + mod( IPOS_ROOT - 1, MBLOCK ) + 1
               CALL MPI_PACK( ILOC_ROOT, 1, MPI_INTEGER,
-     &                       BUF_CB%CONTENT( IPOS ),
+     &                       BUF_CB%CONTENT( IPOS: ),
      &                       SIZE_PACK, POSITION, COMM, IERR_MPI )
             END DO
             DO ISUB = 1, NSUBSET_COL_EFF - NSUPCOL_EFF
@@ -2226,7 +2236,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                  * ( ( JPOS_ROOT - 1 ) / ( NBLOCK * NPCOL ) )
      &                  + mod( JPOS_ROOT - 1, NBLOCK ) + 1
               CALL MPI_PACK( JLOC_ROOT, 1, MPI_INTEGER,
-     &                      BUF_CB%CONTENT( IPOS ),
+     &                      BUF_CB%CONTENT( IPOS: ),
      &                      SIZE_PACK, POSITION, COMM, IERR_MPI )
             END DO
             DO ISUB = NSUBSET_COL_EFF - NSUPCOL_EFF + 1, NSUBSET_COL_EFF
@@ -2236,7 +2246,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
      &                  * ( ( JPOS_ROOT - 1 ) / ( NBLOCK * NPCOL ) )
      &                  + mod( JPOS_ROOT - 1, NBLOCK ) + 1
               CALL MPI_PACK( JLOC_ROOT, 1, MPI_INTEGER,
-     &                      BUF_CB%CONTENT( IPOS ),
+     &                      BUF_CB%CONTENT( IPOS: ),
      &                      SIZE_PACK, POSITION, COMM, IERR_MPI )
             ENDDO
           END IF
@@ -2254,7 +2264,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
               END DO
               CALL MPI_PACK(TAB(1), NSUBSET_COL_EFF*N_PACKET,
      &         MPI_DOUBLE_PRECISION, 
-     &         BUF_CB%CONTENT( IPOS ),
+     &         BUF_CB%CONTENT( IPOS: ),
      &         SIZE_PACK, POSITION, COMM, IERR_MPI )
             ELSE
               ITAB = 1
@@ -2268,7 +2278,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
               END DO
               CALL MPI_PACK(TAB(1), NSUBSET_COL_EFF*N_PACKET,
      &         MPI_DOUBLE_PRECISION, 
-     &         BUF_CB%CONTENT( IPOS ),
+     &         BUF_CB%CONTENT( IPOS: ),
      &         SIZE_PACK, POSITION, COMM, IERR_MPI )
             END IF
           ELSE
@@ -2279,7 +2289,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
                   J         = SUBSET_COL( JSUB )
                   CALL MPI_PACK( VAL_SON( J, I ), 1,
      &            MPI_DOUBLE_PRECISION,
-     &            BUF_CB%CONTENT( IPOS ),
+     &            BUF_CB%CONTENT( IPOS: ),
      &            SIZE_PACK, POSITION, COMM, IERR_MPI )
                 END DO
               END DO
@@ -2290,7 +2300,7 @@ C~        WRITE(*,*) ' Size,position=',SIZE_MSG_BYTES,POSITION
                   I         = SUBSET_COL( ISUB )
                   CALL MPI_PACK( VAL_SON( J, I ), 1,
      &            MPI_DOUBLE_PRECISION,
-     &            BUF_CB%CONTENT( IPOS ),
+     &            BUF_CB%CONTENT( IPOS: ),
      &            SIZE_PACK, POSITION, COMM, IERR_MPI )
                 END DO
               END DO
@@ -2344,20 +2354,20 @@ C~        WRITE(*,*) ' Size,position=',SIZE_PACK,POSITION
         ENDIF
         POSITION = 0
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( LW   , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBDEB   , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( JBFIN   , 1, MPI_INTEGER,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         DO K=1, NRHS
         CALL MPI_PACK( W(1,K), LW, MPI_DOUBLE_PRECISION,
-     &                        BUF_CB%CONTENT( IPOS ), SIZE,
+     &                        BUF_CB%CONTENT( IPOS: ), SIZE,
      &                        POSITION, COMM, IERR_MPI )
         END DO
         KEEP(266)=KEEP(266)+1
@@ -2484,17 +2494,17 @@ C~   &               SIZE, POSITION
           IERR = 0
           CALL MPI_PACK( NBLRB_PACKET, 
      &              1, MPI_INTEGER,
-     &              BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &              BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
           CALL MPI_PACK( NBCOLS_ALREADY_SENT, 
      &              1, MPI_INTEGER,
-     &              BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &              BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
           MAXI_CLUSTER = 1
           DO J=NBLRB_ALREADY_SENT+1, NBLRB_ALREADY_SENT+NBLRB_PACKET
             MAXI_CLUSTER = max(MAXI_CLUSTER, 
      &                         CB_LRB(PANEL2SEND-NB_ROW_SHIFT,J)%N)
           ENDDO
           CALL MPI_PACK( MAXI_CLUSTER, 1, MPI_INTEGER,
-     &              BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &              BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
           DO J=NBLRB_ALREADY_SENT+1, NBLRB_ALREADY_SENT+NBLRB_PACKET
             CALL DMUMPS_MPI_PACK_LRB(
      &               CB_LRB(PANEL2SEND-NB_ROW_SHIFT,J),
@@ -2604,7 +2614,7 @@ C~   &               SIZE, POSITION
       INCLUDE 'mpif.h'
       IERR = 0
       CALL MPI_PACK( size(BLR_LorU), 1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       DO I = 1, size(BLR_LorU)
         CALL DMUMPS_MPI_PACK_LRB(BLR_LorU(I), 
      &                           1, BLR_LorU(I)%M,   
@@ -2631,7 +2641,7 @@ C~   &               SIZE, POSITION
       INCLUDE 'mpif.h'
       IERR = 0
       CALL MPI_PACK( NBLRB_PACKET, 1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       IF (NBLRB_PACKET.EQ.0) RETURN
       IDEB = 1+NBLRB_ALREADY_SENT
       IFIN = IDEB + NBLRB_PACKET-1
@@ -2674,28 +2684,28 @@ C~   &               SIZE, POSITION
         ISLR_INT = 0
       ENDIF
       CALL MPI_PACK( ISLR_INT, 1, MPI_INTEGER,
-     &     BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &     BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       CALL MPI_PACK( LRB%K,
      &     1, MPI_INTEGER,
-     &     BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &     BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       CALL MPI_PACK( NROWS_TO_PACK,
      &     1, MPI_INTEGER,
-     &     BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &     BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       CALL MPI_PACK( LRB%N,
      &     1, MPI_INTEGER,
-     &     BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &     BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       IF (LRB%ISLR) THEN
         IF (LRB%K .GT. 0) THEN
           IF (LRMIXED_ACTIVATED) THEN
             DO PREC=1,NPREC_STOC
               CALL MPI_PACK( LRB%K_STOC(PREC),
      &            1, MPI_INTEGER,
-     &            BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &            BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
               IF (LRB%K_STOC(PREC).GT.0) THEN
                 Q_STOC_SIZE = size(LRB%Q_STOC(PREC)%val)
                 CALL MPI_PACK( Q_STOC_SIZE,
      &            1, MPI_INTEGER,
-     &            BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &            BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 CALL MUMPS_LRMIXED_PACK( LRB%Q_STOC(PREC)%val(1), 
      &            LRB%M, LRB%K_STOC(PREC), IROW_BEG, NROWS_TO_PACK,
      &            COSTS_PREC(PREC), 
@@ -2706,28 +2716,28 @@ C~   &               SIZE, POSITION
                 R_STOC_SIZE = size(LRB%R_STOC(PREC)%val)
                 CALL MPI_PACK( R_STOC_SIZE,
      &            1, MPI_INTEGER,
-     &            BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &            BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 CALL MPI_PACK( LRB%R_STOC(PREC)%val(1), 
      &            R_STOC_SIZE, MPI_INTEGER,
-     &            BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &            BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
               ENDIF
             ENDDO
           ELSE
             DO J=1,LRB%K
               CALL MPI_PACK( LRB%Q(IROW_BEG,J), 
      &          NROWS_TO_PACK, MPI_DOUBLE_PRECISION,
-     &          BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &          BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
             ENDDO
             CALL MPI_PACK( LRB%R(1,1),
      &        LRB%N*LRB%K, MPI_DOUBLE_PRECISION,
-     &        BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &        BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
           ENDIF
         ENDIF
       ELSE
         DO J=1,LRB%N
           CALL MPI_PACK( LRB%Q(IROW_BEG,J), 
      &       NROWS_TO_PACK, MPI_DOUBLE_PRECISION,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
         ENDDO
       ENDIF
       RETURN
@@ -2794,7 +2804,7 @@ C~   &               SIZE, POSITION
             ALLOCATE(LRB%R_STOC(NPREC_STOC))
             DO PREC=1,NPREC_STOC
               CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &               LRB%K_STOC(PREC), 1,
+     &               LRB%K_STOC(PREC:), 1,
      &               MPI_INTEGER, COMM, IERR_MPI )
               IF (LRB%K_STOC(PREC).GT.0) THEN
                 CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
@@ -2823,7 +2833,7 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
                    CALL MUMPS_ABORT()
                 ENDIF
                 CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &               LRB%R_STOC(PREC)%val(1), R_STOC_SIZE,
+     &               LRB%R_STOC(PREC)%val(1:), R_STOC_SIZE,
      &               MPI_INTEGER, COMM, IERR_MPI )
                 MEM = (R_STOC_SIZE*K34 + COSTS_PREC(1)-1)/COSTS_PREC(1)
      &              + (Q_STOC_SIZE*K34 + COSTS_PREC(1)-1)/COSTS_PREC(1)
@@ -2837,16 +2847,16 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
             ENDDO
           ELSE
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     LRB%Q(1,1), M*K, MPI_DOUBLE_PRECISION,
+     &                     LRB%Q(1:,1:), M*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR_MPI )
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     LRB%R(1,1), N*K, MPI_DOUBLE_PRECISION,
+     &                     LRB%R(1:,1:), N*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR_MPI )
           ENDIF
         ENDIF
       ELSE
         CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                   LRB%Q(1,1), M*N, MPI_DOUBLE_PRECISION,
+     &                   LRB%Q(1:,1:), M*N, MPI_DOUBLE_PRECISION,
      &                   COMM, IERR_MPI )
       ENDIF
       RETURN
@@ -2878,7 +2888,7 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
       IERR   = 0
       IERROR = 0
       CALL MPI_PACK( NBLRB_PACKET, 1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
       IF (NBLRB_PACKET.EQ.0) GOTO 600 
       IDEB = 1+NBLRB_ALREADY_SENT
       IFIN = IDEB + NBLRB_PACKET-1
@@ -2901,21 +2911,21 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
           ISLR_INT = 0
         ENDIF
         CALL MPI_PACK( ISLR_INT, 1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( BLR(I)%K,
      &       1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( BLR(I)%M, 
      &       1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( BLR(I)%N,
      &       1, MPI_INTEGER,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
         IF (BLR(I)%ISLR) THEN
           IF (BLR(I)%K .GT. 0) THEN
             CALL MPI_PACK( BLR(I)%Q(1,1), BLR(I)%M*BLR(I)%K,
      &       MPI_DOUBLE_PRECISION,
-     &       BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &       BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
             J =1
           DO WHILE (J <= BLR(I)%N)
               IF (IPIV(J) > 0) THEN
@@ -2924,7 +2934,7 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
                 J = J+1
               CALL MPI_PACK( SCALED(1,1), BLR(I)%K,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
               ELSE 
                 PIV1    = A(POSELTD+LD_DIAG*(J-1)+J-1)
                 PIV2    = A(POSELTD+LD_DIAG*J+J)
@@ -2934,13 +2944,13 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
      &            + OFFDIAG * BLR(I)%R(1:BLR(I)%K,J+1)
                 CALL MPI_PACK( SCALED(1,1), BLR(I)%K,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 SCALED(1:BLR(I)%K,2) = OFFDIAG * BLOCK(1:BLR(I)%K)
      &            + PIV2 * BLR(I)%R(1:BLR(I)%K,J+1)
                  J =J+2
                 CALL MPI_PACK( SCALED(1,2), BLR(I)%K,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
               ENDIF
           END DO
         ENDIF
@@ -2952,7 +2962,7 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
      &           * BLR(I)%Q(1:BLR(I)%M,J)
                 CALL MPI_PACK( SCALED(1,1), BLR(I)%M,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 J = J+1
               ELSE 
                 PIV1    = A(POSELTD+LD_DIAG*(J-1)+J-1)
@@ -2963,12 +2973,12 @@ C~                 WRITE(*,*) "R..%VAL ALLOC FAILED",R_STOC_SIZE
      &            + OFFDIAG * BLR(I)%Q(1:BLR(I)%M,J+1)
                 CALL MPI_PACK( SCALED(1,1), BLR(I)%M,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 SCALED(1:BLR(I)%M,2) = OFFDIAG * BLOCK(1:BLR(I)%M)
      &            + PIV2 * BLR(I)%Q(1:BLR(I)%M,J+1)
                 CALL MPI_PACK( SCALED(1,2), BLR(I)%M,
      &           MPI_DOUBLE_PRECISION,
-     &           BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &           BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                  J=J+2
               ENDIF
           END DO

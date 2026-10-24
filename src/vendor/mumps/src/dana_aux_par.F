@@ -1462,7 +1462,7 @@ C~       WRITE(LP,*)'Insufficient workspace in DMUMPS_PARSYMFACT'
      &     MPI_SUM, 0, ord%COMM, IERR)
       CALL MUMPS_REALLOC(NCLIQUES, NPROCS, id%INFO,
      &     LP, STRING='NCLIQUES', MEMCNT=MEMCNT, ERRCODE=-7)
-      CALL MPI_GATHER(MYNCLIQUES, 1, MPI_INTEGER, NCLIQUES(1), 1, 
+      CALL MPI_GATHER(MYNCLIQUES, 1, MPI_INTEGER, NCLIQUES(1:), 1, 
      &     MPI_INTEGER, 0, ord%COMM, IERR)
       IF(ord%MYID.EQ.0) THEN
          TOTNCLIQUES = sum(NCLIQUES)
@@ -1826,7 +1826,7 @@ C~   &      'Insufficient workspace in DMUMPS_PARSYMFACT_LUMAT'
      &     MPI_SUM, 0, ord%COMM, IERR)
       CALL MUMPS_REALLOC(NCLIQUES, NPROCS, id%INFO,
      &     LP, STRING='NCLIQUES', MEMCNT=MEMCNT, ERRCODE=-7)
-      CALL MPI_GATHER(MYNCLIQUES, 1, MPI_INTEGER, NCLIQUES(1), 1, 
+      CALL MPI_GATHER(MYNCLIQUES, 1, MPI_INTEGER, NCLIQUES(1:), 1, 
      &     MPI_INTEGER, 0, ord%COMM, IERR)
       IF(ord%MYID.EQ.0) THEN
          TOTNCLIQUES = sum(NCLIQUES)
@@ -2545,7 +2545,7 @@ C~   &        '("Insufficient workspace inside BUILD_LOC_GRAPH")')
             END IF
          END IF
       END DO
-      CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER8, RCVCNT(1), 1,
+      CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER8, RCVCNT(1:), 1,
      &     MPI_INTEGER8, ord%COMM, IERR)
       I = ceiling(dble(MAXS)*1.20D0)
       CALL MUMPS_REALLOC(LENG, max(I,1), id%INFO,
@@ -2553,7 +2553,7 @@ C~   &        '("Insufficient workspace inside BUILD_LOC_GRAPH")')
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       CALL MUMPS_I8DEALLOC(SNDCNT, MEMCNT=MEMCNT)
       RDISPL(:) = MAXS
-      CALL MPI_REDUCE_SCATTER ( SIPES(1,1), LENG(1), RDISPL(1), 
+      CALL MPI_REDUCE_SCATTER ( SIPES(1,1), LENG(1:), RDISPL(1), 
      &     MPI_INTEGER, MPI_SUM, ord%COMM, IERR )
       DEALLOCATE(SIPES)
       I = ceiling(dble(NROWS_LOC+1)*1.20D0)
@@ -2706,7 +2706,7 @@ C~   &        '("Insufficient workspace inside BUILD_LOC_GRAPH")')
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       IPE(NROWS_LOC+2:NROWS_LOC+HALO_SIZE+1) = IPE(NROWS_LOC+1)
       GSIZE = NROWS_LOC + HALO_SIZE
-      CALL MPI_GATHER(TOP_CNT, 1, MPI_INTEGER8, RCVCNT(1), 1, 
+      CALL MPI_GATHER(TOP_CNT, 1, MPI_INTEGER8, RCVCNT(1:), 1, 
      & MPI_INTEGER8, 0, ord%COMM, IERR)
       IF(MYID.EQ.0) THEN
          NEW_LOCNNZ = sum(RCVCNT)
@@ -2850,7 +2850,7 @@ C~   &   '("Insufficient workspace inside DMUMPS_LUMAT_TO_LOC_GRAPH")')
          SIPES(LOC_ROW, PROC) = SIPES(LOC_ROW, PROC)+ROWSIZE
          SNDCNT(PROC) = SNDCNT(PROC)+ROWSIZE
       ENDDO
-      CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER8, RCVCNT(1), 1,
+      CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER8, RCVCNT(1:), 1,
      &     MPI_INTEGER8, ord%COMM, IERR)
       I = ceiling(dble(MAXS)*1.20D0)
       CALL MUMPS_REALLOC(LENG, max(I,1), id%INFO,
@@ -2858,7 +2858,7 @@ C~   &   '("Insufficient workspace inside DMUMPS_LUMAT_TO_LOC_GRAPH")')
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       CALL MUMPS_I8DEALLOC(SNDCNT, MEMCNT=MEMCNT)
       RDISPL(:) = MAXS
-      CALL MPI_REDUCE_SCATTER ( SIPES(1,1), LENG(1), RDISPL(1), 
+      CALL MPI_REDUCE_SCATTER ( SIPES(1,1), LENG(1:), RDISPL(1), 
      &     MPI_INTEGER, MPI_SUM, ord%COMM, IERR )
       DEALLOCATE(SIPES)
       I = ceiling(dble(NROWS_LOC+1)*1.20D0)
@@ -3039,7 +3039,7 @@ C~   &   '("Insufficient workspace inside DMUMPS_LUMAT_TO_LOC_GRAPH")')
          ENDIF
        ENDDO
       ENDDO
-      CALL MPI_GATHER(TIDX, 1, MPI_INTEGER8, RCVCNT(1), 1, 
+      CALL MPI_GATHER(TIDX, 1, MPI_INTEGER8, RCVCNT(1:), 1, 
      & MPI_INTEGER8, 0, ord%COMM, IERR)
       IF(MYID.EQ.0) THEN
          NEW_LOCNNZ = sum(RCVCNT)
@@ -3165,7 +3165,7 @@ C~          write(*,*) "Allocation error of REQ in DMUMPS_SEND_BUF"
 C~          write(*,*) "Allocation error of RCVCNT in DMUMPS_SEND_BUF"
             return
          ENDIF
-         CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER, RCVCNT(1), 1,
+         CALL MPI_ALLTOALL(SNDCNT(1), 1, MPI_INTEGER, RCVCNT(1:), 1,
      &        MPI_INTEGER, COMM, IERR)
          DO I=1, NPROCS
             IF(SNDCNT(I) .GT. 0) THEN

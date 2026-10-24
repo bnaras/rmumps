@@ -206,7 +206,7 @@ C~                   WRITE(LP, 150) 'L0_OMP stats'
      &           COST_SUBTREES_UNDER_L0, OPSA_UNDER_L0, NBNODES_BLR,
      &           INFO(1), INFO(2)
      &           )
-               CALL MPI_ALLREDUCE (NBNODES_BLR, KEEP(470), 1, 
+               CALL MPI_ALLREDUCE (NBNODES_BLR, KEEP(470:), 1, 
      &            MPI_INTEGER, MPI_SUM, id%COMM_NODES, IERR)
           ENDIF
       ELSE
@@ -471,10 +471,10 @@ C~                           WRITE(LP, 150) 'Allocation IPOOL'
              SBUF_REC_FR  = max(SBUF_REC_FR ,KEEP(27))
              SBUF_REC_LR  = max(SBUF_REC_LR ,KEEP(27))
          ENDIF
-         CALL MPI_ALLREDUCE (SBUF_REC_FR, KEEP(44), 1, 
+         CALL MPI_ALLREDUCE (SBUF_REC_FR, KEEP(44:), 1, 
      &        MPI_INTEGER, MPI_MAX,
      &        id%COMM_NODES, IERR)
-         CALL MPI_ALLREDUCE (SBUF_REC_LR, KEEP(380), 1, 
+         CALL MPI_ALLREDUCE (SBUF_REC_LR, KEEP(380:), 1, 
      &        MPI_INTEGER, MPI_MAX,
      &        id%COMM_NODES, IERR)
          IF (KEEP(48)==5) THEN
@@ -638,7 +638,7 @@ C~   &              KEEP8(17)
      &     KEEP8(109), MPI_SUM, id%COMM)
       CALL MUMPS_ALLREDUCEI8( KEEP8(19), KEEP8(119),
      &     MPI_MAX, id%COMM)
-      CALL MPI_ALLREDUCE( KEEP(27), KEEP(127), 1,
+      CALL MPI_ALLREDUCE( KEEP(27), KEEP(127:), 1,
      &     MPI_INTEGER, MPI_MAX,
      &     id%COMM, IERR)
       KEEP26_I8_TMP = int(KEEP(26),8)
@@ -656,7 +656,7 @@ C~   &              KEEP8(17)
       IF (id%MYID.EQ.MASTER) THEN
        RINFOG(15) = dble(ITMP8*int(KEEP(35),8))/1D6
       ENDIF
-      CALL MPI_ALLREDUCE( RINFO(1), RINFOG(1), 1,
+      CALL MPI_ALLREDUCE( RINFO(1), RINFOG(1:), 1,
      &     MPI_DOUBLE_PRECISION, MPI_SUM,
      &     id%COMM, IERR)
       CALL MUMPS_SETI8TOI4( KEEP8(11), INFO(3) )

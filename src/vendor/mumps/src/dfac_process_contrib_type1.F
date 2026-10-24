@@ -1,3 +1,4 @@
+C     rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md)
 C
 C  This file is part of MUMPS 5.9.1, released
 C  on Mon Jul 20 09:00:43 UTC 2026
@@ -110,7 +111,7 @@ C
      &                            DYN_SIZE, SON_A )
           IPOS_NODE = 1_8
           CALL MPI_UNPACK(BUFR, LBUFR_BYTES, POSITION,
-     &         SON_A(IPOS_NODE + ISHIFT_PACKET),
+     &         SON_A(IPOS_NODE + ISHIFT_PACKET:),
      &         SIZE_PACKET, MPI_DOUBLE_PRECISION, COMM, IERR)
         ELSE
           IPOS_NODE = PAMASTER(STEP(FINODE))

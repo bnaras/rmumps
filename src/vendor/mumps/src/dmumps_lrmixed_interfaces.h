@@ -4,7 +4,9 @@ C     rmumps: explicit interfaces of the mixed-precision dispatch
 C     routines of dlr_core.F, for callers in other files. Their matrix
 C     arguments hold data of any precision and are only passed on to
 C     the conversion and BLAS kernels, so they are exempt from type,
-C     kind and rank checking, as in the routine definitions.
+C     kind and rank checking. The definitions carry the !GCC$ and !DEC$
+C     attributes only: flang accepts IGNORE_TKR in interfaces and module
+C     procedures, not in the definition of an external procedure.
 C
       INTERFACE
       SUBROUTINE DMUMPS_LRMIXED_CAST(A, B, nrows, ncols, ldA, ldB,

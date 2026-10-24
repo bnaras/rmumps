@@ -1109,15 +1109,15 @@ C~   &             NB_BLOCK_U,size(BLR_U)
         IF (ISLR) THEN
           IF (K .GT. 0) THEN
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%Q(1,1), M*K, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%Q(1:,1:), M*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR )
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%R(1,1), N*K, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%R(1:,1:), N*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR)
           ENDIF
         ELSE
           CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%Q(1,1), M*N, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%Q(1:,1:), M*N, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR)
         ENDIF
       ENDDO
@@ -1187,15 +1187,15 @@ C~   &             NB_BLOCK_U,size(BLR_U)
         IF (ISLR) THEN
           IF (K .GT. 0) THEN
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%Q(1,1), M*K, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%Q(1:,1:), M*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR )
             CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%R(1,1), N*K, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%R(1:,1:), N*K, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR)
           ENDIF
         ELSE
           CALL MPI_UNPACK( BUFR, LBUFR_BYTES, POSITION,
-     &                     BLR_U(I)%Q(1,1), M*N, MPI_DOUBLE_PRECISION,
+     &                     BLR_U(I)%Q(1:,1:), M*N, MPI_DOUBLE_PRECISION,
      &                     COMM, IERR)
         ENDIF
       ENDDO

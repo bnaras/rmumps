@@ -3,8 +3,10 @@ Why: The mixed-precision routines DMUMPS_LRMIXED_CAST, _PLUS and _GEMM
  dummies and only pass them on to the conversion/BLAS kernels; every call
  with REAL or DOUBLE PRECISION data is an argument mismatch, rejected by
  gfortran >= 10. Their dummies are now exempt from type, kind and rank
- checking (!GCC$ / !DEC$ ATTRIBUTES NO_ARG_CHECK, !DIR$ IGNORE_TKR (TKRC)),
- which requires passing A and B rather than A(1) and B(1) on (same
+ checking (!GCC$ / !DEC$ ATTRIBUTES NO_ARG_CHECK, and !DIR$ IGNORE_TKR
+ (TKRC) in the interfaces only: LLVM flang rejects IGNORE_TKR in the
+ definition of an external procedure), which requires passing A and B
+ rather than A(1) and B(1) on (same
  address) and explicit, equally type-agnostic interfaces for the kernels
  of lr_common.F they call (new mumps_lrmixed_kernels.h). Every caller
  needs explicit interfaces of the dispatch routines (new
@@ -32,7 +34,7 @@ index 0fc02ec..c3ce4a9 100644
        CONTAINS
  C *******************************!
  C ALLOCATION!
-@@ -2303,61 +2307,68 @@ C --------------------------------------------------------------------
+@@ -2303,61 +2307,67 @@ C --------------------------------------------------------------------
  C       This routine casts a generic integer matrix A of precision precA 
  C       into generic integer matrix B of precision precB   
          INTEGER :: nrows, ncols, ldA, ldB, precA, precB
@@ -43,7 +45,6 @@ index 0fc02ec..c3ce4a9 100644
 +C       dmumps_lrmixed_interfaces.h for callers in other files)
 +!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
 +!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
-+!DIR$ IGNORE_TKR (TKRC) A, B
 +        INCLUDE 'mumps_lrmixed_kernels.h'
          IF (precA.EQ.prec_dbl .AND. precB.EQ.prec_dbl) THEN
 -          CALL MUMPS_LRMIXED_CAST_DD(A(1), B(1), nrows, ncols,
@@ -120,19 +121,18 @@ index 0fc02ec..c3ce4a9 100644
       &              ldA, ldB)
          ELSE 
            write(*,*) 'conversion impossible: format non pris en charge'
-@@ -2372,6 +2383,11 @@ C       This routine performs Y <- X+Y where X and Y are generic
+@@ -2372,6 +2382,10 @@ C       This routine performs Y <- X+Y where X and Y are generic
  C       integer matrices in precision precX and precY, respectively
          INTEGER :: nrows, ncols, ldX, ldY, precX, precY
          INTEGER :: X(*), Y(*)
 +C       rmumps: see DMUMPS_LRMIXED_CAST
 +!GCC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
 +!DEC$ ATTRIBUTES NO_ARG_CHECK :: X, Y
-+!DIR$ IGNORE_TKR (TKRC) X, Y
 +        INCLUDE 'mumps_lrmixed_kernels.h'
          IF (precX .EQ. prec_dbl .AND. precY .EQ. prec_dbl) THEN
            CALL MUMPS_LRMIXED_PLUS_DD(X, Y, nrows, ncols, ldX, ldY)
          ELSEIF (precX .EQ. prec_dbl .AND. precY .EQ. prec_sgl) THEN
-@@ -2803,6 +2819,8 @@ C          TRUNC_ERR = dnrm2( N-RK, VN1( RK+1 ), 1 )
+@@ -2803,6 +2817,8 @@ C          TRUNC_ERR = dnrm2( N-RK, VN1( RK+1 ), 1 )
         SUBROUTINE DMUMPS_LRMIXED_STOC2CALC_LRB(LRB, K34, K451, KEEP8,
       &    KEEP_stoc)
          USE DMUMPS_LR_TYPE
@@ -141,7 +141,7 @@ index 0fc02ec..c3ce4a9 100644
  C
  C Parameters
  C ==========
-@@ -3049,12 +3067,14 @@ C vv MIXHPC
+@@ -3049,12 +3065,14 @@ C vv MIXHPC
        SUBROUTINE DMUMPS_LRMIXED_LRxFR(LorU,  
       &                  LRB, B, LDB, C, LDC, NCOLS,
       &                  ALPHA, K34, K451, KEEP8, RHS, RB, QRB,
@@ -157,14 +157,13 @@ index 0fc02ec..c3ce4a9 100644
  C       LorU: 0 = L, 1 = U        
          INTEGER, intent(in):: LorU
          TYPE(LRB_TYPE), intent(inout) :: LRB
-@@ -3364,6 +3384,11 @@ C       declaration of DALPHA is needed
+@@ -3364,6 +3382,10 @@ C       declaration of DALPHA is needed
          INTEGER :: M, N, K, LDA, LDB, LDC, prec
          DOUBLE PRECISION :: ALPHA, BETA
          CHARACTER(len=1) :: TRANSA, TRANSB
 +C       rmumps: see DMUMPS_LRMIXED_CAST
 +!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
 +!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B, C
-+!DIR$ IGNORE_TKR (TKRC) A, B, C
 +        INCLUDE 'mumps_lrmixed_kernels.h'
          IF (prec.EQ.prec_dbl) THEN
              CALL MUMPS_LRMIXED_DGEMM(TRANSA, TRANSB, M, N, K, ALPHA, 
@@ -187,13 +186,15 @@ new file mode 100644
 index 0000000..8d64471
 --- /dev/null
 +++ b/src/dmumps_lrmixed_interfaces.h
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,37 @@
 +C
 +C     rmumps: explicit interfaces of the mixed-precision dispatch
 +C     routines of dlr_core.F, for callers in other files. Their matrix
 +C     arguments hold data of any precision and are only passed on to
 +C     the conversion and BLAS kernels, so they are exempt from type,
-+C     kind and rank checking, as in the routine definitions.
++C     kind and rank checking. The definitions carry the !GCC$ and !DEC$
++C     attributes only: flang accepts IGNORE_TKR in interfaces and module
++C     procedures, not in the definition of an external procedure.
 +C
 +      INTERFACE
 +      SUBROUTINE DMUMPS_LRMIXED_CAST(A, B, nrows, ncols, ldA, ldB,

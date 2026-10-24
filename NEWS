@@ -27,8 +27,9 @@ Version 5.9.1-1
    (reviewed against the 5.9.1 defaults); parameters it does not set take
    the MUMPS 5.9.1 defaults, e.g. ICNTL(58) = 2 (symbolic factorization)
  - the Fortran sources compile with gfortran >= 10 without
-   -fallow-argument-mismatch, and the package builds without significant
-   warnings under -Wall -pedantic (gfortran, gcc and clang)
+   -fallow-argument-mismatch and with LLVM flang, and the package builds
+   without significant warnings under -Wall -pedantic (gfortran, gcc and
+   clang)
  - copyright holders and inst/COPYRIGHTS updated for the bundled code;
    the CeCILL-C and Apache-2.0 license texts are included
 

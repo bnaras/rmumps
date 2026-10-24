@@ -1,0 +1,79 @@
+Why: DMUMPS_DECONVERT_LRB and DMUMPS_DECONVERT_LRB_R_W (dlr_core.F) write
+ a row block of R, starting at R(K_CUMUL,1) with the leading dimension of
+ R, by passing that element of a pointer (LRB%R) or assumed-shape
+ (R_WORKSPACE) array to the type-agnostic DMUMPS_LRMIXED_CAST. LLVM flang
+ rejects an element of such an array as actual for an array dummy, and no
+ contiguous section describes a row block, so the element is replaced by a
+ rank-1 view that starts at the same address (C_F_POINTER of its C_LOC),
+ as the routine already does for its stoc_ptr input. R_WORKSPACE gets the
+ TARGET attribute for C_LOC (module procedure, explicit interface).
+Upstream: not sent; worth offering with the interfaces of 0003-0005.
+Obsolete when: flang accepts the pristine dlr_core.F with the interfaces of
+ 0004, or upstream passes these blocks another way.
+diff --git a/src/dlr_core.F b/src/dlr_core.F
+index 757683f..f00740d 100644
+--- a/src/dlr_core.F
++++ b/src/dlr_core.F
+@@ -2159,6 +2159,7 @@ C     Deallocate what was allocated in MIXED and keep UNIFORM
+       RETURN
+       END SUBROUTINE DMUMPS_LRMIXED_CONVERT_LRB
+       SUBROUTINE DMUMPS_DECONVERT_LRB(LRB, IFLAG, IERROR, KEEP8)
++        USE ISO_C_BINDING, ONLY: C_LOC, C_F_POINTER
+ C Parameters
+ C ==========
+         TYPE(LRB_TYPE) :: LRB
+@@ -2168,6 +2169,8 @@ C Local variables
+ C ===============
+         INTEGER :: PREC, Kprec, K_CUMUL
+         TYPE(LRB_TYPE) :: LRB2
++C       rmumps: view of R from R(K_CUMUL,1) on, see below
++        DOUBLE PRECISION, POINTER, CONTIGUOUS :: R_VIEW(:)
+         IF (LRB%ISLR .AND. LRB%K.GT.0) THEN
+           CALL ALLOC_LRB(LRB2,LRB%K,LRB%M,LRB%N,.true.,IFLAG,
+      &     IERROR,KEEP8)
+@@ -2180,8 +2183,14 @@ C ===============
+               CALL DMUMPS_LRMIXED_CAST(LRB%Q_STOC(PREC)%val(1),
+      &            LRB%Q(1,K_CUMUL), LRB%M, Kprec, LRB%M, LRB%M, 
+      &               PREC, PREC_FAC)
++C             rmumps: the output is the row block K_CUMUL.. of R (leading
++C             dimension LRB%K), which no contiguous section describes;
++C             pass a view that starts at R(K_CUMUL,1) instead of the
++C             element (same address)
++              CALL C_F_POINTER(C_LOC(LRB%R(K_CUMUL,1)), R_VIEW,
++     &            [SIZE(LRB%R,KIND=8) - K_CUMUL + 1])
+               CALL DMUMPS_LRMIXED_CAST(LRB%R_STOC(PREC)%val(1),
+-     &            LRB%R(K_CUMUL,1), Kprec, LRB%N, Kprec, LRB%K, 
++     &            R_VIEW, Kprec, LRB%N, Kprec, LRB%K,
+      &               PREC, PREC_FAC)
+             ENDIF
+             K_CUMUL = K_CUMUL + Kprec
+@@ -2218,12 +2227,16 @@ C ==========
+         INTEGER, INTENT(IN) :: START_PREC_K, END_PREC_K
+         INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+         DOUBLE PRECISION, INTENT(INOUT) :: R_WORKSPACE(:,:) !LD,N
++        TARGET :: R_WORKSPACE
+ C Local variables
+ C ===============
+         INTEGER :: PREC, Kprec, K_CUMUL, Kbeg
+         INTEGER :: Krem
+         integer(kind=1), pointer, dimension(:) :: stoc_ptr
+         integer :: ptr_shape(1)
++C       rmumps: view of R_WORKSPACE from R_WORKSPACE(K_CUMUL,1) on, see
++C       DMUMPS_DECONVERT_LRB
++        DOUBLE PRECISION, POINTER, CONTIGUOUS :: R_VIEW(:)
+         IF (LRB%ISLR .AND. LRB%K.GT.0) THEN
+           K_CUMUL=1
+           DO PREC=START_PREC,END_PREC
+@@ -2242,9 +2255,11 @@ C ===============
+             ptr_shape(1) = costs_prec(prec)*Kprec*LRB%N
+             call c_f_pointer(c_loc(LRB%R_stoc(prec)%val),
+      &         stoc_ptr, ptr_shape)
++            call c_f_pointer(c_loc(R_WORKSPACE(K_CUMUL,1)), R_VIEW,
++     &         [SIZE(R_WORKSPACE,KIND=8) - K_CUMUL + 1])
+             CALL DMUMPS_LRMIXED_CAST(
+      &          stoc_ptr((kbeg-1)*costs_prec(prec)+1),
+-     &          R_WORKSPACE(K_CUMUL,1), Krem, LRB%N, Kprec, LD, 
++     &          R_VIEW, Krem, LRB%N, Kprec, LD,
+      &             PREC, 1)
+             K_CUMUL = K_CUMUL + Krem
+           END DO

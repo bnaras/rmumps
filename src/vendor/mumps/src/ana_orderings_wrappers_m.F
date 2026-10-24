@@ -86,9 +86,9 @@ C~   &    "ERROR memory allocation in METIS_NODEND_MIXEDto32"
         RETURN
       ENDIF
       CALL MUMPS_ICOPY_64TO32(IPE8(1:), NCMP+1, IPE)
-      CALL METIS_NODEND(NCMP, IPE, IW(1),
+      CALL METIS_NODEND(NCMP, IPE, IW(1:),
      &           NUMFLAG, OPTIONS_METIS,
-     &           IKEEP2(1), IKEEP1(1) )
+     &           IKEEP2(1), IKEEP1(1:) )
       DEALLOCATE(IPE)
       RETURN
       END SUBROUTINE MUMPS_METIS_NODEND_MIXEDto32
@@ -120,8 +120,8 @@ C~   &    "ERROR memory allocation in METIS_NODEND_MIXEDto32"
         RETURN
       ENDIF
       CALL MUMPS_ICOPY_64TO32(IPE8(1:), NCMP+1, IPE)
-      CALL METIS_NODEND( NCMP, IPE, IW(1), FRERE(1),
-     & OPTIONS_METIS, IKEEP2(1), IKEEP1(1))
+      CALL METIS_NODEND( NCMP, IPE, IW(1:), FRERE(1:),
+     & OPTIONS_METIS, IKEEP2(1), IKEEP1(1:))
       DEALLOCATE(IPE)
       RETURN
       END SUBROUTINE MUMPS_METIS_NODEND_MIXEDto32
@@ -218,9 +218,9 @@ C~   &      "ERROR memory allocation in METIS_NODEWND_MIXEDto64"
      &                                         IKEEP18, IKEEP28
       INTEGER :: allocok
       IF (KEEP10.EQ.1) THEN
-       CALL METIS_NODEND(NCMP, IPE8(1), IW(1),
+       CALL METIS_NODEND(NCMP, IPE8(1:), IW(1:),
      &           NUMFLAG, OPTIONS_METIS,
-     &           IKEEP2(1), IKEEP1(1) )
+     &           IKEEP2(1), IKEEP1(1:) )
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
           CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
@@ -248,11 +248,11 @@ C~   &      "ERROR 2 memory allocation in METIS_METIS_NODEND_MIXEDto64"
             RETURN
         ENDIF
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL METIS_NODEND(NCMP, IPE8(1), IW(1),
+          CALL METIS_NODEND(NCMP, IPE8(1:), IW(1:),
      &              NUMFLAG, OPTIONS_METIS,
      &              IKEEP28, IKEEP18 )
         ELSE
-          CALL METIS_NODEND(NCMP, IPE8(1), IW8,
+          CALL METIS_NODEND(NCMP, IPE8(1:), IW8,
      &             NUMFLAG, OPTIONS_METIS,
      &             IKEEP28, IKEEP18 )
         ENDIF
@@ -292,8 +292,8 @@ C~   &      "ERROR 2 memory allocation in METIS_METIS_NODEND_MIXEDto64"
      &                                         OPTIONS_METIS8
       INTEGER :: allocok
       IF (KEEP10.EQ.1) THEN
-       CALL METIS_NODEND( NCMP, IPE8(1), IW(1), FRERE(1),
-     &      OPTIONS_METIS, IKEEP2(1), IKEEP1(1) )
+       CALL METIS_NODEND( NCMP, IPE8(1:), IW(1:), FRERE(1:),
+     &      OPTIONS_METIS, IKEEP2(1), IKEEP1(1:) )
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
           CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
@@ -327,10 +327,10 @@ C~   &    "ERROR 2 memory allocation in METIS_NODEND_MIXEDto64"
         CALL MUMPS_ICOPY_32TO64    (OPTIONS_METIS, LOPTIONS_METIS,
      &                                 OPTIONS_METIS8)
         IF (INPLACE64_GRAPH_COPY) THEN
-          CALL METIS_NODEND( int(NCMP,8), IPE8(1), IW(1), FRERE8,
+          CALL METIS_NODEND( int(NCMP,8), IPE8(1:), IW(1:), FRERE8,
      &                       OPTIONS_METIS8, IKEEP28, IKEEP18 )
         ELSE
-          CALL METIS_NODEND( int(NCMP,8), IPE8(1), IW8, FRERE8,
+          CALL METIS_NODEND( int(NCMP,8), IPE8(1:), IW8, FRERE8,
      &                       OPTIONS_METIS8, IKEEP28, IKEEP18 )
         ENDIF
         CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1:))
@@ -1044,7 +1044,7 @@ C~   &    "ERROR memory allocation in MUMPS_PORD_MIXEDto32"
         RETURN
       ENDIF
       CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX+1, XADJ)
-      CALL MUMPS_PORDF( NVTX, int(NEDGES8), XADJ, IW(1),
+      CALL MUMPS_PORDF( NVTX, int(NEDGES8), XADJ, IW(1:),
      &                                    NV, NCMPA )
       DO I= 1, NVTX
         PARENT(I) = XADJ(I)
@@ -1072,7 +1072,7 @@ C~   &    "ERROR memory allocation in MUMPS_PORD_MIXEDto32"
       INTEGER(8), DIMENSION(:), ALLOCATABLE :: IW8, NV8
       INTEGER :: I, allocok
       IF (KEEP10.EQ.1) THEN
-        CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1), IW(1),
+        CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1:), IW(1:),
      &                                        NV, NCMPA )
         DO I=1, NVTX
           PARENT(I)=int(XADJ8(I))
@@ -1101,10 +1101,10 @@ C~   &      "ERROR memory allocation in MUMPS_PORD_MIXEDto64"
           RETURN
         ENDIF
         IF (INPLACE64_GRAPH_COPY)  THEN
-         CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1), IW(1),
+         CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1:), IW(1:),
      &                                        NV8, NCMPA )
         ELSE
-         CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1), IW8,
+         CALL MUMPS_PORDF( int(NVTX,8), NEDGES8, XADJ8(1:), IW8,
      &                                        NV8, NCMPA )
          DEALLOCATE(IW8)
         ENDIF
@@ -1147,7 +1147,7 @@ C~   &    "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto32"
       ENDIF
       CALL MUMPS_ICOPY_64TO32(XADJ8(1:),NVTX+1,XADJ)
       CALL MUMPS_PORDF_WND( NVTX, int(NEDGES8),
-     &                             XADJ, IW(1),
+     &                             XADJ, IW(1:),
      &                             NV, NCMPA, N )
       DO I= 1, NVTX
         PARENT(I) = XADJ(I)
@@ -1177,7 +1177,7 @@ C~   &    "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto32"
       INTEGER :: allocok
       IF (KEEP10.EQ.1) THEN
         CALL MUMPS_PORDF_WND( int(NVTX,8), NEDGES8,
-     &                             XADJ8(1), IW(1),
+     &                             XADJ8(1:), IW(1:),
      &                             NV, NCMPA, int(N,8) )
         CALL MUMPS_ICOPY_64TO32(XADJ8(1:), NVTX, PARENT)
       ELSE
@@ -1206,11 +1206,11 @@ C~   &      "ERROR memory allocation in MUMPS_PORDF_WND_MIXEDto64"
         CALL MUMPS_ICOPY_32TO64(NV, NVTX, NV8)
         IF (INPLACE64_GRAPH_COPY)  THEN
           CALL MUMPS_PORDF_WND( int(NVTX,8), NEDGES8,
-     &                             XADJ8(1), IW(1),
+     &                             XADJ8(1:), IW(1:),
      &                             NV8, NCMPA, int(N,8) )
         ELSE
           CALL MUMPS_PORDF_WND( int(NVTX,8), NEDGES8,
-     &                             XADJ8(1), IW8,
+     &                             XADJ8(1:), IW8,
      &                             NV8, NCMPA, int(N,8) )
           DEALLOCATE(IW8)
         ENDIF

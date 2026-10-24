@@ -1008,7 +1008,8 @@ C{
      &         %VAL((COSTS_PREC(PREC_DIAG_FR)*size(D)+KEEP34-1)/KEEP34))
             CALL DMUMPS_LRMIXED_CAST(
      &        D(1),
-     &        BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)%DIAG_STOC%VAL(1),
+     &        BLR_ARRAY(IWHANDLER)%DIAG_BLOCKS(IPANEL)%DIAG_STOC%VAL(1:
+     &),
      &        size(D), 1, size(D), size(D), PREC_FAC, PREC_DIAG_FR)
             deallocate(D)
             nullify(D)

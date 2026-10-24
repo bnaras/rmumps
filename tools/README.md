@@ -10,7 +10,7 @@ command from the package root.
 | `patches/<component>/NNNN-*.patch` | Changes to the **pristine** sources, applied in order |
 | `transforms/` | T1 (Fortran I/O), T2 (C shim, prototypes), T3 (object list, headers, ABI), T4 (element-to-section), T5 (type declarations), with `tests/run.R` |
 | `conformance/<component>-sections.tsv` | Sites T4 rewrites (file, routine, callee, argument) |
-| `conformance-harvest.R` | Proposes T4 rows from a gfortran build log |
+| `conformance-harvest.R` | Proposes T4 rows from a gfortran or flang build log |
 | `licenses/` | License texts that upstream does not ship (Apache-2.0 for METIS) |
 | `abi/` | `DMUMPS_STRUC_C` layout records, ABI registry, adapter rules |
 | `logs/` | What T1 did, per routine (reviewed in diffs) |
@@ -77,18 +77,30 @@ After an import:
    `tools/conformance/mumps-sections.tsv`. Review them (the array must be
    contiguous, with lower bound 1 for multi-dimensional elements), add
    them, regenerate, rebuild; repeat until none are reported (gfortran
-   reports some sites only once others are fixed).
+   reports some sites only once others are fixed). A row block `P(J,1)`
+   has no contiguous section: pass a view instead (patch 0010).
 3. Everything else is a patch: type-agnostic interfaces for routines that
    take buffers of any type (MPI stubs 0003, mixed-precision dispatchers
-   0004, C routines 0005), pointer views for in-place conversions (0006),
-   consistent actual arguments (0007, 0009). Prefer an interface or a
-   one-token fix at the definition over edits at many call sites.
+   0004, C routines 0005), pointer views for in-place conversions (0006)
+   and row blocks (0010), consistent actual arguments (0007, 0009). Prefer
+   an interface or a one-token fix at the definition over edits at many
+   call sites. `!DIR$ IGNORE_TKR` goes in interfaces only: flang rejects
+   it in the definition of an external procedure.
 4. Remove the local flag and build with `FFLAGS = -g -O2 -Wall -pedantic`
    (and the C compiler with `-Wall -pedantic`, clang and gcc): the log
    must have no warning that R CMD check reports as significant
    (`tools:::.check_packages` lists the patterns).
 5. Check at run time with `FFLAGS = -g -O0 -fcheck=pointer,array-temps`:
    the tests must pass with no Fortran run-time message.
+6. LLVM flang (CRAN's debian-clang flavor) is stricter than gfortran: it
+   rejects an element of a pointer/assumed-shape array passed to an array
+   dummy even when the dummy has NO_ARG_CHECK/IGNORE_TKR. Build with
+   `FC = flang-NN`, `F_VISIBILITY =` (empty, when R itself was configured
+   for gfortran), `FLIBS = -L<clang resource lib dir> -lflang_rt.runtime
+   -lm` and `MAKEFLAGS="-k -j<n> -Otarget"` (keep going, unmixed output);
+   `conformance-harvest.R` reads flang's messages too. Repeat until the
+   build is clean: files that need the modules of a failing file are only
+   reached in later rounds.
 
 ## Layout changes (ABI)
 

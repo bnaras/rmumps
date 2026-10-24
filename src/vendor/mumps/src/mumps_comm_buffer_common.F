@@ -196,7 +196,7 @@ C~   &       ' Buf size (bytes)= ',BUF_SMALL%LBUF
         ENDIF
         POSITION=0
         CALL MPI_PACK( I, 1,
-     &                 MPI_INTEGER, BUF_SMALL%CONTENT( IPOS ),
+     &                 MPI_INTEGER, BUF_SMALL%CONTENT( IPOS: ),
      &                 MSG_SIZE,
      &                 POSITION, COMM, IERR_MPI )
         KEEP(266)=KEEP(266)+1
@@ -828,24 +828,24 @@ C~        WRITE(*,*) 'Internal error 2 with small buffers '
         WHAT = 0  
         POSITION = 0
         CALL MPI_PACK( WHAT, 1, MPI_INTEGER,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( LOAD, 1, MPI_DOUBLE_PRECISION,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         IF (BDC_MEM) THEN
           CALL MPI_PACK( MEM, 1, MPI_DOUBLE_PRECISION,
-     &                   BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                   BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                   POSITION, COMM, IERR_MPI )
         END IF
         IF (BDC_SBTR) THEN
           CALL MPI_PACK( SBTR_CUR, 1, MPI_DOUBLE_PRECISION,
-     &                   BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                   BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                   POSITION, COMM, IERR_MPI )
         END IF
         IF(BDC_MD)THEN
            CALL MPI_PACK( LU_USAGE, 1, MPI_DOUBLE_PRECISION,
-     &          BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &          BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &          POSITION, COMM, IERR_MPI )
         ENDIF
         IDEST = 0
@@ -933,14 +933,14 @@ C~   &          "Internal error 1 in MUMPS_BUF_BROADCAST",WHAT
         IPOSMSG = IPOS + OVHSIZE * NDEST
         POSITION = 0
         CALL MPI_PACK( WHAT, 1, MPI_INTEGER,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( LOAD, 1, MPI_DOUBLE_PRECISION,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         IF((WHAT.EQ.17).OR.(WHAT.EQ.10))THEN
            CALL MPI_PACK( UPD_LOAD, 1, MPI_DOUBLE_PRECISION,
-     &          BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &          BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &          POSITION, COMM, IERR_MPI )
         ENDIF
         IDEST = 0
@@ -1010,17 +1010,17 @@ C~        WRITE(*,*) ' Size,position=',SIZE,POSITION
         IPOSMSG = IPOS + OVHSIZE * NDEST
         POSITION = 0
         CALL MPI_PACK( WHAT, 1, MPI_INTEGER,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( FATHER_NODE, 1, MPI_INTEGER,
-     &                 BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &                 BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &                 POSITION, COMM, IERR_MPI )
         IF((KEEP(81).EQ.2).OR.(KEEP(81).EQ.3))THEN
            CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &          BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &          BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &          POSITION, COMM, IERR_MPI )
            CALL MPI_PACK( NCB, 1, MPI_INTEGER,
-     &          BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &          BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &          POSITION, COMM, IERR_MPI )
         ENDIF
         IDEST = 1
@@ -1083,10 +1083,10 @@ C~        WRITE(*,*) ' Size,position=',SIZE,POSITION
         POSITION = 0
         WHAT = 4
         CALL MPI_PACK( WHAT, 1, MPI_INTEGER,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( MAX_SURF_MASTER, 1, MPI_DOUBLE_PRECISION,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         IDEST = 0
         DO I = 0, NPROCS - 1
@@ -1174,31 +1174,31 @@ C~        WRITE(*,*) ' Size,position=',SIZE,POSITION
         IPOSMSG = IPOS + OVHSIZE * NDEST
         POSITION = 0
         CALL MPI_PACK( WHAT, 1, MPI_INTEGER,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( NSLAVES, 1, MPI_INTEGER,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( INODE, 1, MPI_INTEGER,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( LIST_SLAVES, NSLAVES, MPI_INTEGER,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         CALL MPI_PACK( FLOPS_INCREMENT, NSLAVES,
      &      MPI_DOUBLE_PRECISION,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         IF (BDC_MEM) THEN
           CALL MPI_PACK( MEM_INCREMENT, NSLAVES,
      &      MPI_DOUBLE_PRECISION,
-     &      BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &      BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &      POSITION, COMM, IERR_MPI )
         END IF
         IF(WHAT.EQ.19)THEN
            CALL MPI_PACK( CB_BAND, NSLAVES,
      &          MPI_DOUBLE_PRECISION,
-     &          BUF_LOAD%CONTENT( IPOSMSG ), SIZE,
+     &          BUF_LOAD%CONTENT( IPOSMSG: ), SIZE,
      &          POSITION, COMM, IERR_MPI )
         ENDIF
         IDEST = 0

@@ -172,6 +172,24 @@ long <- t4_transform(src(
   "|      END"), "x.F", tab[3, ])$lines
 expect(all(nchar(long) <= 72L) && length(long) == 4L && substr(long[3], 6, 6) == "&",
        "T4 re-wraps lines past column 72")
+cmt <- t4_transform(src(
+  "|      SUBROUTINE S",
+  "|      CALL F(B,",
+  "|     &       R_ptr(1,1), !LRB%R_CALC(PCALC,PCALC)%VAL(1+OFFSET_R_CALC), ",
+  "|     &       N)",
+  "|      END"), "x.F", data.frame(file = "x.F", routine = "S", callee = "F",
+                                  arg = "R_PTR(1,1)"))$lines
+expect(length(cmt) == 5L && startsWith(cmt[3], "     &       R_ptr(1:,1:), !LRB%R_CALC(PCALC,PCALC)"),
+       "T4 does not re-wrap a line whose trailing comment passes column 72")
+cols <- t4_transform(src(
+  "|      SUBROUTINE S",
+  "|      CALL F(LRB%Q(1, K+1), B)",
+  "|      END"), "x.F", data.frame(file = "x.F", routine = "S", callee = "F",
+                                  arg = "LRB%Q(1,K+1)"))$lines
+expect(cols[2] == "      CALL F(LRB%Q(1:, K+1:), B)", "T4 trailing columns P(1,J) -> P(1:,J:)")
+expect_error(t4_transform(src("|      SUBROUTINE S", "|      CALL F(R(K,1))", "|      END"), "x.F",
+                          data.frame(file = "x.F", routine = "S", callee = "F", arg = "R(K,1)")),
+             "cannot make a section", "T4 refuses a row block P(J,1) (not contiguous)")
 
 # ---- T5 ----------------------------------------------------------------------
 
