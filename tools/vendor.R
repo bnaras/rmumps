@@ -21,7 +21,8 @@ if (!file.exists("DESCRIPTION") ||
     read.dcf("DESCRIPTION", "Package")[1, 1] != "rmumps")
   stop("run tools/vendor.R from the rmumps package root", call. = FALSE)
 
-for (f in c("fixedform.R", "t1_fortran.R", "t2_c.R", "t3_meta.R", "abi.R"))
+for (f in c("fixedform.R", "t1_fortran.R", "t2_c.R", "t3_meta.R", "t4_sections.R",
+            "t5_pedantic.R", "abi.R"))
   source(file.path("tools", "transforms", f))
 
 CACHE <- Sys.getenv("RMUMPS_VENDOR_CACHE", file.path("tools", ".cache"))
@@ -211,12 +212,23 @@ build_component <- function(ent, tmp) {
   out <- list()
   log <- character()
   errors <- character()
+  sections <- t4_read_table(file.path("tools", "conformance", paste0(comp, "-sections.tsv")))
   for (f in files) {
     lines <- read_lines(file.path(stage, f))
     pristine <- if (file.exists(file.path(root, f))) read_lines(file.path(root, f)) else character()
     fortran <- grepl("\\.[Ff]$", f) || f %in% man$fortran_headers
     if (fortran) {
       r <- tryCatch(t1_transform(lines, basename(f), man),
+                    error = function(e) conditionMessage(e))
+      if (is.character(r)) { errors <- c(errors, r); next }
+      lines <- r$lines
+      log <- c(log, r$log)
+      r <- tryCatch(t4_transform(lines, basename(f), sections),
+                    error = function(e) conditionMessage(e))
+      if (is.character(r)) { errors <- c(errors, r); next }
+      lines <- r$lines
+      log <- c(log, r$log)
+      r <- tryCatch(t5_transform(lines, basename(f)),
                     error = function(e) conditionMessage(e))
       if (is.character(r)) { errors <- c(errors, r); next }
       lines <- r$lines

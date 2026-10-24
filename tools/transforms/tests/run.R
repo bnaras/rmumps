@@ -2,7 +2,7 @@
 #   Rscript tools/transforms/tests/run.R
 
 invisible(Sys.setlocale("LC_ALL", "C"))
-for (f in c("fixedform.R", "t1_fortran.R", "t2_c.R", "abi.R"))
+for (f in c("fixedform.R", "t1_fortran.R", "t2_c.R", "t4_sections.R", "t5_pedantic.R", "abi.R"))
   source(file.path("tools", "transforms", f))
 write_lf <- function(lines, path) writeLines(lines, path)
 read_lines <- function(path) readLines(path, warn = FALSE)
@@ -135,6 +135,61 @@ out <- t2_transform(c("/* header", "#include <old.h>", "*/", "#include <stdio.h>
 expect(sum(out == T2_INCLUDE) == 2L && out[5] == T2_INCLUDE && out[8] == T2_INCLUDE,
        "shim after each include, none inside a block comment")
 expect(identical(t2_transform("int x;", "f.h", "mumps"), "int x;"), "headers untouched")
+
+out <- t2_void_params(c("int f();", "static void g() {", "  h();", "  x = k();", "}",
+                        "#define FOO() bar()", "#define M(nu) void nu (); \\",
+                        "  void q(); \\", "  y = r();",
+                        "extern \"C\" {", "void s();", "#ifdef __cplusplus", "}",
+                        "/* int c(); */ int d();"))
+expect(out[1] == "int f(void);" && out[2] == "static void g(void) {", "declarations get (void)")
+expect(out[3] == "  h();" && out[4] == "  x = k();", "calls in function bodies untouched")
+expect(out[6] == "#define FOO() bar()", "zero-parameter macros and expression macros untouched")
+expect(out[7] == "#define M(nu) void nu (); \\" && out[8] == "  void q(void); \\" &&
+         out[9] == "  y = r();", "macro parameters and macro calls untouched")
+expect(out[11] == "void s(void);", "extern \"C\" braces do not count as a scope")
+expect(out[14] == "/* int c(); */ int d(void);", "comments skipped")
+
+# ---- T4 ----------------------------------------------------------------------
+
+tab <- data.frame(file = "x.F", routine = c("S", "S", "S"), callee = c("F", "F", "G"),
+                  arg = c("P(1)", "ID%Q(1,1)", "A(I+1)"))
+out <- t4_transform(src(
+  "|      SUBROUTINE S",
+  "|      CALL F(N, P(1), ID%Q(1,1))",
+  "|      CALL F(N, P(1),",
+  "|     &       ID%Q(1, 1))",
+  "|      CALL G(A(I+1))",
+  "|      CALL H(P(1))",
+  "|      END"), "x.F", tab)$lines
+expect(out[2] == "      CALL F(N, P(1:), ID%Q(1:,1:))", "T4 rewrites listed elements")
+expect(out[3] == "      CALL F(N, P(1:)," && out[4] == "     &       ID%Q(1:, 1:))", "T4 across continuation lines")
+expect(out[5] == "      CALL G(A(I+1:))" && out[6] == "      CALL H(P(1))", "T4 only touches listed calls")
+expect_error(t4_transform(src("|      SUBROUTINE S", "|      CALL F(X(1))", "|      END"), "x.F", tab),
+             "match nothing", "T4 stale entries fail")
+long <- t4_transform(src(
+  "|      SUBROUTINE S",
+  "|      CALL G(AAAAAAAAAAAA, BBBBBBBBBBBB, CCCCCCCCCCCC, DDDDDDDD, A(I+1))",
+  "|      END"), "x.F", tab[3, ])$lines
+expect(all(nchar(long) <= 72L) && length(long) == 4L && substr(long[3], 6, 6) == "&",
+       "T4 re-wraps lines past column 72")
+
+# ---- T5 ----------------------------------------------------------------------
+
+out <- t5_transform(src(
+  "|      INTEGER*8 N8, M8",
+  "|      integer*1 :: B(10)",
+  "|      complex*8 Z",
+  "|      CHARACTER*48 MSG",
+  "|      REAL*8 FUNCTION F(X)",
+  "|      X = INTEGER*2",
+  "|C     INTEGER*4 IN A COMMENT"), "x.F")$lines
+expect(out[1] == "      INTEGER(8) N8, M8" && out[2] == "      integer(1) :: B(10)",
+       "T5 INTEGER*n, case kept")
+expect(out[3] == "      complex(4) Z" && out[4] == "      CHARACTER(LEN=48) MSG",
+       "T5 COMPLEX*n (kind n/2) and CHARACTER*n")
+expect(out[5] == "      REAL(8) FUNCTION F(X)", "T5 typed FUNCTION")
+expect(out[6] == "      X = INTEGER*2" && out[7] == "C     INTEGER*4 IN A COMMENT",
+       "T5 leaves non-declarations and comments alone")
 
 # ---- ABI -------------------------------------------------------------------
 

@@ -8,7 +8,10 @@ command from the package root.
 | `vendor.lock` | Pinned upstream tarballs: version, URL, mirror, SHA-256 |
 | `manifest/<component>.dcf` | File selection, preprocessor defines, T1 allowlists |
 | `patches/<component>/NNNN-*.patch` | Changes to the **pristine** sources, applied in order |
-| `transforms/` | T1 (Fortran I/O), T2 (C shim), T3 (object list, headers, ABI), with `tests/run.R` |
+| `transforms/` | T1 (Fortran I/O), T2 (C shim, prototypes), T3 (object list, headers, ABI), T4 (element-to-section), T5 (type declarations), with `tests/run.R` |
+| `conformance/<component>-sections.tsv` | Sites T4 rewrites (file, routine, callee, argument) |
+| `conformance-harvest.R` | Proposes T4 rows from a gfortran build log |
+| `licenses/` | License texts that upstream does not ship (Apache-2.0 for METIS) |
 | `abi/` | `DMUMPS_STRUC_C` layout records, ABI registry, adapter rules |
 | `logs/` | What T1 did, per routine (reviewed in diffs) |
 | `lint-symbols.R` | Forbidden-symbol lint of a build |
@@ -57,6 +60,35 @@ sequential double precision build. Expect 1–3 days per minor release.
    and as binaries built against the previous rmumps.
 6. Review the ICNTL defaults set in `src/rmumps_module.cpp` against the new
    user guide, update `NEWS`, and run `R CMD check --as-cran`.
+
+## Compiler conformance (no -fallow-argument-mismatch)
+
+The vendored Fortran must compile with gfortran >= 10 under CRAN's
+`-Wall -pedantic` without `-fallow-argument-mismatch` (which `-pedantic`
+turns back into an error anyway) and without significant warnings.
+After an import:
+
+1. Build with `PKG_FFLAGS += -fallow-argument-mismatch` added locally
+   (never committed) and `FFLAGS = -g -O0 -Wall`, so that every site is
+   reported as a warning instead of stopping at the first error, e.g.
+   `R_MAKEVARS_USER=<file with FFLAGS> R CMD INSTALL --preclean -l <lib> .`
+2. Elements of pointer/assumed-shape arrays passed to array dummies:
+   `Rscript tools/conformance-harvest.R <log>` proposes rows for
+   `tools/conformance/mumps-sections.tsv`. Review them (the array must be
+   contiguous, with lower bound 1 for multi-dimensional elements), add
+   them, regenerate, rebuild; repeat until none are reported (gfortran
+   reports some sites only once others are fixed).
+3. Everything else is a patch: type-agnostic interfaces for routines that
+   take buffers of any type (MPI stubs 0003, mixed-precision dispatchers
+   0004, C routines 0005), pointer views for in-place conversions (0006),
+   consistent actual arguments (0007, 0009). Prefer an interface or a
+   one-token fix at the definition over edits at many call sites.
+4. Remove the local flag and build with `FFLAGS = -g -O2 -Wall -pedantic`
+   (and the C compiler with `-Wall -pedantic`, clang and gcc): the log
+   must have no warning that R CMD check reports as significant
+   (`tools:::.check_packages` lists the patterns).
+5. Check at run time with `FFLAGS = -g -O0 -fcheck=pointer,array-temps`:
+   the tests must pass with no Fortran run-time message.
 
 ## Layout changes (ABI)
 
