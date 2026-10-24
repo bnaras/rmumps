@@ -60,9 +60,17 @@ Third-party code inside METIS/GKlib:
    translated to C by Chunguang Sun (no copyright notice in the file).
 
 rmumps itself (R/, src/*.c, src/*.cpp, src/shim, inst/include/rmumps.h,
-inst/include/rmumps/rmumps_api.h)
+inst/include/rmumps/rmumps_api.h, and the maintainer tools in the source
+repository)
 ----------------------------------------------------------------------
 Copyright 2015-2026 INRAE/INSA/CNRS.
+Copyright 2026 Balasubramanian Narasimhan: the C interface for other
+packages (inst/include/rmumps/rmumps_api.h, src/rmumps_api.c), the ABI
+adapters (src/rmumps_abi_adapter.h and the generated
+src/rmumps_abi_adapters.c), the shim (src/shim), the test hook
+(src/rmumps_testhook.cpp), the build files (src/Makevars and the generated
+src/Makevars.vendor), the vendoring pipeline and its transforms (tools/),
+and his changes to the other rmumps files.
 Licensed under GPL (>= 2).
 
 Note on license compatibility: the Apache License 2.0 of METIS is
