@@ -1,0 +1,30 @@
+Why: metislib.h includes libmetis' own headers with <...>, which needs
+ libmetis on the include path of every C file in the package; its generic
+ names (defs.h, macros.h, proto.h, struct.h) would then shadow PORD's
+ macros.h and any system header of the same name. Quoted includes are
+ found next to metislib.h.
+Upstream: not sent (METIS 5.1.0 is no longer maintained in this form).
+Obsolete when: METIS is replaced.
+
+--- a/libmetis/metislib.h
++++ b/libmetis/metislib.h
+@@ -22,13 +22,13 @@
+ 
+ 
+ #include <metis.h>
+-#include <rename.h>
+-#include <gklib_defs.h>
++#include "rename.h"
++#include "gklib_defs.h"
+ 
+-#include <defs.h>
+-#include <struct.h>
+-#include <macros.h>
+-#include <proto.h>
++#include "defs.h"
++#include "struct.h"
++#include "macros.h"
++#include "proto.h"
+ 
+ 
+ #if defined(COMPILER_MSC)

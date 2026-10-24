@@ -1,0 +1,18 @@
+Why: MinGW-w64 (Rtools) has no <sys/resource.h>; GKlib only needs it for
+ getrusage(), which timers.c already avoids on MinGW. rmumps 5.2.1 had the
+ same change behind -DMINGW; __MINGW32__ is predefined by the compiler.
+Upstream: not sent (METIS 5.1.0 is no longer maintained in this form).
+Obsolete when: METIS is replaced.
+
+--- a/GKlib/gk_arch.h
++++ b/GKlib/gk_arch.h
+@@ -41,7 +41,9 @@
+ #endif
+   #include <inttypes.h>
+   #include <sys/types.h>
++#ifndef __MINGW32__
+   #include <sys/resource.h>
++#endif
+   #include <sys/time.h>
+ #endif
+ 

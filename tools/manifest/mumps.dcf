@@ -1,0 +1,32 @@
+Component: mumps
+Description: MUMPS, sequential, double precision real arithmetic only.
+Arith: d
+Makefile: src/Makefile
+Makefile.Vars: OBJS_COMMON_MOD, OBJS_COMMON_OTHER, OBJS_C_COMMON,
+ OBJS_MOD_ARITHDEP, OBJS_OTHER
+Files: LICENSE, CREDITS, VERSION,
+ doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, PORD/README,
+ include/dmumps_c.h, include/dmumps_struc.h, include/mumps_c_types.h,
+ include/mumps_compat.h,
+ src/mumps_int_def32_h.in, src/*.h, src/dmumps_*.h,
+ libseq/mpi.f, libseq/mpif.h, libseq/mpi.h, libseq/mpic.c, libseq/elapse.c,
+ libseq/elapse.h,
+ PORD/include/*.h, PORD/lib/*.c
+Exclude: src/smumps_*.h, src/cmumps_*.h, src/zmumps_*.h
+Fortran.Headers: include/dmumps_struc.h, libseq/mpif.h, src/mumps_headers.h,
+ src/mumps_tags.h, src/mumps_save_restore_modes.h
+Defines.C: Add_, metis, pord, NO_SAVE_RESTORE, WITHOUT_PTHREAD
+Defines.Fortran: metis, pord, NO_SAVE_RESTORE
+Defines.Unknown: _WIN32, __GFORTRAN__, __INTEL_COMPILER, __PGLLVM__
+Units: *, 6, LP, MP, MPG, MPA, MPRINT, ICNTL1, ICNTL(1), ICNTL(2), ICNTL(3),
+ ID%ICNTL(1), CV_LP, CV_MP, IUNIT, OUTINFO, MYID+6, LPOK, PROKG
+IO-Disabled: ana_omp_m.F READ_BENCH,
+ dana_driver.F DMUMPS_DUMP_PROBLEM,
+ dmumps_config_file.F *
+RNG: mumps_static_mapping.F MUMPS_MOD_PROPMAP,
+ mumps_static_mapping.F MUMPS_PROPMAP,
+ dmumps_sol_es.F DMUMPS_PERMUTE_RHS_AM1
+Notes: READ_BENCH is made a no-op by patch 0002 (KEEP(403) benchmark files
+ are never read). DMUMPS_DUMP_PROBLEM (ICNTL WRITE_PROBLEM) writes nothing.
+ The configuration file is never located (patch 0001), so
+ DMUMPS_CONFIG_FROM_FILE returns before any I/O.

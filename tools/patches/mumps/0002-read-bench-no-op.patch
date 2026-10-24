@@ -1,0 +1,21 @@
+Why: READ_BENCH (used only when KEEP(403) /= 0) reads a benchmark file
+ named relative to the working directory into BENCH, which has a single
+ element, so upstream writes out of bounds whenever the file exists. The
+ routine now zeroes BENCH and returns. T1 removes its file I/O
+ (IO-Disabled in tools/manifest/mumps.dcf).
+Upstream: not sent; worth reporting (out-of-bounds BENCH).
+Obsolete when: upstream sizes BENCH or removes READ_BENCH.
+
+--- a/src/ana_omp_m.F
++++ b/src/ana_omp_m.F
+@@ -862,6 +862,10 @@
+       PARAMETER(NLINES=2812)
+       DOUBLE PRECISION :: AUX
+       CHARACTER(1)             :: K50_STR
++C     rmumps: benchmark files are not read (the file name is relative to
++C     the working directory, and BENCH has a single element anyway).
++      BENCH = 0.0D0
++      RETURN
+       INDEX_NPIV = 0
+       INDEX_NSCHUR = 0
+       OLD_V = -1

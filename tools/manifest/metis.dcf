@@ -1,0 +1,14 @@
+Component: metis
+Description: METIS 5.1.0, only the objects reachable from the entry points
+ MUMPS uses (METIS_NodeND, METIS_PartGraphKway, METIS_SetDefaultOptions and
+ their Fortran aliases).
+Files: LICENSE.txt, include/metis.h, GKlib/*.h, libmetis/*.h,
+ GKlib/error.c, GKlib/mcore.c, GKlib/memory.c, GKlib/random.c,
+ GKlib/timers.c, GKlib/util.c,
+ libmetis/*.c
+Exclude: libmetis/checkgraph.c, libmetis/parmetis.c, libmetis/stat.c
+Defines.C:
+Notes: patch 0001 makes gk_errexit()/errexit() longjmp back into the METIS API
+ function that is running (which then returns METIS_ERROR) instead of
+ printing and raising a signal, and stops gk_sigtrap() from installing
+ signal handlers.

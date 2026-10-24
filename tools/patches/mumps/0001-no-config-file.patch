@@ -1,0 +1,26 @@
+Why: CRAN packages must not read files the user did not name. MUMPS reads
+ the file named by the environment variable MUMPS_CONFIG_FILE before every
+ job; rmumps behaves as if the variable were unset. T1 removes the Fortran
+ file I/O of DMUMPS_CONFIG_FROM_FILE and its helpers (IO-Disabled in
+ tools/manifest/mumps.dcf); this patch makes that code unreachable.
+Upstream: not sent (rmumps-specific).
+Obsolete when: never (rmumps policy).
+
+--- a/src/mumps_config_file_C.c
++++ b/src/mumps_config_file_C.c
+@@ -23,11 +23,10 @@
+ MUMPS_GET_CONFIG_FILE_C(MUMPS_INT *len_config_file, char* config_file, mumps_ftnlen l1)
+ {
+   char *tmp_config_file;
+-  tmp_config_file = getenv ("MUMPS_CONFIG_FILE");
+-  if (tmp_config_file==NULL)
+-    {
+-      tmp_config_file = "NAME_NOT_INITIALIZED";
+-    }
++  /* rmumps: configuration files are not supported (the library must not
++     read files that the R user did not name); behave as if
++     MUMPS_CONFIG_FILE were unset. */
++  tmp_config_file = "NAME_NOT_INITIALIZED";
+   *len_config_file = strlen(tmp_config_file);
+   config_file = strncpy(config_file, tmp_config_file, l1); 
+ }
