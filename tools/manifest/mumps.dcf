@@ -13,7 +13,8 @@ Files: LICENSE, CREDITS, VERSION,
  libseq/elapse.h,
  PORD/include/*.h, PORD/lib/*.c
 Exclude: src/smumps_*.h, src/cmumps_*.h, src/zmumps_*.h
-Fortran.Headers: include/dmumps_struc.h, libseq/mpif.h, src/mumps_headers.h,
+Fortran.Headers: include/dmumps_struc.h, libseq/mpif.h, libseq/mpif_const.h,
+ src/mumps_headers.h,
  src/mumps_tags.h, src/mumps_save_restore_modes.h
 Defines.C: Add_, metis, pord, NO_SAVE_RESTORE, WITHOUT_PTHREAD
 Defines.Fortran: metis, pord, NO_SAVE_RESTORE

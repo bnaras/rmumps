@@ -25,7 +25,7 @@ C******************************************************************
       SUBROUTINE MPI_BSEND( BUF, CNT, DATATYPE, DEST, TAG, COMM,
      &            IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, DEST, TAG, COMM, IERR
       INTEGER BUF(*)
 C~    WRITE(*,*) 'Error. MPI_BSEND should not be called.'
@@ -37,7 +37,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_BUFFER_ATTACH(BUF, CNT,  IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, IERR
       INTEGER BUF(*)
       IERR = 0
@@ -46,7 +46,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_BUFFER_DETACH(BUF, CNT,  IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, IERR
       INTEGER BUF(*)
            IERR = 0
@@ -238,7 +238,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_BARRIER( COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, IERR
       IERR = 0
       RETURN
@@ -255,7 +255,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_BCAST( BUFFER, CNT, DATATYPE, ROOT, COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, ROOT, COMM, IERR
       INTEGER BUFFER( * )
       IERR = 0
@@ -264,7 +264,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_CANCEL( IREQ, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IREQ, IERR
       IERR = 0
       RETURN
@@ -272,7 +272,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_CREATE( COMM, GROUP, COMM2, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, GROUP, COMM2, IERR
       IERR = 0
       RETURN
@@ -280,7 +280,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_DUP( COMM, COMM2, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, COMM2, IERR
       IERR = 0
       RETURN
@@ -288,7 +288,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_FREE( COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, IERR
       IERR = 0
       RETURN
@@ -296,7 +296,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_GROUP( COMM, GROUP, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, GROUP, IERR
       IERR = 0
       RETURN
@@ -304,7 +304,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_RANK( COMM, RANK, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, RANK, IERR
       RANK = 0
       IERR = 0
@@ -313,7 +313,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_SIZE( COMM, SIZE, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, SIZE, IERR
       SIZE = 1
       IERR = 0
@@ -322,7 +322,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_COMM_SPLIT( COMM, COLOR, KEY, COMM2, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER COMM, COLOR, KEY, COMM2, IERR
       IERR = 0
       RETURN
@@ -330,7 +330,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_FINALIZE( IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IERR
       IERR = 0
       RETURN
@@ -338,7 +338,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_GET_COUNT( STATUS, DATATYPE, CNT, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER DATATYPE, CNT, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
 C~    WRITE(*,*) 'Error. MPI_GET_CNT should not be called.'
@@ -350,7 +350,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_GROUP_FREE( GROUP, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER GROUP, IERR
       IERR = 0
       RETURN
@@ -358,7 +358,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_GROUP_RANGE_EXCL( GROUP, N, RANGES, GROUP2, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER GROUP, N, GROUP2, IERR
       INTEGER RANGES(*)
       IERR = 0
@@ -367,7 +367,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_GROUP_SIZE( GROUP, SIZE, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER GROUP, SIZE, IERR
       SIZE = 1 ! Or should it be zero ?
       IERR = 0
@@ -376,7 +376,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_INIT_THREAD(MPI_THREAD_REQ, THREAD_SUPPORT, IERR)
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IERR, MPI_THREAD_REQ, THREAD_SUPPORT
       IERR = 0
       THREAD_SUPPORT=MPI_THREAD_REQ
@@ -385,7 +385,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_INIT(IERR)
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IERR
       IERR = 0
       RETURN
@@ -393,7 +393,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_INITIALIZED( FLAG, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       LOGICAL FLAG
       INTEGER IERR
       FLAG = .TRUE.
@@ -403,7 +403,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_IPROBE( SOURCE, TAG, COMM, FLAG, STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER SOURCE, TAG, COMM, IERR
       INTEGER STATUS(MPI_STATUS_SIZE)
       LOGICAL FLAG
@@ -415,7 +415,7 @@ C***********************************************************************
       SUBROUTINE MPI_IRECV( BUF, CNT, DATATYPE, SOURCE, TAG, COMM,
      &           IREQ, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, SOURCE, TAG, COMM, IREQ, IERR
       INTEGER BUF(*)
       IERR = 0
@@ -425,7 +425,7 @@ C***********************************************************************
       SUBROUTINE MPI_ISEND( BUF, CNT, DATATYPE, DEST, TAG, COMM,
      &           IREQ, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, DEST, TAG, COMM, IERR, IREQ
       INTEGER BUF(*)
 C~    WRITE(*,*) 'Error. MPI_ISEND should not be called.'
@@ -472,7 +472,7 @@ C***********************************************************************
       SUBROUTINE MPI_PACK( INBUF, INCNT, DATATYPE, OUTBUF, OUTCNT,
      &           POSITION, COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER INCNT, DATATYPE, OUTCNT, POSITION, COMM, IERR
       INTEGER INBUF(*), OUTBUF(*)
 C~    WRITE(*,*) 'Error. MPI_PACKED should not be called.'
@@ -484,7 +484,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_PACK_SIZE( INCNT, DATATYPE, COMM, SIZE, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER INCNT, DATATYPE, COMM, SIZE, IERR
 C~    WRITE(*,*) 'Error. MPI_PACK_SIZE should not be called.'
 C~    STOP
@@ -495,7 +495,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_PROBE( SOURCE, TAG, COMM, STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER SOURCE, TAG, COMM, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
 C~    WRITE(*,*) 'Error. MPI_PROBE should not be called.'
@@ -508,7 +508,7 @@ C***********************************************************************
       SUBROUTINE MPI_RECV( BUF, CNT, DATATYPE, SOURCE, TAG, COMM,
      &           STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, SOURCE, TAG, COMM, IERR
       INTEGER BUF(*), STATUS(MPI_STATUS_SIZE)
 C~    WRITE(*,*) 'Error. MPI_RECV should not be called.'
@@ -520,7 +520,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_REQUEST_FREE( IREQ, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IREQ, IERR
       IERR = 0
       RETURN
@@ -528,7 +528,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_SEND( BUF, CNT, DATATYPE, DEST, TAG, COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, DEST, TAG, COMM, IERR
       INTEGER BUF(*)
 C~    WRITE(*,*) 'Error. MPI_SEND should not be called.'
@@ -540,7 +540,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_SSEND( BUF, CNT, DATATYPE, DEST, TAG, COMM, IERR)
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, DATATYPE, DEST, TAG, COMM, IERR
       INTEGER BUF(*)
 C~    WRITE(*,*) 'Error. MPI_SSEND should not be called.'
@@ -552,7 +552,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_TEST( IREQ, FLAG, STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IREQ, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
       LOGICAL FLAG
@@ -563,7 +563,7 @@ C***********************************************************************
 C***********************************************************************
       SUBROUTINE MPI_TESTANY( CNT, IREQARRAY, IND, FLAG, STATUS, IERR)
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       LOGICAL FLAG
       INTEGER IND, IERR, CNT
       INTEGER IREQARRAY(IND), STATUS(MPI_STATUS_SIZE)
@@ -575,7 +575,7 @@ C***********************************************************************
       SUBROUTINE MPI_UNPACK( INBUF, INSIZE, POSITION, OUTBUF, OUTCNT,
      &           DATATYPE, COMM, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER INSIZE, POSITION, OUTCNT, DATATYPE, COMM, IERR
       INTEGER INBUF(*), OUTBUF(*)
 C~    WRITE(*,*) 'Error. MPI_UNPACK should not be called.'
@@ -587,7 +587,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_WAIT( IREQ, STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER IREQ, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
 C~    WRITE(*,*) 'Error. MPI_WAIT should not be called.'
@@ -599,7 +599,7 @@ C~    STOP
 C***********************************************************************
       SUBROUTINE MPI_WAITALL( CNT, ARRAY_OF_REQUESTS, STATUS, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
       INTEGER ARRAY_OF_REQUESTS( CNT )
@@ -613,7 +613,7 @@ C***********************************************************************
       SUBROUTINE MPI_WAITANY( CNT, ARRAY_OF_REQUESTS, INDEX, STATUS,
      &           IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER CNT, INDEX, IERR
       INTEGER STATUS( MPI_STATUS_SIZE )
       INTEGER ARRAY_OF_REQUESTS( CNT )
@@ -652,7 +652,7 @@ C***********************************************************************
      &     INFO, COMM, CPTR_ARRAY, WIN, IERR )
       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_PTR
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER :: DISP_UNIT, INFO, COMM, WIN, IERR
       INTEGER(KIND=MPI_ADDRESS_KIND) :: SIZE_ARRAY_BYTES
       TYPE(C_PTR) :: CPTR_ARRAY
@@ -666,7 +666,7 @@ C***********************************************************************
      &     DISP_UNIT, CPTR_ARRAY, IERR )
       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_PTR
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER :: WIN, RANK, DISP_UNIT, IERR
       INTEGER(KIND=MPI_ADDRESS_KIND) :: SIZE_ARRAY_BYTES
       TYPE(C_PTR) :: CPTR_ARRAY
@@ -694,33 +694,46 @@ C***********************************************************************
       SUBROUTINE MUMPS_COPY( CNT, SENDBUF, RECVBUF, SS, RS,
      &                       DATATYPE, IERR )
       IMPLICIT NONE
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
 C     SS/RS: shift for SENDBUF/RECVBUF
       INTEGER CNT, DATATYPE, IERR, SS, RS
       INTEGER SENDBUF(*), RECVBUF(*)
+C     rmumps: the buffers are INTEGER here whatever the data type, so
+C     instead of passing them to copy routines of the data type (an
+C     argument mismatch), copy W INTEGER words per element, where W is
+C     the size of the data type in INTEGER storage units.
+      INTEGER W, IS
+      LOGICAL L
+      REAL R4
+      DOUBLE PRECISION R8
+      COMPLEX C4
+      COMPLEX(kind=kind(0.0D0)) C8
+      INTEGER(8) I8
+      IS = STORAGE_SIZE(SENDBUF(1))
       IF ( DATATYPE .EQ. MPI_INTEGER ) THEN
-      CALL MUMPS_COPY_INTEGER( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = 1
       ELSEIF ( DATATYPE .EQ. MPI_LOGICAL ) THEN
-      CALL MUMPS_COPY_LOGICAL( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(L) / IS
       ELSE IF ( DATATYPE .EQ. MPI_REAL ) THEN
-      CALL MUMPS_COPY_REAL( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(R4) / IS
       ELSE IF ( DATATYPE .EQ. MPI_DOUBLE_PRECISION .OR.
      &        DATATYPE .EQ. MPI_REAL8 ) THEN
-      CALL MUMPS_COPY_DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(R8) / IS
       ELSE IF ( DATATYPE .EQ. MPI_COMPLEX ) THEN
-      CALL MUMPS_COPY_COMPLEX( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(C4) / IS
       ELSE IF ( DATATYPE .EQ. MPI_DOUBLE_COMPLEX ) THEN
-      CALL MUMPS_COPY_DOUBLE_COMPLEX( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(C8) / IS
       ELSE IF ( DATATYPE .EQ. MPI_2DOUBLE_PRECISION) THEN
-      CALL MUMPS_COPY_2DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = 2 * STORAGE_SIZE(R8) / IS
       ELSE IF ( DATATYPE .EQ. MPI_2INTEGER) THEN
-      CALL MUMPS_COPY_2INTEGER( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = 2
       ELSE IF ( DATATYPE .EQ. MPI_INTEGER8) THEN
-      CALL MUMPS_COPY_INTEGER8( SENDBUF, RECVBUF, CNT, SS, RS )
+        W = STORAGE_SIZE(I8) / IS
       ELSE
         IERR=1
         RETURN
       END IF
+      CALL MUMPS_COPY_INTEGER( SENDBUF, RECVBUF, CNT*W, SS*W, RS*W )
       IERR=0
       RETURN
       END SUBROUTINE MUMPS_COPY
@@ -818,7 +831,7 @@ C     DOUBLE COMPLEX S(N),R(N)
       END
       LOGICAL FUNCTION MUMPS_IS_IN_PLACE( SENDBUF, CNT )
       INTEGER SENDBUF(*), CNT
-      INCLUDE 'mpif.h'
+      INCLUDE 'mpif_const.h'
       INTEGER(8) :: I
 C     Check address using C code
       MUMPS_IS_IN_PLACE = .FALSE.

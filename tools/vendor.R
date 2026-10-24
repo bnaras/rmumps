@@ -205,12 +205,15 @@ build_component <- function(ent, tmp) {
     file.copy(file.path(root, f), file.path(stage, f))
   }
   apply_patches(stage, comp)
+  # files created by patches belong to the output too
+  staged <- list.files(stage, recursive = TRUE, all.files = TRUE)
+  files <- sort(union(intersect(files, staged), staged), method = "radix")
   out <- list()
   log <- character()
   errors <- character()
   for (f in files) {
     lines <- read_lines(file.path(stage, f))
-    pristine <- read_lines(file.path(root, f))
+    pristine <- if (file.exists(file.path(root, f))) read_lines(file.path(root, f)) else character()
     fortran <- grepl("\\.[Ff]$", f) || f %in% man$fortran_headers
     if (fortran) {
       r <- tryCatch(t1_transform(lines, basename(f), man),
