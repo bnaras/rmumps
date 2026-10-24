@@ -31,8 +31,8 @@
  * - RMUMPS_DMUMPS_C (the "safe" entry point) never returns by longjmp: an R
  *   error or a user interrupt raised while MUMPS runs is caught and reported
  *   through the return value and 'msg'. This makes it callable from C++
- *   frames. MUMPS diagnostics that R reports as warnings are deferred to the
- *   end of the top-level R call and cannot be caught by the caller.
+ *   frames. The bundled MUMPS prints nothing; ICNTL(1:4) have no visible
+ *   effect, and errors are reported only through INFO/INFOG.
  * - After such a failure the instance is "poisoned": INFO(1) is set to
  *   RMUMPS_INFO_POISONED (-99999) and INFO(2) to the return code. Further
  *   calls on it return RMUMPS_ERR_POISONED, and JOB = -2 returns without
@@ -51,6 +51,10 @@
  * against headers of another layout cannot resolve it and gets R's clean
  * "function ... not provided by package 'rmumps'" error at load time instead
  * of memory corruption. The size of the client's structure is checked too.
+ * When the layout changes, the entry points of the older layouts (and the
+ * legacy name "dmumps_c" of rmumps <= 5.2.1-43) stay registered and reach
+ * the current MUMPS through generated adapters, so existing client binaries
+ * keep working; members that the old layout lacks keep MUMPS' defaults.
  *
  * Reserved for a possible later opaque-handle API (not implemented): names
  * starting with rmumps_handle_.
@@ -62,13 +66,15 @@
 #include <stddef.h>
 #include <R_ext/Rdynload.h>
 #include "dmumps_c.h"
+/* RMUMPS_DMUMPS_ABI: number of the DMUMPS_STRUC_C layout in dmumps_c.h
+ * (1 = MUMPS 5.2.1, 2 = MUMPS 5.9.1; see the generated rmumps_abi.h). It
+ * changes only when the layout changes, i.e. when existing binaries would
+ * otherwise break; rmumps keeps serving the older layouts through
+ * adapters. */
+#include "rmumps_abi.h"
 
 /* Version of this header's interface; grows when entry points are added. */
 #define RMUMPS_API_VERSION 1
-
-/* Layout of DMUMPS_STRUC_C: 1 = MUMPS 5.2.1. Changes only when the layout
- * changes, i.e. when existing binaries would otherwise break. */
-#define RMUMPS_DMUMPS_ABI 1
 
 #define RMUMPS_STR_(x) #x
 #define RMUMPS_STR(x) RMUMPS_STR_(x)
@@ -99,7 +105,7 @@ typedef struct rmumps_api {
   rmumps_dmumps_c_safe_fn dmumps_c_safe;
   rmumps_dmumps_c_fn dmumps_c;
   int (*api_version)(void);         /* RMUMPS_API_VERSION of the library */
-  const char *(*mumps_version)(void);  /* e.g. "5.2.1" */
+  const char *(*mumps_version)(void);  /* e.g. "5.9.1" */
   int (*orderings_available)(void);    /* RMUMPS_ORDERING_BIT mask */
 } rmumps_api;
 

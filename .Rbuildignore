@@ -13,3 +13,4 @@ tar\.gz$
 ^PLAN-mumps-update\.md$
 ^CLAUDE\.md$
 ^tests/clients$
+^src/.*\.(o|mod|smod|so|dll|a)$

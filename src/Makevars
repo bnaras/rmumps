@@ -1,0 +1,27 @@
+# rmumps build: the vendored MUMPS/PORD/METIS objects (src/vendor, listed in
+# the generated Makevars.vendor) are linked directly into the package
+# library. Regenerate vendor sources with tools/vendor.R, never by hand.
+
+# Makevars.vendor defines explicit rules: keep the shared library the
+# default target.
+all: $(SHLIB)
+
+include Makevars.vendor
+
+RMUMPS_OBJS = RcppExports.o get_cnst.o rmumps_api.o rmumps_abi_adapters.o \
+	rmumps_module.o rmumps_testhook.o shim/rmumps_shim.o
+
+OBJECTS = $(RMUMPS_OBJS) $(VENDOR_OBJS)
+
+VENDOR_INC = -Ivendor/mumps/include -Ivendor/mumps/libseq \
+	-Ivendor/mumps/PORD/include -Ivendor/metis/include -Ivendor/metis/GKlib
+VENDOR_DEFS = -DAdd_ -Dmetis -Dpord -DNO_SAVE_RESTORE -DWITHOUT_PTHREAD \
+	-DUSE_GKREGEX
+
+PKG_CPPFLAGS = -I../inst/include -Ishim $(VENDOR_INC) $(VENDOR_DEFS)
+PKG_CFLAGS = $(C_VISIBILITY)
+# TEMPORARY (until the Fortran conformance patches of phase P3 are in):
+# -fallow-argument-mismatch is gfortran-only and must not ship.
+PKG_FFLAGS = $(F_VISIBILITY) -Ivendor/mumps/include -Ivendor/mumps/libseq \
+	-Dmetis -Dpord -DNO_SAVE_RESTORE -fallow-argument-mismatch
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)

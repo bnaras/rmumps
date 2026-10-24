@@ -1,11 +1,12 @@
 /* Client written the way packages built against rmumps <= 5.2.1-43 are
- * (e.g. Uno's dmumps_shim.c): top-level header, legacy "dmumps_c" name. */
+ * (e.g. Uno's dmumps_shim.c): legacy "dmumps_c" name, MUMPS 5.2.1 layout
+ * (the headers they were compiled with; copies in abi1/). */
 
 #include <string.h>
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
-#include <dmumps_c.h>
+#include "abi1/dmumps_c.h"
 
 SEXP legacy_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs)
 {

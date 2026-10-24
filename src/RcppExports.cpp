@@ -780,6 +780,15 @@ RcppExport SEXP _rmumps_Rmumps__mumps_version(SEXP pmSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// rmumps_test_fail_next_r
+void rmumps_test_fail_next_r();
+RcppExport SEXP _rmumps_rmumps_test_fail_next_r() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rmumps_test_fail_next_r();
+    return R_NilValue;
+END_RCPP
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _rmumps_RcppExport_validate(const char* sig) { 
@@ -865,6 +874,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rmumps_Rmumps__get_uns_perm", (DL_FUNC) &_rmumps_Rmumps__get_uns_perm, 1},
     {"_rmumps_Rmumps__set_perm_in", (DL_FUNC) &_rmumps_Rmumps__set_perm_in, 2},
     {"_rmumps_Rmumps__mumps_version", (DL_FUNC) &_rmumps_Rmumps__mumps_version, 1},
+    {"_rmumps_rmumps_test_fail_next_r", (DL_FUNC) &_rmumps_rmumps_test_fail_next_r, 0},
     {"_rcpp_module_boot_mod_Rmumps", (DL_FUNC) &_rcpp_module_boot_mod_Rmumps, 0},
     {"_rmumps_RcppExport_registerCCallable", (DL_FUNC) &_rmumps_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

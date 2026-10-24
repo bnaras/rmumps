@@ -1,15 +1,16 @@
 /*
  *
- *  This file is part of MUMPS 5.2.1, released
- *  on Fri Jun 14 14:46:05 UTC 2019
+ *  This file is part of MUMPS 5.9.1, released
+ *  on Mon Jul 20 09:00:43 UTC 2026
  *
  *
- *  Copyright 1991-2019 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2026 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
- *  released under the CeCILL-C license:
- *  http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+ *  released under the CeCILL-C license 
+ *  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
+ *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
 
@@ -18,7 +19,14 @@
 #define MUMPS_C_TYPES_H
 
 #include <stdint.h>
-#ifdef INTSIZE64
+
+/* mumps_int_def.h will define either MUMPS_INTSIZE32 (default)
+   or MUMPS_INTSIZE64 (if compilation is with -DINTSIZE64 to
+   match Fortran -i8 or equivalent option). This allows one to
+   test from an external code whether MUMPS_INT is 64bits or not */
+#include "mumps_int_def.h"
+
+#ifdef MUMPS_INTSIZE64
 #define MUMPS_INT int64_t
 #else
 #define MUMPS_INT int
@@ -46,8 +54,7 @@ typedef struct {double r,i;} mumps_double_complex;
 #ifndef mumps_ftnlen
 /* When passing a string, what is the type of the extra argument
  * passed by value ? */
-/* # define mumps_ftnlen MUMPS_INT */ /* ssg */
-# define mumps_ftnlen int
+# define mumps_ftnlen MUMPS_INT
 #endif
 
 
@@ -61,5 +68,6 @@ typedef struct {double r,i;} mumps_double_complex;
 #define MUMPS_ARITH_SINGLE ( MUMPS_ARITH_s | MUMPS_ARITH_c )
 #define MUMPS_ARITH_DBL    ( MUMPS_ARITH_d | MUMPS_ARITH_z )
 
+#define MUMPS_OFF_T MUMPS_INT8
 
 #endif /* MUMPS_C_TYPES_H */

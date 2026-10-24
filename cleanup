@@ -1,9 +1,7 @@
-#make -C inst clean
-#exit 0
-for f in src/lib/scotch*/src; do
-   make -C $f realclean
-done
-# an explicit start directory: BSD find (macOS) has no default
-find src \( -name '*.bck' -o -name '*.o' -o -name '*.so' -o -name '*.dll' -o -name '*.a'  -o -name '*.mod' \) -exec rm -f {} \;
-find src \( -name 'tmp' -o -name 'build' \) -prune -exec rm -fr {} \;
+#!/bin/sh
+# Remove build products, including those in the src/vendor subdirectories
+# (R only cleans the top level of src). BSD find (macOS) needs the explicit
+# start directory.
+find src \( -name '*.o' -o -name '*.mod' -o -name '*.smod' -o -name '*.so' \
+  -o -name '*.dll' -o -name '*.a' \) -exec rm -f {} \;
 rm -f .RData .Rhistory

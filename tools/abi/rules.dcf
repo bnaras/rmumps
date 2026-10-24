@@ -1,0 +1,5 @@
+ABI: 1
+Member: deficiency
+Out: c->infog[27]
+Comment: MUMPS 5.2.1 copied INFOG(28) (number of null pivots) to
+ 'deficiency'; 5.3 removed the member.

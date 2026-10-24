@@ -199,6 +199,12 @@ Rmumps__mumps_version <- function(pm) {
     .Call(`_rmumps_Rmumps__mumps_version`, pm)
 }
 
+#' Make the next MUMPS call fail inside the error boundary (tests only)
+#' @noRd
+.rmumps_test_fail_next <- function() {
+    invisible(.Call(`_rmumps_rmumps_test_fail_next_r`))
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call(`_rmumps_RcppExport_registerCCallable`)

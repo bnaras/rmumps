@@ -21,12 +21,14 @@ using namespace Rcpp;
 #include "../inst/include/rmumps/rmumps_api.h"
 #include "rmumps_internal.h"
 
-// lengths of the MUMPS control and information arrays (MUMPS 5.2.1)
-#define RMUMPS_NICNTL 60
-#define RMUMPS_NCNTL 15
-#define RMUMPS_NINFO 80
-#define RMUMPS_NRINFO 40
-#define RMUMPS_NKEEP 500
+// lengths of the MUMPS control and information arrays, taken from the
+// structure so that they follow the vendored MUMPS version
+#define RMUMPS_NELEM(m) ((int) (sizeof(((DMUMPS_STRUC_C *) 0)->m) / sizeof(((DMUMPS_STRUC_C *) 0)->m[0])))
+#define RMUMPS_NICNTL RMUMPS_NELEM(icntl)
+#define RMUMPS_NCNTL RMUMPS_NELEM(cntl)
+#define RMUMPS_NINFO RMUMPS_NELEM(info)
+#define RMUMPS_NRINFO RMUMPS_NELEM(rinfo)
+#define RMUMPS_NKEEP RMUMPS_NELEM(keep)
 
 Rmumps::~Rmumps() { if (ref == 0) clean(); }
 void Rmumps::clean() {

@@ -87,19 +87,18 @@ test_that("pointer interface", {
 })
 
 test_that("an R error inside MUMPS poisons the instance cleanly", {
-  # The bundled MUMPS 5.2.1 reports its diagnostics as R warnings; with
-  # warn = 2 they become R errors raised inside Fortran.
+  # The test hook raises an R error inside the error boundary, where an
+  # internal MUMPS error (rexit) would.
   am <- diag_solver()
-  am$set_icntl(c(6L, 6L, 6L, 4L), 1:4)
-  op <- options(warn = 2)
-  on.exit(options(op))
+  rmumps:::.rmumps_test_fail_next()
   err <- tryCatch(am$solve(rep(1, 5)), error = function(e) conditionMessage(e))
-  options(op)
-  skip_if(is.numeric(err), "this MUMPS build raises no diagnostics")
-  expect_match(err, "^rmumps: ")
+  expect_match(err, "^rmumps: injected failure")
   expect_error(am$solve(rep(1, 5)), "failed earlier")
   rm(am)
   expect_silent(invisible(gc()))
+  # other instances are unaffected
+  am2 <- diag_solver()
+  expect_equal(am2$solve(rep(1, 5)), rep(0.5, 5))
 })
 
 test_that("C entry points are registered", {

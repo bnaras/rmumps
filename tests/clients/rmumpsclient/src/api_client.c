@@ -10,6 +10,10 @@ static rmumps_api api;
 
 SEXP legacy_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs);
 SEXP l3_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs);
+SEXP abi1_safe_solve(SEXP irn, SEXP jcn, SEXP a, SEXP rhs);
+SEXP abi1_size_mismatch(void);
+SEXP abi1_not_initialized(void);
+void abi1_load(void);
 
 static void init_struct(DMUMPS_STRUC_C *id, int sym)
 {
@@ -114,6 +118,9 @@ static const R_CallMethodDef call_entries[] = {
   {"meta", (DL_FUNC) &meta, 0},
   {"legacy_solve", (DL_FUNC) &legacy_solve, 4},
   {"l3_solve", (DL_FUNC) &l3_solve, 4},
+  {"abi1_safe_solve", (DL_FUNC) &abi1_safe_solve, 4},
+  {"abi1_size_mismatch", (DL_FUNC) &abi1_size_mismatch, 0},
+  {"abi1_not_initialized", (DL_FUNC) &abi1_not_initialized, 0},
   {NULL, NULL, 0}
 };
 
@@ -122,4 +129,5 @@ void R_init_rmumpsclient(DllInfo *dll)
   R_registerRoutines(dll, NULL, call_entries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   rmumps_api_load(&api);
+  abi1_load();
 }

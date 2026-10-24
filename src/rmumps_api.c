@@ -1,7 +1,10 @@
 /*
  * C entry points of rmumps registered for other packages (see
- * inst/include/rmumps/rmumps_api.h for the contract), and the error and
- * warning hooks called from the bundled MUMPS, PORD, METIS and SCOTCH code.
+ * inst/include/rmumps/rmumps_api.h for the contract).
+ *
+ * The vendored code reports unrecoverable internal errors with rexit()
+ * (Fortran) or rmumps_fatal() (C, src/shim), both of which longjmp like
+ * Rf_error; rmumps_dmumps_c_safe() below catches them.
  */
 
 #include <stdarg.h>
@@ -12,33 +15,14 @@
 #include <R_ext/Rdynload.h>
 #include "../inst/include/rmumps/rmumps_api.h"
 #include "rmumps_internal.h"
+#include "shim/rmumps_shim.h"
 
-/* ---- error and warning hooks used by the bundled C libraries ----------- */
-
-/* These are plain C on purpose: they are called from C code that is itself
- * called from Fortran, so throwing a C++ exception from here (as earlier
- * versions did through Rcpp::stop) is undefined behavior. Rf_error longjmps
- * like the rexit() used by the Fortran code; rmumps_dmumps_c_safe() below
- * catches both. */
-
-void rcpp_error(const char *format, ...)
+/* Every call starts from the same state of the private random generator
+ * used inside MUMPS, so results do not depend on earlier calls. */
+void rmumps_dmumps_c_raw(DMUMPS_STRUC_C *id)
 {
-  char buf[1024];
-  va_list ap;
-  va_start(ap, format);
-  vsnprintf(buf, sizeof buf, format, ap);
-  va_end(ap);
-  Rf_error("%s", buf);
-}
-
-void rcpp_warning(const char *format, ...)
-{
-  char buf[1024];
-  va_list ap;
-  va_start(ap, format);
-  vsnprintf(buf, sizeof buf, format, ap);
-  va_end(ap);
-  Rf_warning("%s", buf);
+  rmumps_rng_reset();
+  dmumps_c(id);
 }
 
 /* ---- safe call --------------------------------------------------------- */
@@ -56,10 +40,19 @@ static void set_msg(char *msg, size_t msglen, const char *text)
     snprintf(msg, msglen, "%s", text);
 }
 
+/* Test hook (src/rmumps_testhook.cpp): the next safe call raises an R
+ * error inside the protected region, as rexit() would from MUMPS. */
+static int fail_next = 0;
+void rmumps_test_fail_next(void) { fail_next = 1; }
+
 static SEXP safe_body(void *data)
 {
   safe_call *s = (safe_call *) data;
-  dmumps_c(s->id);
+  if (fail_next) {
+    fail_next = 0;
+    Rf_error("injected failure (test hook)");
+  }
+  rmumps_dmumps_c_raw(s->id);
   return R_NilValue;
 }
 
@@ -158,14 +151,13 @@ static int rmumps_orderings_available(void)
 
 void rmumps_register_c_callables(void)
 {
-  /* Legacy name used by clients built against rmumps <= 5.2.1-43. In
-   * releases with a different DMUMPS_STRUC_C layout it becomes an adapter
-   * from the 5.2.1 layout. */
-  R_RegisterCCallable("rmumps", "dmumps_c", (DL_FUNC) dmumps_c);
-
   R_RegisterCCallable("rmumps", RMUMPS_NAME_DMUMPS_C_SAFE,
                       (DL_FUNC) rmumps_dmumps_c_safe);
-  R_RegisterCCallable("rmumps", RMUMPS_NAME_DMUMPS_C, (DL_FUNC) dmumps_c);
+  R_RegisterCCallable("rmumps", RMUMPS_NAME_DMUMPS_C,
+                      (DL_FUNC) rmumps_dmumps_c_raw);
+  /* Older layouts, and the legacy name "dmumps_c" used by clients built
+   * against rmumps <= 5.2.1-43 (MUMPS 5.2.1 layout). */
+  rmumps_register_abi_adapters();
   R_RegisterCCallable("rmumps", "rmumps_api_version",
                       (DL_FUNC) rmumps_api_version);
   R_RegisterCCallable("rmumps", "rmumps_mumps_version",
