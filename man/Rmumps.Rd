@@ -21,11 +21,11 @@ Rcpp Exported Class Wrapping MUMPS library
  LU factorization and system solving.
 }
 \examples{
- \dontrun{
+ if (requireNamespace("Matrix", quietly = TRUE)) {
   # prepare random sparse matrix
   library(Matrix)
   library(rmumps)
-  n=2000
+  n=300
   a=Matrix(0, n, n)
   set.seed(7)
   ij=sample(1:(n*n), 15*n)
@@ -73,10 +73,10 @@ Rcpp Exported Class Wrapping MUMPS library
  }
 }
 \references{
- MUMPS official site http://mumps.enseeiht.fr
+ MUMPS official site \url{https://mumps-solver.org}
 
- Sokol S (2020). _Rmumps: Rcpp port of MUMPS_. rmumps package version 5.2.1-X, <URL:
- http://CRAN.R-project.org/package=rmumps>.
+ Sokol S. \emph{rmumps: Wrapper for 'MUMPS' Library}.
+ \url{https://CRAN.R-project.org/package=rmumps}
 }
 \author{
  Serguei Sokol, INRA

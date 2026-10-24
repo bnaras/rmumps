@@ -21,13 +21,14 @@
   Maintainer: Serguei Sokol (sokol at insa-toulouse.fr)
 }
 \references{
-  MUMPS official site http://mumps.enseeiht.fr
+  MUMPS official site \url{https://mumps-solver.org}
 
-  Sokol S (2026). _Rmumps: Rcpp port of MUMPS_. rmumps package version 5.2.1-37, <URL: http://CRAN.R-project.org/package=rmumps>.
+  Sokol S. \emph{rmumps: Wrapper for 'MUMPS' Library}.
+  \url{https://CRAN.R-project.org/package=rmumps}
 }
 \examples{
-  \dontrun{
-    A <- Rmumps$new(asparse)
-    x <- solve(A, b)
-  }
+  # 3 x 3 system given as triplets (0-based indices): A = diag(4, 5, 6)
+  A <- Rmumps$new(0:2, 0:2, c(4, 5, 6), 3L)
+  x <- solve(A, c(4, 10, 18))
+  x  # 1 2 3
 }

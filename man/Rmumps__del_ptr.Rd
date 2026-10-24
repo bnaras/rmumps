@@ -9,6 +9,10 @@ Rmumps__del_ptr(pm)
 \arguments{
 \item{pm}{pointer of type XPtr<Rmumps>, object to be deleted}
 }
+\value{
+No return value, called for its side effect: the object and
+  its MUMPS instance are freed; \code{pm} must not be used afterwards.
+}
 \description{
 This is a C wrapper to \code{Rmumps::~Rmumps()} destructor. Available in R too.
 In C++ code can be used as \code{rmumps::Rmumps__del_ptr(pm)}

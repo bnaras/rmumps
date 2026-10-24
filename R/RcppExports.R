@@ -14,6 +14,8 @@
 #' @param pb pointer of type XPtr<double>, vector or dense matrix of rhs
 #' @param lrhs integer, leading dimension in pb
 #' @param nrhs integer, number of rhs to solve.
+#' @return No return value, called for its side effect: the right hand
+#'   sides pointed to by \code{pb} are overwritten by the solutions.
 #' @export
 Rmumps__solveptr <- function(pobj, pb, lrhs, nrhs) {
     invisible(.Call(`_rmumps_Rmumps__solveptr`, pobj, pb, lrhs, nrhs))
@@ -42,6 +44,8 @@ Rmumps__ptr_ijv <- function(pi, pj, pa, n, nz, sym) {
 #' In C++ code can be used as \code{rmumps::Rmumps__del_ptr(pm)}
 #'
 #' @param pm pointer of type XPtr<Rmumps>, object to be deleted
+#' @return No return value, called for its side effect: the object and
+#'   its MUMPS instance are freed; \code{pm} must not be used afterwards.
 #' @export
 Rmumps__del_ptr <- function(pm) {
     invisible(.Call(`_rmumps_Rmumps__del_ptr`, pm))
@@ -66,6 +70,8 @@ Rmumps__triplet <- function(pm) {
 #'
 #' @param pm pointer of type XPtr<Rmumps>, object having sparse matrix to be replaced with second parameter
 #' @param pa pointer of type XPtr<double>, value vector from sparse triplet providing a new matrix. Structure of the new matrix must be identical to the old one. That's why there is no need to provide i and j for the new triplet.
+#' @return No return value, called for its side effect: the object now
+#'   holds the new matrix values (the next solve refactorizes).
 #' @export
 Rmumps__set_mat_ptr <- function(pm, pa) {
     invisible(.Call(`_rmumps_Rmumps__set_mat_ptr`, pm, pa))
@@ -78,6 +84,8 @@ Rmumps__set_mat_ptr <- function(pm, pa) {
 #'
 #' @param pm pointer of type XPtr<Rmumps>, object having sparse matrix permuted according to a chosen method.
 #' @param permutation integer one of predefined constants (cf. \code{\link{RMUMPS_PERM}}). Setting a new permutation invalidates current symbolic and numeric matrix decompositions.
+#' @return No return value, called for its side effect: the ordering
+#'   method (ICNTL(7)) of the object is set.
 #' @export
 Rmumps__set_permutation <- function(pm, permutation) {
     invisible(.Call(`_rmumps_Rmumps__set_permutation`, pm, permutation))

@@ -15,6 +15,10 @@ Rmumps__solveptr(pobj, pb, lrhs, nrhs)
 
 \item{nrhs}{integer, number of rhs to solve.}
 }
+\value{
+No return value, called for its side effect: the right hand
+  sides pointed to by \code{pb} are overwritten by the solutions.
+}
 \description{
 This is a C wrapper to \code{Rmumps::solveptr()} method. Available in R too.
 In C++ code can be used as \code{rmumps::Rmumps__solveptr(pobj, pb, lrhs, nrhs)}

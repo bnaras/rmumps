@@ -2,7 +2,9 @@ Rcpp Wrapper for MUMPS Library
 ------------------------------
 
 MUMPS stands for "a MUltifrontal Massively Parallel sparse direct Solver"
-see more on their official site http://mumps.enseeiht.fr/.
+see more on their official site https://mumps-solver.org/.
+rmumps bundles MUMPS 5.9.1 (sequential, double precision) with the
+orderings AMD, AMF, QAMD, PORD and METIS.
 Currently, it is one of the most competitive direct solvers for
 sparse matrices. On my  CPU (Xenon E5-2609 v2 @ 2.50GHz) I have
 a speedup ranging from 3 to 16 compared to the default solver from

@@ -11,6 +11,10 @@ Rmumps__set_permutation(pm, permutation)
 
 \item{permutation}{integer one of predefined constants (cf. \code{\link{RMUMPS_PERM}}). Setting a new permutation invalidates current symbolic and numeric matrix decompositions.}
 }
+\value{
+No return value, called for its side effect: the ordering
+  method (ICNTL(7)) of the object is set.
+}
 \description{
 This is a C wrapper to \code{Rmumps::set_permutation(permutation)} method. Available in R too.
 In C++ code can be used as \code{rmumps::Rmumps__set_permutation(pm, permutation)}

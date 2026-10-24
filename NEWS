@@ -1,8 +1,8 @@
 Log changes in rmumps package
 =============================
 
-Version 5.9.1-0.9000 (development)
-----------------------------------
+Version 5.9.1-1
+---------------
 
 * 2026-10-23
  - MUMPS updated from 5.2.1 to 5.9.1 (sequential, double precision real)

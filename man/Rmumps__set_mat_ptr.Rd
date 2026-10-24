@@ -11,6 +11,10 @@ Rmumps__set_mat_ptr(pm, pa)
 
 \item{pa}{pointer of type XPtr<double>, value vector from sparse triplet providing a new matrix. Structure of the new matrix must be identical to the old one. That's why there is no need to provide i and j for the new triplet.}
 }
+\value{
+No return value, called for its side effect: the object now
+  holds the new matrix values (the next solve refactorizes).
+}
 \description{
 This is a C wrapper to \code{Rmumps::set_mat_ptr(a)} method. Available in R too.
 In C++ code can be used as \code{rmumps::Rmumps__set_mat_ptr(pm)}. Using this method invalidates previous numeric decomposition (but not symbolic one).

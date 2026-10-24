@@ -932,6 +932,8 @@ RCPP_MODULE(mod_Rmumps){
 //' @param pb pointer of type XPtr<double>, vector or dense matrix of rhs
 //' @param lrhs integer, leading dimension in pb
 //' @param nrhs integer, number of rhs to solve.
+//' @return No return value, called for its side effect: the right hand
+//'   sides pointed to by \code{pb} are overwritten by the solutions.
 //' @export
 // [[Rcpp::export]]
 void Rmumps__solveptr(XPtr<Rmumps> pobj, XPtr<double> pb, int lrhs, int nrhs) {
@@ -966,6 +968,8 @@ XPtr<Rmumps> Rmumps__ptr_ijv(XPtr<int> pi, XPtr<int> pj, XPtr<double> pa, int n,
 //' In C++ code can be used as \code{rmumps::Rmumps__del_ptr(pm)}
 //'
 //' @param pm pointer of type XPtr<Rmumps>, object to be deleted
+//' @return No return value, called for its side effect: the object and
+//'   its MUMPS instance are freed; \code{pm} must not be used afterwards.
 //' @export
 // [[Rcpp::export]]
 void Rmumps__del_ptr(XPtr<Rmumps> pm) {
@@ -992,6 +996,8 @@ List Rmumps__triplet(XPtr<Rmumps> pm) {
 //'
 //' @param pm pointer of type XPtr<Rmumps>, object having sparse matrix to be replaced with second parameter
 //' @param pa pointer of type XPtr<double>, value vector from sparse triplet providing a new matrix. Structure of the new matrix must be identical to the old one. That's why there is no need to provide i and j for the new triplet.
+//' @return No return value, called for its side effect: the object now
+//'   holds the new matrix values (the next solve refactorizes).
 //' @export
 // [[Rcpp::export]]
 void Rmumps__set_mat_ptr(XPtr<Rmumps> pm, XPtr<double> pa) {
@@ -1006,6 +1012,8 @@ void Rmumps__set_mat_ptr(XPtr<Rmumps> pm, XPtr<double> pa) {
 //'
 //' @param pm pointer of type XPtr<Rmumps>, object having sparse matrix permuted according to a chosen method.
 //' @param permutation integer one of predefined constants (cf. \code{\link{RMUMPS_PERM}}). Setting a new permutation invalidates current symbolic and numeric matrix decompositions.
+//' @return No return value, called for its side effect: the ordering
+//'   method (ICNTL(7)) of the object is set.
 //' @export
 // [[Rcpp::export]]
 void Rmumps__set_permutation(XPtr<Rmumps> pm, int permutation) {
