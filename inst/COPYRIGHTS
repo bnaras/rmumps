@@ -1,38 +1,73 @@
-rmumps package includes several software packages. Here we list their copyright holders.
+The rmumps package bundles the software listed below, in src/vendor (see
+src/vendor/README.md for how it is selected and modified). Every bundled
+file keeps its original copyright and license notice; files modified for
+rmumps say so in their first line.
 
-MUMPS software
---------------
-Copyright 1991-2017 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria, University of Bordeaux.
-Licensed under the CeCILL-C license.
+MUMPS 5.9.1 (src/vendor/mumps; four of its headers are installed in
+include/rmumps)
+--------------------------------------------------------------------------
+Copyright 1991-2026 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+Mumps Technologies, University of Bordeaux.
+Licensed under the CeCILL-C license: src/vendor/mumps/LICENSE and the full
+texts src/vendor/mumps/doc/CeCILL-C_V1-en.txt, CeCILL-C_V1-fr.txt.
+Developers and acknowledgments: src/vendor/mumps/CREDITS.
 
-PORD ordering software
-----------------------
-It was developed in University of Paderborn and it is in public domain.
+Third-party code inside MUMPS:
+ - src/vendor/mumps/src/ana_orderings.F (AMD and the routines derived
+   from it):
+   AMD, Copyright (c), 1996-2016, Timothy A. Davis, Patrick R. Amestoy,
+   and Iain S. Duff. All Rights Reserved.
+   BSD 3-clause license, text in the file header.
+ - src/vendor/mumps/src/dlr_core.F, routine DMUMPS_TRUNCATED_RRQR (from
+   LAPACK xGEQP3/xLAQPS):
+   Copyright (c) 1992-2017 The University of Tennessee and The University
+   of Tennessee Research Foundation. Copyright (c) 2000-2017 The University
+   of California Berkeley. Copyright (c) 2006-2017 The University of
+   Colorado Denver.
+   BSD 3-clause license, text in the routine header.
 
-METIS ordering software
------------------------
-Copyright 1995-2013, Regents of the University of Minnesota
-Licensed under the Apache License, Version 2.0
+PORD (src/vendor/mumps/PORD)
+----------------------------
+Developed by Juergen Schulze at the University of Paderborn, as part of
+SPACE-1.0, which is in the public domain; see src/vendor/mumps/PORD/README.
 
-Some files in METIS are extracted from third part software:
- - GNU C Library
-   Copyright (C) 2002, 2003, 2005 Free Software Foundation, Inc.
-   Licensed under the GNU Lesser General Public License.
- - Copyright (c) 2006 Alexander Chemeris
- - Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+METIS 5.1.0 (src/vendor/metis)
+------------------------------
+Copyright 1995-2013, Regents of the University of Minnesota (author:
+George Karypis).
+Licensed under the Apache License, Version 2.0: notice in
+src/vendor/metis/LICENSE.txt, full text in
+src/vendor/metis/LICENSE-Apache-2.0.txt.
 
+Third-party code inside METIS/GKlib:
+ - GKlib/gk_mksort.h (from glibc stdlib/qsort.c):
+   Copyright (C) 1991, 1992, 1996, 1997, 1999 Free Software Foundation,
+   Inc.; written by Douglas C. Schmidt.
+   GNU Lesser General Public License 2.1 or later (R ships the text in
+   share/licenses/LGPL-2.1).
+ - GKlib/gkregex.h (from glibc regex.h):
+   Copyright (C) 1985, 1989-1993, 1995-1998, 2000-2003, 2005, 2006 Free
+   Software Foundation, Inc.
+   GNU Lesser General Public License 2.1 or later.
+ - GKlib/ms_stdint.h, GKlib/ms_inttypes.h (used only with MSVC):
+   Copyright (c) 2006 Alexander Chemeris.
+   BSD 3-clause license, text in the file headers.
+ - GKlib/random.c, MT19937-64 code (compiled only with USE_GKRAND, which
+   rmumps does not define):
+   Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura.
+ - libmetis/mmd.c was developed from a FORTRAN subroutine in SPARSPAK
+   written by Eleanor Chu, Alan George, Joseph Liu and Esmond Ng, and
+   translated to C by Chunguang Sun (no copyright notice in the file).
 
-SCOTCH ordering software
-------------------------
-Copyright 2004,2007-2012 IPB, Universite de Bordeaux, INRIA & CNRS
-Licensed under the CeCILL-C license.
+rmumps itself (R/, src/*.c, src/*.cpp, src/shim, inst/include/rmumps.h,
+inst/include/rmumps/rmumps_api.h)
+----------------------------------------------------------------------
+Copyright 2015-2026 INRAE/INSA/CNRS.
+Licensed under GPL (>= 2).
 
-Some files in SCOTCH have the following mention:
-Copyright (C) 1995 Timothy A. Davis, Patrick Amestoy, Iain S. Duff, John K. Reid
-Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
-Copyright (c) 2004-2012 Samuel Thibault, licensed under a BSD 2-Clause License
-
-RMUMPS wrapper itself
----------------------
-Copyright 2015-2026 INRAE/INSA/CNRS
-Licensed under GPL (>= 2)
+Note on license compatibility: the Apache License 2.0 of METIS is
+compatible with version 3 of the GPL but not with version 2, so a binary
+combining METIS with the rmumps code can be distributed under GPL version 3
+(which "GPL (>= 2)" permits). CeCILL-C allows its components to be
+integrated into a larger work distributed under another license; the
+CeCILL-C files themselves stay under CeCILL-C.

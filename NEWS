@@ -1,6 +1,31 @@
 Log changes in rmumps package
 =============================
 
+Version 5.9.1-0.9000 (development)
+----------------------------------
+
+* 2026-10-23
+ - MUMPS updated from 5.2.1 to 5.9.1 (sequential, double precision real)
+ - the bundled MUMPS, PORD and METIS 5.1.0 sources are now generated from
+   the pristine upstream tarballs by a reproducible pipeline (tools/ in the
+   source repository): pinned checksums, numbered patches, and automatic
+   transforms that remove all output to the console, all process exits,
+   file access and use of the Fortran/C random generators
+ - SCOTCH is no longer bundled (RMUMPS_PERM_SCOTCH falls back to AUTO, as
+   in 5.2.1-44)
+ - MUMPS prints nothing any more (ICNTL(1:4) have no visible effect);
+   errors are reported through INFO/INFOG and rmumps' messages
+ - DMUMPS_STRUC_C has the MUMPS 5.9.1 layout (RMUMPS_DMUMPS_ABI 2). Client
+   binaries built against older rmumps keep working: the legacy "dmumps_c"
+   callable and the rmumps_dmumps_c*_abi1 entry points translate from the
+   5.2.1 layout ('deficiency' is filled from INFOG(28)). Packages built
+   from source must include <rmumps/rmumps_api.h> or <rmumps/dmumps_c.h>:
+   the top-level copies of the MUMPS headers are removed
+ - results do not depend on earlier calls: the generator MUMPS uses
+   internally is reset before every call, and never touches R's
+ - copyright holders and inst/COPYRIGHTS updated for the bundled code;
+   the CeCILL-C and Apache-2.0 license texts are included
+
 Version 5.2.1-44
 ----------------
 
