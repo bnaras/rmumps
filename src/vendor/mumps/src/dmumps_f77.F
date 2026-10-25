@@ -126,10 +126,25 @@ C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
      &         MUMPS_NULLIFY_C_GLOB2LOC_SOL
       EXTERNAL DMUMPS_ASSIGN_COLSCA,
      &         DMUMPS_ASSIGN_ROWSCA,
-     &         DMUMPS_ASSIGN_ROWSCA_LOC,
-     &         DMUMPS_ASSIGN_COLSCA_LOC,
      &         DMUMPS_ASSIGN_RHSINTR,
      &         DMUMPS_ASSIGN_SINGULAR_VALUES
+C     rmumps: explicit interfaces of the two C routines that record the
+C     address of the local scaling arrays; they are called with the
+C     INTEGER constant 1 as a placeholder for a DOUBLE PRECISION array
+      INTERFACE
+      SUBROUTINE DMUMPS_ASSIGN_ROWSCA_LOC(A)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
+!DIR$ IGNORE_TKR (TKRC) A
+      INTEGER :: A(*)
+      END SUBROUTINE DMUMPS_ASSIGN_ROWSCA_LOC
+      SUBROUTINE DMUMPS_ASSIGN_COLSCA_LOC(A)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
+!DIR$ IGNORE_TKR (TKRC) A
+      INTEGER :: A(*)
+      END SUBROUTINE DMUMPS_ASSIGN_COLSCA_LOC
+      END INTERFACE
       EXTERNAL DMUMPS_NULLIFY_C_COLSCA,
      &         DMUMPS_NULLIFY_C_ROWSCA,
      &         DMUMPS_NULLIFY_C_ROWSCA_LOC,

@@ -120,7 +120,9 @@ C
       TYPE(IO_BLOCK) :: MonBloc
       LOGICAL LAST_CALL
       INTEGER :: INFO_TMP(2)
-      INTEGER :: IDUMMY(1)
+C     rmumps: placeholder for the unused M_ARRAY argument of
+C     DMUMPS_COMPRESS_CB_I, of its DOUBLE PRECISION type (was INTEGER)
+      DOUBLE PRECISION :: RDUMMY(1)
       INTEGER :: NELIM, NPARTSASS_MASTER, NPARTSASS_MASTER_AUX,
      &           IPANEL, IP,
      &           CURRENT_BLR, 
@@ -992,7 +994,7 @@ C~   &          ': ERROR allocation during DMUMPS_PROCESS_BLOCFACTO'
      &      WORK, TAU, JPVT, LWORK, RWORK, BLOCK,
      &      MAXI_CLUSTER, KEEP8, OMP_NUM,
      &      -9999, -9999, -9999, KEEP(1),
-     &      IDUMMY, 0, -9999 )
+     &      RDUMMY, 0, -9999 )
 #if ! defined(BLR_NOOPENMP)
 !$OMP BARRIER
 #endif

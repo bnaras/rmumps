@@ -735,14 +735,15 @@ C~   &          INFO(1)
               CALL mumps_mtko_deactivate(KEEP(249))
             ENDIF
 #endif
-             CALL DMUMPS_ROOT_SOLVE( NRHS, root%DESCRIPTOR(1), 
+C     rmumps: FROM_PP dropped; DMUMPS_ROOT_SOLVE takes 18 arguments
+             CALL DMUMPS_ROOT_SOLVE( NRHS, root%DESCRIPTOR(1),
      &       root%CNTXT_BLACS, LOCAL_M, LOCAL_N,
      &       root%MBLOCK, root%NBLOCK,
      &       root%IPIV(1), root%LPIV, MASTER_ROOT, MYID_NODES,
      &       COMM_NODES,
      &       RHS_ROOT(1),
      &       root%TOT_ROOT_SIZE, A( IAPOS ),
-     &       INFO(1), MTYPE, KEEP(50), FROM_PP)
+     &       INFO(1), MTYPE, KEEP(50))
 #if defined(MPI_TO_K_OMP)
             IF (I_AM_HEAD .and. KEEP(381).GT.1) THEN
               CALL mumps_mtko_reactivate(KEEP(381)*KEEP(249),
@@ -1889,6 +1890,8 @@ C~        WRITE(*,*) "DMUMPS_AM1_BLOCK_ADD(true) should not be called"
      &             IRHS_loc_MEANINGFUL, IRHS_loc, Nloc_RHS
      &             )
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER MTYPE, MYID_NODES, N, NSLAVES
       INTEGER KEEP(500)
       INTEGER(8) KEEP8(150)

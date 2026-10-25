@@ -21,6 +21,58 @@ C
       USE ISO_C_BINDING
 !$    USE OMP_LIB
       IMPLICIT NONE
+C     rmumps: explicit interfaces of the mixed-precision solve kernels
+C     of dlr_core.F. Their B and C arguments hold working-precision
+C     data behind INTEGER dummies and are only passed on to the
+C     conversion and BLAS kernels, so they are exempt from type, kind
+C     and rank checking.
+      INTERFACE
+      SUBROUTINE DMUMPS_LRMIXED_LRxFR(LorU,
+     &                  LRB, B, LDB, C, LDC, NCOLS,
+     &                  ALPHA, K34, K451, KEEP8, RHS, RB, QRB,
+     &                  thread_workspace, tws_size)
+      USE DMUMPS_LR_TYPE, ONLY : LRB_TYPE, LRMIXED_TYPE
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: B, C
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: B, C
+!DIR$ IGNORE_TKR (TKRC) B, C
+      INTEGER, intent(in) :: LorU
+      TYPE(LRB_TYPE), intent(inout) :: LRB
+      INTEGER, target, intent(inout) :: B(*)
+      INTEGER, target, intent(inout) :: C(*)
+      INTEGER, intent(in) :: NCOLS, LDB, LDC
+      DOUBLE PRECISION, intent(in) :: ALPHA
+      INTEGER, intent(in) :: K34, K451
+      INTEGER(8), intent(in) :: KEEP8(150)
+      TYPE(LRMIXED_TYPE), intent(inout) :: RHS(*), QRB(*)
+      INTEGER, intent(inout) :: RB(*)
+      INTEGER, intent(in) :: tws_size
+      DOUBLE PRECISION, target, intent(inout) ::
+     &          thread_workspace(tws_size)
+      END SUBROUTINE DMUMPS_LRMIXED_LRxFR
+      SUBROUTINE DMUMPS_LRMIXED_FRxFR(TRANSA, TRANSB,
+     &                  M, N, K, ALPHA,
+     &                  FRB, iA, jA, LDA,
+     &                  B, LDB, C, LDC,
+     &                  RHS, QB, thread_workspace, tws_size)
+      USE DMUMPS_LR_TYPE, ONLY : LRB_TYPE, LRMIXED_TYPE
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: B, C
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: B, C
+!DIR$ IGNORE_TKR (TKRC) B, C
+      CHARACTER, intent(in) :: TRANSA, TRANSB
+      INTEGER, intent(in) :: M, N, K
+      DOUBLE PRECISION, intent(in) :: ALPHA
+      TYPE(LRB_TYPE), intent(inout) :: FRB
+      INTEGER, intent(in) :: iA, jA, LDA
+      INTEGER, target, intent(inout) :: B(*)
+      INTEGER, target, intent(inout) :: C(*)
+      INTEGER, intent(in) :: LDB, LDC
+      TYPE(LRMIXED_TYPE), intent(inout) :: RHS(*)
+      INTEGER, TARGET, INTENT(IN) :: QB(*)
+      INTEGER, intent(in) :: tws_size
+      DOUBLE PRECISION, target, intent(inout) ::
+     &          thread_workspace(tws_size)
+      END SUBROUTINE DMUMPS_LRMIXED_FRxFR
+      END INTERFACE
       CONTAINS
 C     INCOMPATIBILITIES:
 C     LRSOLVE is not compatible with old option KEEP(350) = 0
@@ -1349,7 +1401,7 @@ C                      write(*,*) "MYSTUFF", m, krem, k
      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &            ARRAYCB(POSBLOCK), LDCB,
      &            NRHS_B, -1.0D0,
-     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1:), PT_QRB,
      &            thread_workspaces, WSMAX)
               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
 C               Entirely on FS side              
@@ -1358,7 +1410,7 @@ C               Entirely on FS side
      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &            ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
      &            NRHS_B, -1.0D0, 
-     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1:), PT_QRB,
      &            thread_workspaces, WSMAX)
               ELSE
 C               Entirely on CB side              
@@ -1367,7 +1419,7 @@ C               Entirely on CB side
      &            ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &            ARRAYCB(POSBLOCK), LDCB, 
      &            NRHS_B, -1.0D0,
-     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB,
+     &            K34, K451, KEEP8, PT_RHS(1), PT_RB(1:), PT_QRB,
      &            thread_workspaces, WSMAX)
               ENDIF
             ENDIF
@@ -1744,7 +1796,7 @@ C                 Entirely on CB side
                   CALL DMUMPS_LRMIXED_LRxFR(0, LRB,
      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &              ARRAYCB(POSBLOCK), LDCB, NRHS_B, -1.0D0,
-     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB)
+     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1:), PT_QRB)
                 ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
 C                 Entirely on FS side              
                   POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
@@ -1752,14 +1804,14 @@ C                 Entirely on FS side
      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &              ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
      &              NRHS_B, -1.0D0, K34, K451, KEEP8, 
-     &              PT_RHS(1), PT_RB(1), PT_QRB)
+     &              PT_RHS(1), PT_RB(1:), PT_QRB)
                 ELSE
 C                 Entirely on CB side              
                   POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
                   CALL DMUMPS_LRMIXED_LRxFR(0, LRB,
      &              ARRAYPIV(POSDIAG,POSPIVCOL), LDPIV,
      &              ARRAYCB(POSBLOCK), LDCB, NRHS_B, -1.0D0,
-     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1), PT_QRB)
+     &              K34, K451, KEEP8, PT_RHS(1), PT_RB(1:), PT_QRB)
                 ENDIF
               ENDIF
             ENDIF
@@ -2815,7 +2867,7 @@ C                      write(*,*) "MYSTUFF", n, current_k, k
                 CALL DMUMPS_LRMIXED_LRxFR(1, LRB,
      &            ARRAYCB(POSBLOCK), LDCB,
      &            DEST_ARRAY(1), N, NRHS_B, -1.0D0,
-     &            K34, K451, KEEP8, ptPT_RHS(1), PT_RB(1), PT_QRB,
+     &            K34, K451, KEEP8, ptPT_RHS(1:), PT_RB(1:), PT_QRB,
      &            thread_workspaces, wsmax)
               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
 C               Entirely on FS side              
@@ -2824,7 +2876,7 @@ C               Entirely on FS side
      &            ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
      &            DEST_ARRAY(1), N,
      &            NRHS_B, -1.0D0, K34, K451, KEEP8, 
-     &            ptPT_RHS(1), PT_RB(1), PT_QRB,
+     &            ptPT_RHS(1:), PT_RB(1:), PT_QRB,
      &            thread_workspaces, wsmax)
               ELSE
 C               Entirely on CB side              
@@ -2832,7 +2884,7 @@ C               Entirely on CB side
                 CALL DMUMPS_LRMIXED_LRxFR(1, LRB,
      &            ARRAYCB(POSBLOCK), LDCB,
      &            DEST_ARRAY(1), N, NRHS_B, -1.0D0,
-     &            K34, K451, KEEP8, ptPT_RHS(1), PT_RB(1), PT_QRB,
+     &            K34, K451, KEEP8, ptPT_RHS(1:), PT_RB(1:), PT_QRB,
      &            thread_workspaces, wsmax)
               ENDIF
             ENDIF
@@ -2847,7 +2899,7 @@ C               Entirely on CB side
      &                LRB, 1, 1, M,
      &                ARRAYCB(POSBLOCK), LDCB,
      &                DEST_ARRAY(1), N,
-     &                PT_RHS(1,I), TEMP_QRB, thread_workspaces, WSMAX)
+     &                PT_RHS(1:,I:), TEMP_QRB, thread_workspaces, WSMAX)
               ELSEIF (IBEG_BLOCK.LE.NPIV.AND.IEND_BLOCK.GT.NPIV) THEN
 C               Case of overlap between the FS and non FS
                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
@@ -2856,13 +2908,13 @@ C               Case of overlap between the FS and non FS
      &                LRB, 1, 1, M,
      &                ARRAYPIV(POSBLOCK,POSPIVCOL),LDPIV,
      &                DEST_ARRAY(1), N,
-     &                PT_RHS(1,I), TEMP_QRB, thread_workspaces, WSMAX)
+     &                PT_RHS(1:,I:), TEMP_QRB, thread_workspaces, WSMAX)
                 CALL DMUMPS_LRMIXED_FRxFR('T', 'N',
      &                N, NRHS_B, M-(NPIV-IBEG_BLOCK+1), MONE, 
      &                LRB, NPIV-IBEG_BLOCK+2, 1, M,
      &                ARRAYCB(POSCB), LDCB,
      &                DEST_ARRAY(1), N,
-     &                PT_RHS(1,I), TEMP_QRB, thread_workspaces, WSMAX)
+     &                PT_RHS(1:,I:), TEMP_QRB, thread_workspaces, WSMAX)
               ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
 C               Entirely on FS side              
                 POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
@@ -2871,7 +2923,7 @@ C               Entirely on FS side
      &                LRB, 1, 1, M,
      &                ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
      &                DEST_ARRAY(1), N,
-     &                PT_RHS(1,I), TEMP_QRB, thread_workspaces, WSMAX)
+     &                PT_RHS(1:,I:), TEMP_QRB, thread_workspaces, WSMAX)
               ELSE
 C               Entirely on CB side              
                 POSBLOCK = POSCB + int(IBEG_BLOCK-1-NPIV,8)
@@ -2880,7 +2932,7 @@ C               Entirely on CB side
      &                LRB, 1, 1, M,
      &                ARRAYCB(POSBLOCK),LDCB,
      &                DEST_ARRAY(1), N,
-     &                PT_RHS(1,I), TEMP_QRB, thread_workspaces, WSMAX)
+     &                PT_RHS(1:,I:), TEMP_QRB, thread_workspaces, WSMAX)
               ENDIF
             ELSE
               if (prec.le.1.and.associated(LRB%Q)) then
@@ -3172,7 +3224,7 @@ C                 Entirely on CB side
                   CALL DMUMPS_LRMIXED_LRxFR(1, LRB,
      &              ARRAYCB(POSBLOCK), LDCB,
      &              DEST_ARRAY(1), N, NRHS_B, -1.0D0,
-     &              K34, K451, KEEP8, PT_RHS(1,I), PT_RB(1), PT_QRB)
+     &              K34, K451, KEEP8, PT_RHS(1:,I:), PT_RB(1:), PT_QRB)
                 ELSEIF (IBEG_BLOCK.LE.NPIV) THEN
 C                 Entirely on FS side              
                   POSBLOCK = POSPIV+int(IBEG_BLOCK-1,8)
@@ -3180,14 +3232,14 @@ C                 Entirely on FS side
      &              ARRAYPIV(POSBLOCK,POSPIVCOL), LDPIV,
      &              DEST_ARRAY(1), N,
      &              NRHS_B, -1.0D0, K34, K451, KEEP8, 
-     &              PT_RHS(1,I), PT_RB(1), PT_QRB)
+     &              PT_RHS(1:,I:), PT_RB(1:), PT_QRB)
                 ELSE
 C                 Entirely on CB side              
                   POSBLOCK = POSCB+int(IBEG_BLOCK-1-NPIV,8)
                   CALL DMUMPS_LRMIXED_LRxFR(1, LRB,
      &              ARRAYCB(POSBLOCK), LDCB,
      &              DEST_ARRAY(1), N, NRHS_B, -1.0D0,
-     &              K34, K451, KEEP8, PT_RHS(1,I), PT_RB(1), PT_QRB)
+     &              K34, K451, KEEP8, PT_RHS(1:,I:), PT_RB(1:), PT_QRB)
                 ENDIF
               ENDIF
             ENDIF ! K GT 0

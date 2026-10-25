@@ -33,6 +33,8 @@ C
       USE MUMPS_FAC_DESCBAND_DATA_M
 #endif
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER MYID
       INTEGER KEEP(500)
       INTEGER(8) KEEP8(150)

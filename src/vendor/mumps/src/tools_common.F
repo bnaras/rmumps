@@ -1537,6 +1537,9 @@ C     interface
      &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_ICOPY_64TO32_64C_IP_C, whose
+C     INTEGER(8) argument is passed as an INTEGER array
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
       INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
@@ -2684,6 +2687,9 @@ C     interface
      &                     IN_OUT_TAB48, SIZETAB)
       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_RCOPY_64TO32_64C_IP_C, whose
+C     DOUBLE PRECISION argument is passed as a REAL array
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER(8), intent(in) :: SIZETAB
       REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2

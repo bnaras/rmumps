@@ -1,0 +1,647 @@
+Why: Under link-time optimization (CRAN's gcc LTO check) gfortran
+ compares every call against the definition of the callee and warns
+ (-Wlto-type-mismatch) when the argument types differ; 39 such sites
+ remain after patches 0003-0007 (37 at first, 2 more once the others
+ were fixed). Nine pass a Fortran string to C, whose hidden length
+ gfortran >= 8 and flang pass as size_t while mumps_c_types.h declared
+ it MUMPS_INT (int): the fallback definition of mumps_ftnlen is now
+ size_t; the two binary dump routines called from dana_driver.F also
+ get explicit interfaces, because for an implicit call gfortran types
+ the hidden length of their file name as a signed integer. 28 pass data of one
+ type to a routine declared with another because the callee only
+ forwards the address (MUMPS_SIZE_C, MUMPS_ADDR_C, MUMPS_CHECKADDREQUAL,
+ DMUMPS_ASSIGN_ROWSCA_LOC/COLSCA_LOC, the in-place 64-to-32-bit copies,
+ the complex-domain mumps_flytes.c kernels, and the mixed-precision
+ pack/unpack and solve kernels): they get explicit interfaces whose
+ forwarded arguments are exempt from type, kind and rank checking, in
+ the existing mumps_c_interfaces.h, the new mumps_flytes_interfaces.h,
+ dmumps_f77.F, and the module specification parts of DMUMPS_BUF and
+ DMUMPS_SOL_LR (the interfaces make the compilers check the actuals, so
+ six elements of pointer or assumed-shape arrays at those calls became
+ T4 rows). Two are wrong actuals: dsol_c.F calls DMUMPS_ROOT_SOLVE with
+ 19 arguments for 18 dummies (FROM_PP dropped) and
+ dfac_process_blocfacto.F passes an INTEGER placeholder for the DOUBLE
+ PRECISION M_ARRAY of DMUMPS_COMPRESS_CB_I (now a DOUBLE PRECISION
+ placeholder).
+Upstream: not sent; the ROOT_SOLVE argument count, the M_ARRAY
+ placeholder and the mumps_ftnlen default are worth reporting.
+Obsolete when: an LTO build (tools/README.md, conformance step 7) shows
+ no -Wlto-type-mismatch warning without this patch.
+
+diff --git a/include/mumps_c_types.h b/include/mumps_c_types.h
+index 5bb9a08..403b149 100644
+--- a/include/mumps_c_types.h
++++ b/include/mumps_c_types.h
+@@ -54,7 +54,11 @@ typedef struct {double r,i;} mumps_double_complex;
+ #ifndef mumps_ftnlen
+ /* When passing a string, what is the type of the extra argument
+  * passed by value ? */
+-# define mumps_ftnlen MUMPS_INT
++/* rmumps: size_t, which is what gfortran >= 8 and LLVM flang pass
++ * (MUMPS_INT is the pre-GCC-8 convention and a type mismatch under
++ * LTO) */
++# include <stddef.h>
++# define mumps_ftnlen size_t
+ #endif
+ 
+ 
+diff --git a/libseq/mpi.f b/libseq/mpi.f
+index 33e78ec..c07d59a 100644
+--- a/libseq/mpi.f
++++ b/libseq/mpi.f
+@@ -802,6 +802,17 @@ C     DOUBLE COMPLEX S(N),R(N)
+       INTEGER SENDBUF(*), CNT
+       INCLUDE 'mpif_const.h'
+       INTEGER(8) :: I
++C     rmumps: explicit interface of the C routine, which compares the
++C     addresses of data of any type
++      INTERFACE
++      SUBROUTINE MUMPS_CHECKADDREQUAL(A, B, I)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
++!DIR$ IGNORE_TKR (TKRC) A, B
++      INTEGER :: A(*), B(*)
++      INTEGER(8) :: I
++      END SUBROUTINE MUMPS_CHECKADDREQUAL
++      END INTERFACE
+ C     Check address using C code
+       MUMPS_IS_IN_PLACE = .FALSE.
+       IF ( CNT .GT. 0 ) THEN
+diff --git a/src/dfac_mem_dynamic.F b/src/dfac_mem_dynamic.F
+index 5b1406c..29e20dd 100644
+--- a/src/dfac_mem_dynamic.F
++++ b/src/dfac_mem_dynamic.F
+@@ -202,6 +202,8 @@ C
+ !$    USE OMP_LIB
+       USE MUMPS_LOAD, ONLY : MUMPS_LOAD_MEM_UPDATE
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER, INTENT(in) :: STRATEGY
+       INTEGER(8), INTENT(in) :: SIZER_NEEDED
+       LOGICAL, INTENT(in)    :: SKIP_TOP_STACK
+diff --git a/src/dfac_process_blocfacto.F b/src/dfac_process_blocfacto.F
+index dd0f49c..5a70175 100644
+--- a/src/dfac_process_blocfacto.F
++++ b/src/dfac_process_blocfacto.F
+@@ -119,7 +119,9 @@ C
+       TYPE(IO_BLOCK) :: MonBloc
+       LOGICAL LAST_CALL
+       INTEGER :: INFO_TMP(2)
+-      INTEGER :: IDUMMY(1)
++C     rmumps: placeholder for the unused M_ARRAY argument of
++C     DMUMPS_COMPRESS_CB_I, of its DOUBLE PRECISION type (was INTEGER)
++      DOUBLE PRECISION :: RDUMMY(1)
+       INTEGER :: NELIM, NPARTSASS_MASTER, NPARTSASS_MASTER_AUX,
+      &           IPANEL, IP,
+      &           CURRENT_BLR, 
+@@ -991,7 +993,7 @@ C
+      &      WORK, TAU, JPVT, LWORK, RWORK, BLOCK,
+      &      MAXI_CLUSTER, KEEP8, OMP_NUM,
+      &      -9999, -9999, -9999, KEEP(1),
+-     &      IDUMMY, 0, -9999 )
++     &      RDUMMY, 0, -9999 )
+ #if ! defined(BLR_NOOPENMP)
+ !$OMP BARRIER
+ #endif
+diff --git a/src/dmumps_comm_buffer.F b/src/dmumps_comm_buffer.F
+index e65547e..5356828 100644
+--- a/src/dmumps_comm_buffer.F
++++ b/src/dmumps_comm_buffer.F
+@@ -30,8 +30,38 @@ C
+      &        DMUMPS_BUF_SEND_BLOCFACTO,
+      &        DMUMPS_BUF_SEND_BLFAC_SLAVE,
+      &        DMUMPS_BUF_SEND_CONTRIB_TYPE3,
+-     &        DMUMPS_BUF_SEND_BACKVEC, 
++     &        DMUMPS_BUF_SEND_BACKVEC,
+      &        DMUMPS_MPI_UNPACK_LRB
++C     rmumps: explicit interfaces of the lr_common.F routines that pack
++C     and unpack mixed-precision blocks; they address the block by bytes
++C     (INTEGER(1)) while the callers hold it in INTEGER storage
++      INTERFACE
++      SUBROUTINE MUMPS_LRMIXED_PACK(X, NROWS, NCOLS, IROW_BEG,
++     &                              NROWS_TO_PACK, NBYTES_PER_ELT,
++     &                              BUF, LBUF, POSITION, COMM, IERR)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X
++!DIR$ IGNORE_TKR (TKRC) X
++      INTEGER :: X
++      INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS, IROW_BEG,
++     &           NROWS_TO_PACK
++      INTEGER, intent(in)  :: COMM, LBUF
++      INTEGER, intent(inout) :: POSITION, IERR
++      INTEGER, intent(inout) :: BUF(*)
++      END SUBROUTINE MUMPS_LRMIXED_PACK
++      SUBROUTINE MUMPS_LRMIXED_UNPACK(X, NROWS, NCOLS,
++     &                                NBYTES_PER_ELT,
++     &                                BUF, LBUF, POSITION, COMM, IERR)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: X
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: X
++!DIR$ IGNORE_TKR (TKRC) X
++      INTEGER :: X
++      INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS
++      INTEGER, intent(in)  :: COMM, LBUF
++      INTEGER, intent(inout) :: POSITION, IERR
++      INTEGER, intent(in) :: BUF(*)
++      END SUBROUTINE MUMPS_LRMIXED_UNPACK
++      END INTERFACE
+       CONTAINS
+         SUBROUTINE DMUMPS_BUF_DEALL_MAX_ARRAY()
+         IMPLICIT NONE
+diff --git a/src/dsol_c.F b/src/dsol_c.F
+index f087035..d859f79 100644
+--- a/src/dsol_c.F
++++ b/src/dsol_c.F
+@@ -734,14 +734,15 @@ C
+               CALL mumps_mtko_deactivate(KEEP(249))
+             ENDIF
+ #endif
+-             CALL DMUMPS_ROOT_SOLVE( NRHS, root%DESCRIPTOR(1), 
++C     rmumps: FROM_PP dropped; DMUMPS_ROOT_SOLVE takes 18 arguments
++             CALL DMUMPS_ROOT_SOLVE( NRHS, root%DESCRIPTOR(1),
+      &       root%CNTXT_BLACS, LOCAL_M, LOCAL_N,
+      &       root%MBLOCK, root%NBLOCK,
+      &       root%IPIV(1), root%LPIV, MASTER_ROOT, MYID_NODES,
+      &       COMM_NODES,
+      &       RHS_ROOT(1),
+      &       root%TOT_ROOT_SIZE, A( IAPOS ),
+-     &       INFO(1), MTYPE, KEEP(50), FROM_PP)
++     &       INFO(1), MTYPE, KEEP(50))
+ #if defined(MPI_TO_K_OMP)
+             IF (I_AM_HEAD .and. KEEP(381).GT.1) THEN
+               CALL mumps_mtko_reactivate(KEEP(381)*KEEP(249),
+@@ -1888,6 +1889,8 @@ C
+      &             IRHS_loc_MEANINGFUL, IRHS_loc, Nloc_RHS
+      &             )
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER MTYPE, MYID_NODES, N, NSLAVES
+       INTEGER KEEP(500)
+       INTEGER(8) KEEP8(150)
+diff --git a/src/dsol_driver.F b/src/dsol_driver.F
+index d097add..3087e4b 100644
+--- a/src/dsol_driver.F
++++ b/src/dsol_driver.F
+@@ -65,6 +65,8 @@ C
+ #endif
+ !$    USE OMP_LIB
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+ C     -------------------
+ C     Explicit interfaces
+ C     -------------------
+diff --git a/src/dsol_lr.F b/src/dsol_lr.F
+index b68873a..7159df0 100644
+--- a/src/dsol_lr.F
++++ b/src/dsol_lr.F
+@@ -20,6 +20,58 @@ C
+       USE ISO_C_BINDING
+ !$    USE OMP_LIB
+       IMPLICIT NONE
++C     rmumps: explicit interfaces of the mixed-precision solve kernels
++C     of dlr_core.F. Their B and C arguments hold working-precision
++C     data behind INTEGER dummies and are only passed on to the
++C     conversion and BLAS kernels, so they are exempt from type, kind
++C     and rank checking.
++      INTERFACE
++      SUBROUTINE DMUMPS_LRMIXED_LRxFR(LorU,
++     &                  LRB, B, LDB, C, LDC, NCOLS,
++     &                  ALPHA, K34, K451, KEEP8, RHS, RB, QRB,
++     &                  thread_workspace, tws_size)
++      USE DMUMPS_LR_TYPE, ONLY : LRB_TYPE, LRMIXED_TYPE
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B, C
++!DIR$ IGNORE_TKR (TKRC) B, C
++      INTEGER, intent(in) :: LorU
++      TYPE(LRB_TYPE), intent(inout) :: LRB
++      INTEGER, target, intent(inout) :: B(*)
++      INTEGER, target, intent(inout) :: C(*)
++      INTEGER, intent(in) :: NCOLS, LDB, LDC
++      DOUBLE PRECISION, intent(in) :: ALPHA
++      INTEGER, intent(in) :: K34, K451
++      INTEGER(8), intent(in) :: KEEP8(150)
++      TYPE(LRMIXED_TYPE), intent(inout) :: RHS(*), QRB(*)
++      INTEGER, intent(inout) :: RB(*)
++      INTEGER, intent(in) :: tws_size
++      DOUBLE PRECISION, target, intent(inout) ::
++     &          thread_workspace(tws_size)
++      END SUBROUTINE DMUMPS_LRMIXED_LRxFR
++      SUBROUTINE DMUMPS_LRMIXED_FRxFR(TRANSA, TRANSB,
++     &                  M, N, K, ALPHA,
++     &                  FRB, iA, jA, LDA,
++     &                  B, LDB, C, LDC,
++     &                  RHS, QB, thread_workspace, tws_size)
++      USE DMUMPS_LR_TYPE, ONLY : LRB_TYPE, LRMIXED_TYPE
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B, C
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B, C
++!DIR$ IGNORE_TKR (TKRC) B, C
++      CHARACTER, intent(in) :: TRANSA, TRANSB
++      INTEGER, intent(in) :: M, N, K
++      DOUBLE PRECISION, intent(in) :: ALPHA
++      TYPE(LRB_TYPE), intent(inout) :: FRB
++      INTEGER, intent(in) :: iA, jA, LDA
++      INTEGER, target, intent(inout) :: B(*)
++      INTEGER, target, intent(inout) :: C(*)
++      INTEGER, intent(in) :: LDB, LDC
++      TYPE(LRMIXED_TYPE), intent(inout) :: RHS(*)
++      INTEGER, TARGET, INTENT(IN) :: QB(*)
++      INTEGER, intent(in) :: tws_size
++      DOUBLE PRECISION, target, intent(inout) ::
++     &          thread_workspace(tws_size)
++      END SUBROUTINE DMUMPS_LRMIXED_FRxFR
++      END INTERFACE
+       CONTAINS
+ C     INCOMPATIBILITIES:
+ C     LRSOLVE is not compatible with old option KEEP(350) = 0
+diff --git a/src/mumps_c_interfaces.h b/src/mumps_c_interfaces.h
+index 614948d..91587aa 100644
+--- a/src/mumps_c_interfaces.h
++++ b/src/mumps_c_interfaces.h
+@@ -6,6 +6,20 @@ C     Fortran type, so the arguments are exempt from type, kind and rank
+ C     checking.
+ C
+       INTERFACE
++      SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_C(A, N)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(8) :: N
++      END SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_C
++      SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP_C(A, N)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(8) :: N
++      END SUBROUTINE MUMPS_RCOPY_64TO32_64C_IP_C
+       SUBROUTINE MUMPS_ADDR_C(A, ADDR)
+ !GCC$ ATTRIBUTES NO_ARG_CHECK :: A
+ !DEC$ ATTRIBUTES NO_ARG_CHECK :: A
+diff --git a/src/tools_common.F b/src/tools_common.F
+index ca22989..a6a8ccc 100644
+--- a/src/tools_common.F
++++ b/src/tools_common.F
+@@ -1535,6 +1535,9 @@ C     interface
+      &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
+       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_ICOPY_64TO32_64C_IP_C, whose
++C     INTEGER(8) argument is passed as an INTEGER array
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+       INTEGER, TARGET :: IN_OUT_TAB48(SIZETABX2)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
+@@ -2682,6 +2685,9 @@ C     interface
+      &                     IN_OUT_TAB48, SIZETAB)
+       USE, INTRINSIC :: ISO_C_BINDING, ONLY : C_LOC, C_F_POINTER
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_RCOPY_64TO32_64C_IP_C, whose
++C     DOUBLE PRECISION argument is passed as a REAL array
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER(8), intent(in) :: SIZETAB
+       REAL, TARGET :: IN_OUT_TAB48(2*SIZETAB)
+       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
+diff --git a/src/lr_common.F b/src/lr_common.F
+index 33f6ef5..7071d3c 100644
+--- a/src/lr_common.F
++++ b/src/lr_common.F
+@@ -376,6 +376,7 @@ C{
+       SUBROUTINE MUMPS_LRMIXED_CAST_16C(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
+         implicit none
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX :: B(ldB,ncols)
+         INTEGER*1 :: A(2*2*ldA,ncols)
+@@ -383,6 +384,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_16C
+       SUBROUTINE MUMPS_LRMIXED_CAST_16Z(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: B(ldB,ncols)
+         INTEGER*1 :: A(2*2*ldA,ncols)
+@@ -390,6 +392,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_16Z
+       SUBROUTINE MUMPS_LRMIXED_CAST_24C(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX :: B(ldB,ncols)
+         INTEGER*1 :: A(2*3*ldA,ncols)
+@@ -397,6 +400,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_24C
+       SUBROUTINE MUMPS_LRMIXED_CAST_24Z(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: B(ldB,ncols)
+         INTEGER*1 :: A(2*3*ldA,ncols)
+@@ -404,6 +408,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_24Z
+       SUBROUTINE MUMPS_LRMIXED_CAST_40Z(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: B(ldB,ncols)
+         INTEGER*1 :: A(2*5*ldA,ncols)
+@@ -411,6 +416,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_40Z
+       SUBROUTINE MUMPS_LRMIXED_CAST_48Z(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: B(ldB,ncols)
+         INTEGER*1 :: A(2*6*ldA,ncols)
+@@ -418,6 +424,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_48Z
+       SUBROUTINE MUMPS_LRMIXED_CAST_56Z(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: B(ldB,ncols)
+         INTEGER*1 :: A(2*7*ldA,ncols)
+@@ -427,6 +434,7 @@ C{
+       SUBROUTINE MUMPS_LRMIXED_CAST_C16(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
+         implicit none
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX :: A(ldA,ncols)
+         INTEGER*1 :: B(2*2*ldB,ncols)
+@@ -434,6 +442,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_C16
+       SUBROUTINE MUMPS_LRMIXED_CAST_Z16(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: A(ldA,ncols)
+         INTEGER*1 :: B(2*2*ldB,ncols)
+@@ -441,6 +450,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_Z16
+       SUBROUTINE MUMPS_LRMIXED_CAST_C24(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX :: A(ldA,ncols)
+         INTEGER*1 :: B(2*3*ldB,ncols)
+@@ -448,6 +458,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_C24
+       SUBROUTINE MUMPS_LRMIXED_CAST_Z24(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: A(ldA,ncols)
+         INTEGER*1 :: B(2*3*ldB,ncols)
+@@ -455,6 +466,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_Z24
+       SUBROUTINE MUMPS_LRMIXED_CAST_Z40(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: A(ldA,ncols)
+         INTEGER*1 :: B(2*5*ldB,ncols)
+@@ -462,6 +474,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_Z40
+       SUBROUTINE MUMPS_LRMIXED_CAST_Z48(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: A(ldA,ncols)
+         INTEGER*1 :: B(2*6*ldB,ncols)
+@@ -469,6 +482,7 @@ C{
+       END SUBROUTINE MUMPS_LRMIXED_CAST_Z48
+       SUBROUTINE MUMPS_LRMIXED_CAST_Z56(A, B, nrows, ncols, ldA, 
+      &                                      ldB)
++        INCLUDE 'mumps_flytes_interfaces.h'
+         INTEGER :: nrows, ncols, ldA, ldB
+         COMPLEX(kind=8) :: A(ldA,ncols)
+         INTEGER*1 :: B(2*7*ldB,ncols)
+diff --git b/src/mumps_flytes_interfaces.h b/src/mumps_flytes_interfaces.h
+new file mode 100644
+index 0000000..c1910b4
+--- /dev/null
++++ b/src/mumps_flytes_interfaces.h
+@@ -0,0 +1,123 @@
++C
++C     rmumps: explicit interfaces of the complex-domain conversion
++C     kernels of mumps_flytes.c. C declares the complex matrix as
++C     double* or float* and reads it as pairs of reals; the Fortran
++C     callers pass COMPLEX(kind=8) or COMPLEX arrays. The argument is
++C     exempt from type, kind and rank checking so that the call and the
++C     definition agree under LTO. The byte array is INTEGER(1), as in
++C     the callers.
++C
++      INTERFACE
++      SUBROUTINE MUMPS_ZDOUBLE_FP56Z(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_ZDOUBLE_FP56Z
++      SUBROUTINE MUMPS_ZDOUBLE_FP48Z(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_ZDOUBLE_FP48Z
++      SUBROUTINE MUMPS_ZDOUBLE_FP40Z(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_ZDOUBLE_FP40Z
++      SUBROUTINE MUMPS_ZDOUBLE_FP24C(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_ZDOUBLE_FP24C
++      SUBROUTINE MUMPS_ZDOUBLE_FP16C(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_ZDOUBLE_FP16C
++      SUBROUTINE MUMPS_CFLOAT_FP24C(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_CFLOAT_FP24C
++      SUBROUTINE MUMPS_CFLOAT_FP16C(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      INTEGER(1) :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_CFLOAT_FP16C
++      SUBROUTINE MUMPS_FP56Z_ZDOUBLE(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP56Z_ZDOUBLE
++      SUBROUTINE MUMPS_FP48Z_ZDOUBLE(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP48Z_ZDOUBLE
++      SUBROUTINE MUMPS_FP40Z_ZDOUBLE(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP40Z_ZDOUBLE
++      SUBROUTINE MUMPS_FP24C_ZDOUBLE(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP24C_ZDOUBLE
++      SUBROUTINE MUMPS_FP16C_ZDOUBLE(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP16C_ZDOUBLE
++      SUBROUTINE MUMPS_FP24C_CFLOAT(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP24C_CFLOAT
++      SUBROUTINE MUMPS_FP16C_CFLOAT(A, B, NROWS, NCOLS, LDA, LDB)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: B
++!DIR$ IGNORE_TKR (TKRC) B
++      INTEGER(1) :: A(*)
++      INTEGER :: B(*)
++      INTEGER :: NROWS, NCOLS, LDA, LDB
++      END SUBROUTINE MUMPS_FP16C_CFLOAT
++      END INTERFACE
+diff --git a/src/dfac_process_band.F b/src/dfac_process_band.F
+index 0b87f27..f01c0fc 100644
+--- a/src/dfac_process_band.F
++++ b/src/dfac_process_band.F
+@@ -32,6 +32,8 @@ C
+       USE MUMPS_FAC_DESCBAND_DATA_M
+ #endif
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER MYID
+       INTEGER KEEP(500)
+       INTEGER(8) KEEP8(150)
+diff --git a/src/dmumps_f77.F b/src/dmumps_f77.F
+index c2a78ac..d88f2fc 100644
+--- a/src/dmumps_f77.F
++++ b/src/dmumps_f77.F
+@@ -125,10 +125,25 @@ C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
+      &         MUMPS_NULLIFY_C_GLOB2LOC_SOL
+       EXTERNAL DMUMPS_ASSIGN_COLSCA,
+      &         DMUMPS_ASSIGN_ROWSCA,
+-     &         DMUMPS_ASSIGN_ROWSCA_LOC,
+-     &         DMUMPS_ASSIGN_COLSCA_LOC,
+      &         DMUMPS_ASSIGN_RHSINTR,
+      &         DMUMPS_ASSIGN_SINGULAR_VALUES
++C     rmumps: explicit interfaces of the two C routines that record the
++C     address of the local scaling arrays; they are called with the
++C     INTEGER constant 1 as a placeholder for a DOUBLE PRECISION array
++      INTERFACE
++      SUBROUTINE DMUMPS_ASSIGN_ROWSCA_LOC(A)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      END SUBROUTINE DMUMPS_ASSIGN_ROWSCA_LOC
++      SUBROUTINE DMUMPS_ASSIGN_COLSCA_LOC(A)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: A
++!DIR$ IGNORE_TKR (TKRC) A
++      INTEGER :: A(*)
++      END SUBROUTINE DMUMPS_ASSIGN_COLSCA_LOC
++      END INTERFACE
+       EXTERNAL DMUMPS_NULLIFY_C_COLSCA,
+      &         DMUMPS_NULLIFY_C_ROWSCA,
+      &         DMUMPS_NULLIFY_C_ROWSCA_LOC,
+diff --git a/src/mumps_load.F b/src/mumps_load.F
+index 8593c07..fa10ce2 100644
+--- a/src/mumps_load.F
++++ b/src/mumps_load.F
+@@ -475,6 +475,8 @@ C
+       USE MUMPS_BUF_COMMON
+       USE MUMPS_FUTURE_NIV2
+       IMPLICIT NONE
++C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
++      INCLUDE 'mumps_c_interfaces.h'
+       INTEGER(8), intent(in) :: MEMORY_MD_ARG
+       INTEGER(8), intent(in) :: MAXS
+       INTEGER, TARGET :: idKEEP(500)
+diff --git a/src/dana_driver.F b/src/dana_driver.F
+index 9a5c3d8..6753426 100644
+--- a/src/dana_driver.F
++++ b/src/dana_driver.F
+@@ -5403,6 +5403,33 @@ C
+       LOGICAL              :: NAME_INITIALIZED
+       INTEGER              :: DO_WRITE, DO_WRITE_CHECK
+       CHARACTER(LEN=20)    :: IDSTR
++C     rmumps: explicit interfaces of the two C dump routines. Without
++C     an interface gfortran types the hidden length of the file name
++C     argument as a signed integer, which LTO reports against the
++C     size_t of the C definition. The data arguments are elements of
++C     pointer arrays of several types and are exempt from argument
++C     checking.
++      INTERFACE
++      SUBROUTINE MUMPS_DUMPMATBINARY_C(N, NNZ, K35, IRN, JCN, A,
++     &                                 IS_A_PROVIDED, FILENAME)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: IRN, JCN, A
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: IRN, JCN, A
++!DIR$ IGNORE_TKR (TKRC) IRN, JCN, A
++      INTEGER :: N, K35, IS_A_PROVIDED
++      INTEGER(8) :: NNZ
++      INTEGER :: IRN, JCN, A
++      CHARACTER(len=*) :: FILENAME
++      END SUBROUTINE MUMPS_DUMPMATBINARY_C
++      SUBROUTINE MUMPS_DUMPRHSBINARY_C(N, NRHS, LRHS, RHS, K35,
++     &                                 FILENAME)
++!GCC$ ATTRIBUTES NO_ARG_CHECK :: RHS
++!DEC$ ATTRIBUTES NO_ARG_CHECK :: RHS
++!DIR$ IGNORE_TKR (TKRC) RHS
++      INTEGER :: N, NRHS, LRHS, K35
++      INTEGER :: RHS
++      CHARACTER(len=*) :: FILENAME
++      END SUBROUTINE MUMPS_DUMPRHSBINARY_C
++      END INTERFACE
+       LOGICAL              :: I_AM_SLAVE, I_AM_MASTER
+       INTEGER              :: L
+       LOGICAL              :: BINARY_FORMAT, DUMP_RHS,

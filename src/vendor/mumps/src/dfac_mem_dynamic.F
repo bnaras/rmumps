@@ -203,6 +203,8 @@ C~        WRITE(*,*) "Wrong state during DMUMPS_DM_ISBAND", XXSTATE
 !$    USE OMP_LIB
       USE MUMPS_LOAD, ONLY : MUMPS_LOAD_MEM_UPDATE
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_ADDR_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER, INTENT(in) :: STRATEGY
       INTEGER(8), INTENT(in) :: SIZER_NEEDED
       LOGICAL, INTENT(in)    :: SKIP_TOP_STACK

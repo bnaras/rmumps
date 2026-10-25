@@ -833,6 +833,17 @@ C     DOUBLE COMPLEX S(N),R(N)
       INTEGER SENDBUF(*), CNT
       INCLUDE 'mpif_const.h'
       INTEGER(8) :: I
+C     rmumps: explicit interface of the C routine, which compares the
+C     addresses of data of any type
+      INTERFACE
+      SUBROUTINE MUMPS_CHECKADDREQUAL(A, B, I)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: A, B
+!DIR$ IGNORE_TKR (TKRC) A, B
+      INTEGER :: A(*), B(*)
+      INTEGER(8) :: I
+      END SUBROUTINE MUMPS_CHECKADDREQUAL
+      END INTERFACE
 C     Check address using C code
       MUMPS_IS_IN_PLACE = .FALSE.
       IF ( CNT .GT. 0 ) THEN

@@ -5404,6 +5404,33 @@ C
       LOGICAL              :: NAME_INITIALIZED
       INTEGER              :: DO_WRITE, DO_WRITE_CHECK
       CHARACTER(LEN=20)    :: IDSTR
+C     rmumps: explicit interfaces of the two C dump routines. Without
+C     an interface gfortran types the hidden length of the file name
+C     argument as a signed integer, which LTO reports against the
+C     size_t of the C definition. The data arguments are elements of
+C     pointer arrays of several types and are exempt from argument
+C     checking.
+      INTERFACE
+      SUBROUTINE MUMPS_DUMPMATBINARY_C(N, NNZ, K35, IRN, JCN, A,
+     &                                 IS_A_PROVIDED, FILENAME)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: IRN, JCN, A
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: IRN, JCN, A
+!DIR$ IGNORE_TKR (TKRC) IRN, JCN, A
+      INTEGER :: N, K35, IS_A_PROVIDED
+      INTEGER(8) :: NNZ
+      INTEGER :: IRN, JCN, A
+      CHARACTER(len=*) :: FILENAME
+      END SUBROUTINE MUMPS_DUMPMATBINARY_C
+      SUBROUTINE MUMPS_DUMPRHSBINARY_C(N, NRHS, LRHS, RHS, K35,
+     &                                 FILENAME)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: RHS
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: RHS
+!DIR$ IGNORE_TKR (TKRC) RHS
+      INTEGER :: N, NRHS, LRHS, K35
+      INTEGER :: RHS
+      CHARACTER(len=*) :: FILENAME
+      END SUBROUTINE MUMPS_DUMPRHSBINARY_C
+      END INTERFACE
       LOGICAL              :: I_AM_SLAVE, I_AM_MASTER
       INTEGER              :: L
       LOGICAL              :: BINARY_FORMAT, DUMP_RHS,

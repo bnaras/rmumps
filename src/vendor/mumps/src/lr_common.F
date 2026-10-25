@@ -377,6 +377,7 @@ C{
       SUBROUTINE MUMPS_LRMIXED_CAST_16C(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         implicit none
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
         INTEGER(1) :: A(2*2*ldA,ncols)
@@ -384,6 +385,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_16C
       SUBROUTINE MUMPS_LRMIXED_CAST_16Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
         INTEGER(1) :: A(2*2*ldA,ncols)
@@ -391,6 +393,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_16Z
       SUBROUTINE MUMPS_LRMIXED_CAST_24C(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: B(ldB,ncols)
         INTEGER(1) :: A(2*3*ldA,ncols)
@@ -398,6 +401,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_24C
       SUBROUTINE MUMPS_LRMIXED_CAST_24Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
         INTEGER(1) :: A(2*3*ldA,ncols)
@@ -405,6 +409,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_24Z
       SUBROUTINE MUMPS_LRMIXED_CAST_40Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
         INTEGER(1) :: A(2*5*ldA,ncols)
@@ -412,6 +417,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_40Z
       SUBROUTINE MUMPS_LRMIXED_CAST_48Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
         INTEGER(1) :: A(2*6*ldA,ncols)
@@ -419,6 +425,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_48Z
       SUBROUTINE MUMPS_LRMIXED_CAST_56Z(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: B(ldB,ncols)
         INTEGER(1) :: A(2*7*ldA,ncols)
@@ -428,6 +435,7 @@ C{
       SUBROUTINE MUMPS_LRMIXED_CAST_C16(A, B, nrows, ncols, ldA, 
      &                                      ldB)
         implicit none
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
         INTEGER(1) :: B(2*2*ldB,ncols)
@@ -435,6 +443,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_C16
       SUBROUTINE MUMPS_LRMIXED_CAST_Z16(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
         INTEGER(1) :: B(2*2*ldB,ncols)
@@ -442,6 +451,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z16
       SUBROUTINE MUMPS_LRMIXED_CAST_C24(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX :: A(ldA,ncols)
         INTEGER(1) :: B(2*3*ldB,ncols)
@@ -449,6 +459,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_C24
       SUBROUTINE MUMPS_LRMIXED_CAST_Z24(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
         INTEGER(1) :: B(2*3*ldB,ncols)
@@ -456,6 +467,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z24
       SUBROUTINE MUMPS_LRMIXED_CAST_Z40(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
         INTEGER(1) :: B(2*5*ldB,ncols)
@@ -463,6 +475,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z40
       SUBROUTINE MUMPS_LRMIXED_CAST_Z48(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
         INTEGER(1) :: B(2*6*ldB,ncols)
@@ -470,6 +483,7 @@ C{
       END SUBROUTINE MUMPS_LRMIXED_CAST_Z48
       SUBROUTINE MUMPS_LRMIXED_CAST_Z56(A, B, nrows, ncols, ldA, 
      &                                      ldB)
+        INCLUDE 'mumps_flytes_interfaces.h'
         INTEGER :: nrows, ncols, ldA, ldB
         COMPLEX(kind=8) :: A(ldA,ncols)
         INTEGER(1) :: B(2*7*ldB,ncols)

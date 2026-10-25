@@ -66,6 +66,8 @@ C
 #endif
 !$    USE OMP_LIB
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
 C     -------------------
 C     Explicit interfaces
 C     -------------------

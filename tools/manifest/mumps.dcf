@@ -16,6 +16,7 @@ Exclude: src/smumps_*.h, src/cmumps_*.h, src/zmumps_*.h
 Fortran.Headers: include/dmumps_struc.h, libseq/mpif.h, libseq/mpif_const.h,
  src/mumps_headers.h, src/mumps_c_interfaces.h,
  src/dmumps_lrmixed_interfaces.h, src/mumps_lrmixed_kernels.h,
+ src/mumps_flytes_interfaces.h,
  src/mumps_tags.h, src/mumps_save_restore_modes.h
 Defines.C: Add_, metis, pord, NO_SAVE_RESTORE, WITHOUT_PTHREAD
 Defines.Fortran: metis, pord, NO_SAVE_RESTORE

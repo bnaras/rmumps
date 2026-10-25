@@ -1,3 +1,4 @@
+/* rmumps: this file was modified by tools/vendor.R (see src/vendor/README.md) */
 /*
  *
  *  This file is part of MUMPS 5.9.1, released
@@ -54,7 +55,11 @@ typedef struct {double r,i;} mumps_double_complex;
 #ifndef mumps_ftnlen
 /* When passing a string, what is the type of the extra argument
  * passed by value ? */
-# define mumps_ftnlen MUMPS_INT
+/* rmumps: size_t, which is what gfortran >= 8 and LLVM flang pass
+ * (MUMPS_INT is the pre-GCC-8 convention and a type mismatch under
+ * LTO) */
+# include <stddef.h>
+# define mumps_ftnlen size_t
 #endif
 
 

@@ -39,11 +39,12 @@ rmumps 5.9.1-1 updates the bundled MUMPS from 5.2.1 to 5.9.1.
     `-fsanitize=address,undefined`, R preloading libasan): no reports in
     the tests and examples;
   - valgrind 3.27 memcheck on the tests and examples: no errors, no
-    leaks.
+    leaks;
+  - an LTO build emulating the CRAN LTO check (`-flto` for C, C++ and
+    Fortran, `gcc-ar`): no `-Wlto-type-mismatch` warning, tests pass
+    against that build.
 - To be run before upload (not yet done): win-builder (R-devel, R-release)
-  and mac-builder. An LTO build (`-flto -Wlto-type-mismatch`) currently
-  reports type mismatches between Fortran callers and C/Fortran
-  definitions of 37 routines; to be fixed before upload.
+  and mac-builder.
 
 ## R CMD check results
 

@@ -31,8 +31,38 @@ C
      &        DMUMPS_BUF_SEND_BLOCFACTO,
      &        DMUMPS_BUF_SEND_BLFAC_SLAVE,
      &        DMUMPS_BUF_SEND_CONTRIB_TYPE3,
-     &        DMUMPS_BUF_SEND_BACKVEC, 
+     &        DMUMPS_BUF_SEND_BACKVEC,
      &        DMUMPS_MPI_UNPACK_LRB
+C     rmumps: explicit interfaces of the lr_common.F routines that pack
+C     and unpack mixed-precision blocks; they address the block by bytes
+C     (INTEGER(1)) while the callers hold it in INTEGER storage
+      INTERFACE
+      SUBROUTINE MUMPS_LRMIXED_PACK(X, NROWS, NCOLS, IROW_BEG,
+     &                              NROWS_TO_PACK, NBYTES_PER_ELT,
+     &                              BUF, LBUF, POSITION, COMM, IERR)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X
+!DIR$ IGNORE_TKR (TKRC) X
+      INTEGER :: X
+      INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS, IROW_BEG,
+     &           NROWS_TO_PACK
+      INTEGER, intent(in)  :: COMM, LBUF
+      INTEGER, intent(inout) :: POSITION, IERR
+      INTEGER, intent(inout) :: BUF(*)
+      END SUBROUTINE MUMPS_LRMIXED_PACK
+      SUBROUTINE MUMPS_LRMIXED_UNPACK(X, NROWS, NCOLS,
+     &                                NBYTES_PER_ELT,
+     &                                BUF, LBUF, POSITION, COMM, IERR)
+!GCC$ ATTRIBUTES NO_ARG_CHECK :: X
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: X
+!DIR$ IGNORE_TKR (TKRC) X
+      INTEGER :: X
+      INTEGER :: NBYTES_PER_ELT, NROWS, NCOLS
+      INTEGER, intent(in)  :: COMM, LBUF
+      INTEGER, intent(inout) :: POSITION, IERR
+      INTEGER, intent(in) :: BUF(*)
+      END SUBROUTINE MUMPS_LRMIXED_UNPACK
+      END INTERFACE
       CONTAINS
         SUBROUTINE DMUMPS_BUF_DEALL_MAX_ARRAY()
         IMPLICIT NONE
@@ -2709,7 +2739,7 @@ C~   &               SIZE, POSITION
                 CALL MUMPS_LRMIXED_PACK( LRB%Q_STOC(PREC)%val(1), 
      &            LRB%M, LRB%K_STOC(PREC), IROW_BEG, NROWS_TO_PACK,
      &            COSTS_PREC(PREC), 
-     &            BUF(1), LBUF, POSITION, COMM, IERR_MPI )
+     &            BUF(1:), LBUF, POSITION, COMM, IERR_MPI )
                 DO WHILE ( mod(POSITION,K34) .NE. 0 )
                   POSITION = POSITION + 1
                 ENDDO

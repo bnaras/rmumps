@@ -476,6 +476,8 @@ C~    write(*,*) "Internal error 3 in MUMPS_LOAD_PARTI_REGULAR."
       USE MUMPS_BUF_COMMON
       USE MUMPS_FUTURE_NIV2
       IMPLICIT NONE
+C     rmumps: explicit interface of MUMPS_SIZE_C (any argument type)
+      INCLUDE 'mumps_c_interfaces.h'
       INTEGER(8), intent(in) :: MEMORY_MD_ARG
       INTEGER(8), intent(in) :: MAXS
       INTEGER, TARGET :: idKEEP(500)

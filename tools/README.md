@@ -101,6 +101,25 @@ After an import:
    `conformance-harvest.R` reads flang's messages too. Repeat until the
    build is clean: files that need the modules of a failing file are only
    reached in later rounds.
+7. Link-time optimization (CRAN's gcc LTO check: R configured with
+   `--enable-lto=R`, packages installed with `--use-LTO`). gfortran then
+   compares every call against the callee's definition, including calls
+   to C and calls with no interface, and `-Wlto-type-mismatch` reports
+   each disagreement in the install log. Emulate it on Linux with an
+   `R_MAKEVARS_USER` file holding `LTO = -flto`, `LTO_FC = -flto`,
+   `LTO_LD = -flto`, `AR = gcc-ar`, `RANLIB = gcc-ranlib` and
+   `CFLAGS/CXXFLAGS/FFLAGS/FCFLAGS = -g -O2 -Wall -pedantic` followed by
+   `$(LTO)` or `$(LTO_FC)`, then `R CMD INSTALL --preclean`. The count of
+   `lto-type-mismatch` lines must be 0. The three kinds of site and their
+   fixes: a Fortran string passed to C (hidden length: `mumps_ftnlen` is
+   `size_t`, patch 0011); data of one type passed to a routine declared
+   with another because the callee only forwards the address (explicit
+   interface with NO_ARG_CHECK/IGNORE_TKR on that argument, as in
+   `mumps_c_interfaces.h`, `mumps_flytes_interfaces.h`, the DMUMPS_BUF
+   and DMUMPS_SOL_LR module headers); a wrong actual argument (fix the
+   call; two in patch 0011 are upstream bugs). Adding an interface makes
+   gfortran and flang check the actuals, so elements of pointer and
+   assumed-shape arrays at those calls then need T4 rows (step 2).
 
 ## Layout changes (ABI)
 

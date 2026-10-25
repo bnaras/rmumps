@@ -364,7 +364,11 @@ cmd_capture <- function(comp, name) {
   out <- file.path(d, sprintf("%04d-%s.patch", n, name))
   diff <- suppressWarnings(system2("git", c("diff", "--no-index", "--no-prefix", "--",
                                             shQuote(a), shQuote(b)), stdout = TRUE))
-  diff <- gsub(paste0(a, "/"), "a/", gsub(paste0(b, "/"), "b/", diff, fixed = TRUE), fixed = TRUE)
+  # git >= 2.5x prints absolute paths without their leading slash
+  for (p in c(a, sub("^/", "", a)))
+    diff <- gsub(paste0(p, "/"), "a/", diff, fixed = TRUE)
+  for (p in c(b, sub("^/", "", b)))
+    diff <- gsub(paste0(p, "/"), "b/", diff, fixed = TRUE)
   hdr <- c("Why: <one paragraph>",
            "Upstream: <not sent | sent YYYY-MM-DD | merged in x.y.z>",
            "Obsolete when: <test that tells when this patch can be dropped>",
