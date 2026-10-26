@@ -160,4 +160,12 @@ Every patch starts with:
   source. Add a T2 shim macro or a patch, regenerate, re-lint.
 - *Compiler warnings*: reproduce with that flavor's flags (CRAN's Debian
   flags are `-g -O2 -Wall -pedantic -mtune=native`); fixes are patches.
+- *Undefined reference to `sgemm_`, `cgemm_` (Windows)*: R's reference
+  BLAS (Rblas) has only double real and double complex routines, and a
+  Windows DLL must resolve every symbol at link time. `lr_common.F` is
+  arithmetic-neutral and wraps all four gemm routines; patch 0012 computes
+  the single and complex-single products in Fortran. After an import, run
+  `nm -u` on the built library and look for single-precision BLAS or
+  LAPACK names (`s*_`, `c*_`) before uploading; Linux and macOS builds
+  do not report them.
 - *A new upstream release is needed*: follow "Importing" above.

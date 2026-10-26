@@ -20,8 +20,16 @@ rmumps 5.9.1-1 updates the bundled MUMPS from 5.2.1 to 5.9.1.
 - Copyright holders of all bundled code are listed in `Authors@R` and
   `inst/COPYRIGHTS`; the CeCILL-C (MUMPS) and Apache-2.0 (METIS) license
   texts are included in `src/vendor`.
+- The package links against R's own BLAS on every platform: the
+  single-precision BLAS calls of MUMPS 5.9.1's mixed-precision low-rank
+  code are computed in Fortran, since Rblas has no single-precision
+  routines (the Windows DLL would otherwise not link).
 
 ## Test environments
+
+- GitHub Actions (r-lib/actions, R release unless stated): macOS arm64,
+  Windows, Ubuntu x86_64 (R devel, release, oldrel-1), Ubuntu arm64:
+  `R CMD check --as-cran --no-manual`, 0 errors, 0 warnings, 0 notes.
 
 - macOS 26.6 (arm64), R 4.6.1, Apple clang 21, GNU Fortran 16.2:
   `R CMD check --as-cran` with `_R_CHECK_COMPILATION_FLAGS_=true`; also

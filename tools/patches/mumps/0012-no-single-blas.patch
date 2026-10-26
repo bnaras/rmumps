@@ -1,0 +1,142 @@
+Why: lr_common.F is arithmetic-neutral and calls sgemm and cgemm from
+ the single and complex-single mixed-precision wrappers. R's reference
+ BLAS (Rblas) has only double real and double complex routines, and a
+ Windows DLL must resolve every symbol at link time, so rmumps.dll
+ failed to link ("undefined reference to sgemm_ / cgemm_", GitHub
+ Actions windows-latest, R 4.6.1, 2026-10-26; win-builder and CRAN's
+ Windows build fail the same way). The two wrappers now compute the
+ product in Fortran under the sgemm/cgemm contract (TRANSA/TRANSB in
+ N, T, C; with BETA = 0 the input C is not read). MUMPS_LRMIXED_DGEMM
+ and _ZGEMM are untouched. The single path is reachable from R (BLR via
+ ICNTL(35) with ICNTL(40) = 1 plus KEEP(448) > 0 through set_keep();
+ verified with a breakpoint on MUMPS_LRMIXED_SGEMM during the BLR
+ forward solve of a 64000-unknown 3D Laplacian), so a stub was not an
+ option. ICNTL(40) alone stores low-rank blocks in single precision but
+ computes in double, so ordinary users never reach the slower Fortran
+ product. Where the BLAS lacks sgemm (Rblas on any platform) upstream's
+ code would also fail at run time when the symbol is first needed.
+Upstream: not sent; upstream builds link a full BLAS. Could be offered
+ as a compile-time option.
+Obsolete when: upstream guards the single-precision wrappers behind a
+ preprocessor symbol, or R's Rblas gains single-precision routines.
+
+diff --git a/src/lr_common.F b/src/lr_common.F
+index 7071d3c..248189e 100644
+--- a/src/lr_common.F
++++ b/src/lr_common.F
+@@ -1193,8 +1193,58 @@ CAJ2ALL blas defines alpha/beta in the same precision as the arrays
+          REAL :: A(LDA,*), B(LDB,*), C(LDC,*)
+          DOUBLE PRECISION :: ALPHA, BETA
+          CHARACTER(len=1) :: TRANSA, TRANSB
+-         CALL sgemm(TRANSA, TRANSB, M, N, K, real(ALPHA),
+-     &              A, LDA, B, LDB, real(BETA), C, LDC)
++C        rmumps: computed here instead of calling sgemm, which R's
++C        reference BLAS does not provide (patch 0012).
++         REAL :: SALPHA, SBETA, TEMP
++         INTEGER :: I, J, L
++         LOGICAL :: NOTA, NOTB
++         IF (M.LE.0 .OR. N.LE.0) RETURN
++         SALPHA = REAL(ALPHA)
++         SBETA  = REAL(BETA)
++         NOTA = (TRANSA.EQ.'N' .OR. TRANSA.EQ.'n')
++         NOTB = (TRANSB.EQ.'N' .OR. TRANSB.EQ.'n')
++         DO J = 1, N
++           IF (SBETA.EQ.0.0E0) THEN
++             DO I = 1, M
++               C(I,J) = 0.0E0
++             ENDDO
++           ELSE IF (SBETA.NE.1.0E0) THEN
++             DO I = 1, M
++               C(I,J) = SBETA*C(I,J)
++             ENDDO
++           ENDIF
++         ENDDO
++         IF (SALPHA.EQ.0.0E0 .OR. K.LE.0) RETURN
++         IF (NOTA) THEN
++           DO J = 1, N
++             DO L = 1, K
++               IF (NOTB) THEN
++                 TEMP = SALPHA*B(L,J)
++               ELSE
++                 TEMP = SALPHA*B(J,L)
++               ENDIF
++               DO I = 1, M
++                 C(I,J) = C(I,J) + TEMP*A(I,L)
++               ENDDO
++             ENDDO
++           ENDDO
++         ELSE
++           DO J = 1, N
++             DO I = 1, M
++               TEMP = 0.0E0
++               IF (NOTB) THEN
++                 DO L = 1, K
++                   TEMP = TEMP + A(L,I)*B(L,J)
++                 ENDDO
++               ELSE
++                 DO L = 1, K
++                   TEMP = TEMP + A(L,I)*B(J,L)
++                 ENDDO
++               ENDIF
++               C(I,J) = C(I,J) + SALPHA*TEMP
++             ENDDO
++           ENDDO
++         ENDIF
+        END SUBROUTINE MUMPS_LRMIXED_SGEMM
+        SUBROUTINE MUMPS_LRMIXED_ZGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
+      &               A, LDA, B, LDB, BETA, C, LDC)
+@@ -1211,6 +1261,52 @@ CAJ2ALL blas defines alpha/beta in the same precision as the arrays
+          COMPLEX :: A(LDA,*), B(LDB,*), C(LDC,*)
+          DOUBLE PRECISION :: ALPHA, BETA
+          CHARACTER(len=1) :: TRANSA, TRANSB
+-         CALL cgemm(TRANSA, TRANSB, M, N, K, cmplx(ALPHA),
+-     &              A, LDA, B, LDB, cmplx(BETA), C, LDC)
++C        rmumps: computed here instead of calling cgemm, which R's
++C        reference BLAS does not provide (patch 0012). Not reachable
++C        from the double-precision build; kept correct so it links.
++         COMPLEX :: CALPHA, CBETA, TEMP, TA, TB
++         INTEGER :: I, J, L
++         LOGICAL :: NOTA, NOTB, CONJA, CONJB
++         IF (M.LE.0 .OR. N.LE.0) RETURN
++         CALPHA = CMPLX(REAL(ALPHA), 0.0E0)
++         CBETA  = CMPLX(REAL(BETA), 0.0E0)
++         NOTA  = (TRANSA.EQ.'N' .OR. TRANSA.EQ.'n')
++         NOTB  = (TRANSB.EQ.'N' .OR. TRANSB.EQ.'n')
++         CONJA = (TRANSA.EQ.'C' .OR. TRANSA.EQ.'c')
++         CONJB = (TRANSB.EQ.'C' .OR. TRANSB.EQ.'c')
++         DO J = 1, N
++           IF (CBETA.EQ.(0.0E0,0.0E0)) THEN
++             DO I = 1, M
++               C(I,J) = (0.0E0,0.0E0)
++             ENDDO
++           ELSE IF (CBETA.NE.(1.0E0,0.0E0)) THEN
++             DO I = 1, M
++               C(I,J) = CBETA*C(I,J)
++             ENDDO
++           ENDIF
++         ENDDO
++         IF (CALPHA.EQ.(0.0E0,0.0E0) .OR. K.LE.0) RETURN
++         DO J = 1, N
++           DO I = 1, M
++             TEMP = (0.0E0,0.0E0)
++             DO L = 1, K
++               IF (NOTA) THEN
++                 TA = A(I,L)
++               ELSE IF (CONJA) THEN
++                 TA = CONJG(A(L,I))
++               ELSE
++                 TA = A(L,I)
++               ENDIF
++               IF (NOTB) THEN
++                 TB = B(L,J)
++               ELSE IF (CONJB) THEN
++                 TB = CONJG(B(J,L))
++               ELSE
++                 TB = B(J,L)
++               ENDIF
++               TEMP = TEMP + TA*TB
++             ENDDO
++             C(I,J) = C(I,J) + CALPHA*TEMP
++           ENDDO
++         ENDDO
+        END SUBROUTINE MUMPS_LRMIXED_CGEMM

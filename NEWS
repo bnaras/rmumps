@@ -34,6 +34,14 @@ Version 5.9.1-1
  - copyright holders and inst/COPYRIGHTS updated for the bundled code;
    the CeCILL-C and Apache-2.0 license texts are included
 
+* 2026-10-26
+ - the single-precision BLAS calls (sgemm, cgemm) of MUMPS 5.9.1's
+   mixed-precision low-rank code are computed in Fortran instead: R's
+   reference BLAS has no single-precision routines and the Windows DLL
+   did not link (patch 0012). Double-precision results are unchanged
+ - a GitHub Actions workflow runs R CMD check on macOS, Windows, Linux
+   x86_64 (R devel, release, oldrel-1) and Linux arm64
+
 Version 5.2.1-44
 ----------------
 

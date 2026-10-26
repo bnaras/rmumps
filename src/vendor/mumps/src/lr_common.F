@@ -1194,8 +1194,58 @@ CAJ2ALL blas defines alpha/beta in the same precision as the arrays
          REAL :: A(LDA,*), B(LDB,*), C(LDC,*)
          DOUBLE PRECISION :: ALPHA, BETA
          CHARACTER(len=1) :: TRANSA, TRANSB
-         CALL sgemm(TRANSA, TRANSB, M, N, K, real(ALPHA),
-     &              A, LDA, B, LDB, real(BETA), C, LDC)
+C        rmumps: computed here instead of calling sgemm, which R's
+C        reference BLAS does not provide (patch 0012).
+         REAL :: SALPHA, SBETA, TEMP
+         INTEGER :: I, J, L
+         LOGICAL :: NOTA, NOTB
+         IF (M.LE.0 .OR. N.LE.0) RETURN
+         SALPHA = REAL(ALPHA)
+         SBETA  = REAL(BETA)
+         NOTA = (TRANSA.EQ.'N' .OR. TRANSA.EQ.'n')
+         NOTB = (TRANSB.EQ.'N' .OR. TRANSB.EQ.'n')
+         DO J = 1, N
+           IF (SBETA.EQ.0.0E0) THEN
+             DO I = 1, M
+               C(I,J) = 0.0E0
+             ENDDO
+           ELSE IF (SBETA.NE.1.0E0) THEN
+             DO I = 1, M
+               C(I,J) = SBETA*C(I,J)
+             ENDDO
+           ENDIF
+         ENDDO
+         IF (SALPHA.EQ.0.0E0 .OR. K.LE.0) RETURN
+         IF (NOTA) THEN
+           DO J = 1, N
+             DO L = 1, K
+               IF (NOTB) THEN
+                 TEMP = SALPHA*B(L,J)
+               ELSE
+                 TEMP = SALPHA*B(J,L)
+               ENDIF
+               DO I = 1, M
+                 C(I,J) = C(I,J) + TEMP*A(I,L)
+               ENDDO
+             ENDDO
+           ENDDO
+         ELSE
+           DO J = 1, N
+             DO I = 1, M
+               TEMP = 0.0E0
+               IF (NOTB) THEN
+                 DO L = 1, K
+                   TEMP = TEMP + A(L,I)*B(L,J)
+                 ENDDO
+               ELSE
+                 DO L = 1, K
+                   TEMP = TEMP + A(L,I)*B(J,L)
+                 ENDDO
+               ENDIF
+               C(I,J) = C(I,J) + SALPHA*TEMP
+             ENDDO
+           ENDDO
+         ENDIF
        END SUBROUTINE MUMPS_LRMIXED_SGEMM
        SUBROUTINE MUMPS_LRMIXED_ZGEMM(TRANSA, TRANSB, M, N, K, ALPHA,
      &               A, LDA, B, LDB, BETA, C, LDC)
@@ -1212,6 +1262,52 @@ CAJ2ALL blas defines alpha/beta in the same precision as the arrays
          COMPLEX :: A(LDA,*), B(LDB,*), C(LDC,*)
          DOUBLE PRECISION :: ALPHA, BETA
          CHARACTER(len=1) :: TRANSA, TRANSB
-         CALL cgemm(TRANSA, TRANSB, M, N, K, cmplx(ALPHA),
-     &              A, LDA, B, LDB, cmplx(BETA), C, LDC)
+C        rmumps: computed here instead of calling cgemm, which R's
+C        reference BLAS does not provide (patch 0012). Not reachable
+C        from the double-precision build; kept correct so it links.
+         COMPLEX :: CALPHA, CBETA, TEMP, TA, TB
+         INTEGER :: I, J, L
+         LOGICAL :: NOTA, NOTB, CONJA, CONJB
+         IF (M.LE.0 .OR. N.LE.0) RETURN
+         CALPHA = CMPLX(REAL(ALPHA), 0.0E0)
+         CBETA  = CMPLX(REAL(BETA), 0.0E0)
+         NOTA  = (TRANSA.EQ.'N' .OR. TRANSA.EQ.'n')
+         NOTB  = (TRANSB.EQ.'N' .OR. TRANSB.EQ.'n')
+         CONJA = (TRANSA.EQ.'C' .OR. TRANSA.EQ.'c')
+         CONJB = (TRANSB.EQ.'C' .OR. TRANSB.EQ.'c')
+         DO J = 1, N
+           IF (CBETA.EQ.(0.0E0,0.0E0)) THEN
+             DO I = 1, M
+               C(I,J) = (0.0E0,0.0E0)
+             ENDDO
+           ELSE IF (CBETA.NE.(1.0E0,0.0E0)) THEN
+             DO I = 1, M
+               C(I,J) = CBETA*C(I,J)
+             ENDDO
+           ENDIF
+         ENDDO
+         IF (CALPHA.EQ.(0.0E0,0.0E0) .OR. K.LE.0) RETURN
+         DO J = 1, N
+           DO I = 1, M
+             TEMP = (0.0E0,0.0E0)
+             DO L = 1, K
+               IF (NOTA) THEN
+                 TA = A(I,L)
+               ELSE IF (CONJA) THEN
+                 TA = CONJG(A(L,I))
+               ELSE
+                 TA = A(L,I)
+               ENDIF
+               IF (NOTB) THEN
+                 TB = B(L,J)
+               ELSE IF (CONJB) THEN
+                 TB = CONJG(B(J,L))
+               ELSE
+                 TB = B(J,L)
+               ENDIF
+               TEMP = TEMP + TA*TB
+             ENDDO
+             C(I,J) = C(I,J) + CALPHA*TEMP
+           ENDDO
+         ENDDO
        END SUBROUTINE MUMPS_LRMIXED_CGEMM
