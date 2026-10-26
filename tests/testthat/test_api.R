@@ -104,9 +104,12 @@ test_that("an R error inside MUMPS poisons the instance cleanly", {
 
 test_that("MUMPS writes nothing to stdout or stderr, even when asked to", {
   # Output from compiled code bypasses R's connections, so run a child R
-  # process and look at what reaches its file descriptors.
+  # process and look at what reaches its file descriptors. The library
+  # paths go into the script: system2()'s env argument is not supported
+  # for Rscript on Windows (it becomes a command-line token).
   skip_on_cran()
   code <- c(
+    sprintf(".libPaths(%s)", paste(deparse(.libPaths()), collapse = "")),
     "suppressPackageStartupMessages(library(rmumps))",
     "set.seed(1); n <- 30",
     "i <- c(1:n, sample(n, 60, TRUE)); j <- c(1:n, sample(n, 60, TRUE))",
@@ -127,8 +130,7 @@ test_that("MUMPS writes nothing to stdout or stderr, even when asked to", {
   f <- tempfile(fileext = ".R")
   writeLines(code, f)
   out <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"), c("--vanilla", shQuote(f)),
-                                  stdout = TRUE, stderr = TRUE,
-                                  env = paste0("R_LIBS=", paste(.libPaths(), collapse = .Platform$path.sep))))
+                                  stdout = TRUE, stderr = TRUE))
   unlink(f)
   expect_identical(out, "DONE")
 })
