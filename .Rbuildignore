@@ -15,3 +15,4 @@ tar\.gz$
 ^tests/clients$
 ^cran-comments\.md$
 ^src/.*\.(o|mod|smod|so|dll|a)$
+^\.github$
