@@ -1,3 +1,4 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
 context("golden regression (results of rmumps 5.2.1-43)")
 
 # The fixture is written by tools/golden/make-golden.R. Results are compared

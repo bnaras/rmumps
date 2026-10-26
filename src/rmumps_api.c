@@ -1,4 +1,6 @@
 /*
+ * Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+ *
  * C entry points of rmumps registered for other packages (see
  * inst/include/rmumps/rmumps_api.h for the contract).
  *

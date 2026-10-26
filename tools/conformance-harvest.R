@@ -1,4 +1,6 @@
 #!/usr/bin/env Rscript
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Propose T4 entries (tools/conformance/mumps-sections.tsv) from a gfortran
 # or LLVM flang build log: one row per call that passes an element of a
 # pointer or assumed-shape array to an array dummy.

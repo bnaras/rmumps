@@ -3,8 +3,9 @@ Type: Package
 Title: Wrapper for 'MUMPS' Library
 Version: 5.9.1-1
 Authors@R: c(person("Serguei", "Sokol", role=c("aut", "cre"), email="sokol@insa-toulouse.fr"),
-         person("Balasubramanian", "Narasimhan", role=c("aut", "cph"),
-                email="naras@stanford.edu"),
+         person("Balasubramanian", "Narasimhan", role=c("ctb", "cph"),
+                email="naras@stanford.edu",
+                comment="C interface for other packages, ABI adapters, vendoring pipeline"),
          person("Emmanuel", "Agullo", role="ctb", comment="MUMPS"),
          person("Patrick", "Amestoy", role=c("ctb", "cph"), comment="MUMPS, AMD"),
          person("Maurice", "Bremond", role="ctb", comment="MUMPS"),

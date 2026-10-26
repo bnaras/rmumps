@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Unit tests of the vendoring transforms. Run from the package root:
 #   Rscript tools/transforms/tests/run.R
 

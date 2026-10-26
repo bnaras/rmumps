@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # T4: element-to-section rewrites (Fortran conformance).
 #
 # MUMPS often passes an element of a pointer or assumed-shape array, P(I),

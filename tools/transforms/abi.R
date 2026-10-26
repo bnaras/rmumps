@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Layout (ABI) records of DMUMPS_STRUC_C and the generated adapters that let
 # clients built for an older layout keep working.
 #

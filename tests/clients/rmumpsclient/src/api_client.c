@@ -1,3 +1,4 @@
+/* Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see rmumps' inst/COPYRIGHTS. */
 /* Client of the safe C API in <rmumps/rmumps_api.h>. */
 
 #include <string.h>

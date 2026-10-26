@@ -1,4 +1,6 @@
 /*
+ * Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+ *
  * Run-time support for rmumps_cshim.h and for the Fortran replacements
  * made by tools/vendor.R (transform T1).
  */

@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Builds the test client package against an installed rmumps and checks every
 # way a package can link to it (maintainer gate, not run by R CMD check).
 #

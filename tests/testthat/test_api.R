@@ -1,3 +1,4 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
 context("interface and error handling")
 
 diag_solver <- function(n = 5) Rmumps$new(0:(n - 1), 0:(n - 1), rep(2, n), n)

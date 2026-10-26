@@ -1,4 +1,6 @@
 /*
+ * Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+ *
  * rmumps_cshim.h: compatibility shim for the vendored C sources (MUMPS,
  * PORD, METIS/GKlib).
  *

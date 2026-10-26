@@ -1,4 +1,6 @@
 #!/usr/bin/env Rscript
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Forbidden-symbol lint for the compiled package.
 #
 # Usage (from the package root, after a build that left the objects in src/):

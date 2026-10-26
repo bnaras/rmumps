@@ -1,4 +1,6 @@
 /*
+ * Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+ *
  * rmumps_api.h -- C interface to the MUMPS solver shipped in the rmumps
  * package, for use from other R packages.
  *

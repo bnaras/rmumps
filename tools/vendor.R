@@ -1,4 +1,6 @@
 #!/usr/bin/env Rscript
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Vendoring pipeline for the MUMPS and METIS sources shipped in src/vendor.
 #
 # Usage (from the package root):

@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # rmumps build: the vendored MUMPS/PORD/METIS objects (src/vendor, listed in
 # the generated Makevars.vendor) are linked directly into the package
 # library. Regenerate vendor sources with tools/vendor.R, never by hand.

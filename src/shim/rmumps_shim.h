@@ -1,3 +1,4 @@
+/* Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS. */
 /* Declarations of the shim run-time used by rmumps' own code. */
 #ifndef RMUMPS_SHIM_H
 #define RMUMPS_SHIM_H

@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # Fixed-form Fortran statement scanner used by the T1 transform.
 #
 # A source file is split into physical lines, each classified as one of

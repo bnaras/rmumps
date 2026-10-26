@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # T2: C shim insertion.
 #
 # Every vendored .c file gets `#include "rmumps_cshim.h"` right after each of

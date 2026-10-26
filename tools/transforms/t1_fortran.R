@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # T1: Fortran I/O transform.
 #
 # Removes every statement that would make the compiled library write to

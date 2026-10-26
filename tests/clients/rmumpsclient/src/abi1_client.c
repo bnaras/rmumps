@@ -1,3 +1,4 @@
+/* Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see rmumps' inst/COPYRIGHTS. */
 /* Client built against the rmumps 5.2.1-44 headers (DMUMPS_STRUC_C of
  * MUMPS 5.2.1, ABI 1; copies in abi1/), as Uno is when compiled in API mode
  * against rmumps 5.2.1-44. It must keep working with any later rmumps. */

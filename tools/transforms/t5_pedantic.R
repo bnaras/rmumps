@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # T5: nonstandard type declarations (Fortran conformance, -pedantic).
 #
 # Declarations such as INTEGER*8 or REAL*4 are a common extension that

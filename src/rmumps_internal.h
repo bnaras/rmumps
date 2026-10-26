@@ -1,3 +1,4 @@
+/* Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS. */
 /* Declarations shared by the C and C++ sources of rmumps (not installed). */
 
 #ifndef RMUMPS_INTERNAL_H

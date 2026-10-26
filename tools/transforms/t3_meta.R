@@ -1,3 +1,5 @@
+# Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+#
 # T3: everything derived from the transformed sources: the object list and
 # module dependencies (src/Makevars.vendor), generated glue files, the
 # public headers in inst/include/rmumps, and the struct-layout (ABI) record.

@@ -1,3 +1,4 @@
+// Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see rmumps' inst/COPYRIGHTS.
 // Client of the Rcpp interface (L3), written like r2sundials and multbxxc.
 
 #include <rmumps.h>

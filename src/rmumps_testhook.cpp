@@ -1,3 +1,5 @@
+// Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+//
 // Test hook, kept out of the C++ interface of rmumps (this file has no
 // Rcpp::interfaces attribute) and out of the exported R functions.
 

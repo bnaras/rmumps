@@ -1,4 +1,6 @@
 /*
+ * Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see inst/COPYRIGHTS.
+ *
  * Adapters for clients built against an older DMUMPS_STRUC_C layout.
  *
  * Included by the generated rmumps_abi_adapters.c, which defines, for each

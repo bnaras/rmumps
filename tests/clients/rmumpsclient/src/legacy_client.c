@@ -1,3 +1,4 @@
+/* Copyright 2026 Balasubramanian Narasimhan. GPL (>= 2); see rmumps' inst/COPYRIGHTS. */
 /* Client written the way packages built against rmumps <= 5.2.1-43 are
  * (e.g. Uno's dmumps_shim.c): legacy "dmumps_c" name, MUMPS 5.2.1 layout
  * (the headers they were compiled with; copies in abi1/). */
